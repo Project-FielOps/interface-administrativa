@@ -17,6 +17,8 @@ import { extractErrorMessage } from '../../../shared/components/state-container/
 export interface EquipmentFormDialogData {
   equipment?: Equipment;
   siteId?: string;
+  /** Optional: lets the dialog show the site's name in the (disabled) select instead of a blank value. */
+  site?: InspectionSite;
 }
 
 @Component({
@@ -55,13 +57,14 @@ export class EquipmentFormDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // The real backend has no flat GET /sites list, so the site is always supplied by the
+    // caller (the equipment list screen requires a site to be selected before "Novo equipamento").
     if (this.data.siteId) {
       this.form.controls.siteId.disable();
     }
-    this.sitesService.list({ size: 200, sort: 'name,asc', status: 'ACTIVE' }).subscribe({
-      next: (page) => this.sites.set(page.content),
-      error: () => this.sites.set([]),
-    });
+    if (this.data.site) {
+      this.sites.set([this.data.site]);
+    }
   }
 
   submit(): void {
@@ -87,7 +90,7 @@ export class EquipmentFormDialogComponent implements OnInit {
 
     const request$ = this.isEdit
       ? this.equipmentService.update(this.data.equipment!.id, payload)
-      : this.equipmentService.create(payload);
+      : this.equipmentService.createForSite(raw.siteId!, payload);
 
     request$.subscribe({
       next: (equipment) => {

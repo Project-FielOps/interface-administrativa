@@ -39,9 +39,10 @@ export class TemplatePreviewComponent implements OnInit {
     this.state.set(loadingState());
     forkJoin({
       template: this.templatesService.get(this.templateId),
-      sections: this.templatesService.getSections(this.templateId),
+      draft: this.templatesService.getDraft(this.templateId),
     }).subscribe({
-      next: ({ template, sections }) => {
+      next: ({ template, draft }) => {
+        const sections = draft.sections;
         const sorted = [...sections].sort((a, b) => a.displayOrder - b.displayOrder);
         sorted.forEach((s) => s.items.sort((a, b) => a.displayOrder - b.displayOrder));
         this.state.set(successState({ template, sections: sorted }, false));
@@ -52,5 +53,16 @@ export class TemplatePreviewComponent implements OnInit {
 
   back(): void {
     this.router.navigate(['/app/inspection-templates', this.templateId, 'edit']);
+  }
+
+  /** optionsJson travels the wire as a JSON-encoded string, e.g. '["A","B"]'. */
+  parseOptions(optionsJson?: string): string[] {
+    if (!optionsJson) return [];
+    try {
+      const parsed = JSON.parse(optionsJson);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   }
 }

@@ -45,7 +45,7 @@ export class InspectionNewComponent implements OnInit {
 
   readonly form = this.fb.group({
     templateId: ['', [Validators.required]],
-    templateVersionId: ['', [Validators.required]],
+    templateVersionNumber: [null as number | null, [Validators.required]],
     clientId: ['', [Validators.required]],
     siteId: ['', [Validators.required]],
     equipmentId: [''],
@@ -75,7 +75,7 @@ export class InspectionNewComponent implements OnInit {
     this.usersService.list({ size: 200, role: 'SUPERVISOR', status: 'ACTIVE' }).subscribe({ next: (p) => this.supervisors.set(p.content) });
 
     this.form.controls.templateId.valueChanges.subscribe((templateId) => {
-      this.form.controls.templateVersionId.setValue('');
+      this.form.controls.templateVersionNumber.setValue(null);
       this.versions.set([]);
       if (!templateId) return;
       this.templatesService.getVersions(templateId).subscribe({
@@ -83,7 +83,7 @@ export class InspectionNewComponent implements OnInit {
           const active = versions.filter((v) => v.activeForNewInspections).sort((a, b) => b.versionNumber - a.versionNumber);
           this.versions.set(active);
           if (active.length === 1) {
-            this.form.controls.templateVersionId.setValue(active[0].id);
+            this.form.controls.templateVersionNumber.setValue(active[0].versionNumber);
           }
         },
       });
@@ -116,7 +116,8 @@ export class InspectionNewComponent implements OnInit {
     const raw = this.form.getRawValue();
     this.inspectionsService
       .create({
-        templateVersionId: raw.templateVersionId!,
+        templateId: raw.templateId!,
+        templateVersionNumber: raw.templateVersionNumber ?? undefined,
         clientId: raw.clientId!,
         siteId: raw.siteId!,
         equipmentId: raw.equipmentId || undefined,

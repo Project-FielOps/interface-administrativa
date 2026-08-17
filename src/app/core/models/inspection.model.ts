@@ -4,9 +4,17 @@ export type Conformity = 'NOT_APPLICABLE' | 'CONFORMING' | 'NON_CONFORMING';
 export type Severity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 export type ReviewDecision = 'APPROVED' | 'REJECTED';
 
+/**
+ * Covers both InspectionSummaryResponse (from GET /inspections list) and
+ * InspectionDetailResponse (from GET /inspections/{id} and every action endpoint).
+ * The detail-only fields (instructions, createdBy, items, ...) are optional because
+ * the summary shape returned by the list endpoint omits them.
+ */
 export interface Inspection {
   id: string;
-  templateVersionId: string;
+  templateVersionId?: string;
+  templateId?: string;
+  templateVersionNumber?: number;
   templateTitle?: string;
   clientId: string;
   clientName?: string;
@@ -18,7 +26,7 @@ export interface Inspection {
   technicianName?: string;
   supervisorId: string;
   supervisorName?: string;
-  createdBy: string;
+  createdBy?: string;
   title: string;
   instructions?: string;
   priority: InspectionPriority;
@@ -30,13 +38,17 @@ export interface Inspection {
   canceledAt?: string;
   canceledBy?: string;
   canceledReason?: string;
-  createdAt: string;
-  updatedAt: string;
-  version: number;
+  createdAt?: string;
+  updatedAt?: string;
+  version?: number;
+  /** Only present on InspectionDetailResponse (get/create/assign/cancel/start/submit/review actions). */
+  items?: InspectionItemSnapshot[];
 }
 
 export interface InspectionCreateRequest {
-  templateVersionId: string;
+  templateId: string;
+  /** Optional: omit to use the template's currently active-for-new-inspections version. */
+  templateVersionNumber?: number;
   clientId: string;
   siteId: string;
   equipmentId?: string;
@@ -50,33 +62,34 @@ export interface InspectionCreateRequest {
 
 export interface InspectionItemSnapshot {
   id: string;
-  inspectionId: string;
   sectionTitle: string;
+  sectionDescription?: string;
   sectionOrder: number;
   itemCode?: string;
   itemTitle: string;
   itemDescription?: string;
   responseType: string;
   required: boolean;
-  optionsJson?: string[];
+  rulesJson?: string;
+  /** JSON-encoded array of option strings, e.g. '["A","B"]'. */
+  optionsJson?: string;
   itemOrder: number;
-  response?: InspectionResponse;
+  answer?: InspectionAnswer | null;
 }
 
-export interface InspectionResponse {
+export interface InspectionAnswer {
   id: string;
-  inspectionId: string;
   inspectionItemId: string;
   valueText?: string;
   valueNumber?: number;
   valueBoolean?: boolean;
   valueDate?: string;
+  valueJson?: string;
   observation?: string;
   conformity?: Conformity;
   answeredBy?: string;
-  answeredAtDevice?: string;
   serverReceivedAt?: string;
-  evidence?: Evidence[];
+  version: number;
 }
 
 export interface Evidence {
@@ -85,14 +98,15 @@ export interface Evidence {
   responseId?: string;
   nonConformityId?: string;
   type: string;
-  storageKey: string;
-  url?: string;
   originalFileName?: string;
   mimeType?: string;
   sizeBytes?: number;
+  checksum?: string;
   description?: string;
-  capturedAtDevice?: string;
+  latitude?: number;
+  longitude?: number;
   uploadedAt: string;
+  createdBy?: string;
 }
 
 export interface NonConformity {
@@ -106,9 +120,8 @@ export interface NonConformity {
   status: string;
   createdBy: string;
   createdAt: string;
-  updatedAt: string;
   version: number;
-  evidence?: Evidence[];
+  /** Not returned by the backend; populated client-side when aggregating across inspections. */
   inspectionTitle?: string;
 }
 
@@ -122,12 +135,14 @@ export interface InspectionReview {
   comments?: string;
   reviewedAt: string;
   reviewCycle: number;
-  createdAt: string;
 }
 
-export interface ReviewRequest {
-  decision: ReviewDecision;
-  reason?: string;
+export interface ApproveRequest {
+  comments?: string;
+}
+
+export interface RejectRequest {
+  reason: string;
   comments?: string;
 }
 

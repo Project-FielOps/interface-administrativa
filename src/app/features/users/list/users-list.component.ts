@@ -14,7 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { debounceTime } from 'rxjs';
 import { UsersService } from '../users.service';
-import { User } from '../../../core/models/user.model';
+import { User, UserStatus } from '../../../core/models/user.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
@@ -115,6 +115,7 @@ export class UsersListComponent implements OnInit {
       inactivate: { title: 'Inativar usuário', message: `Inativar o acesso de ${user.name}?` },
       block: { title: 'Bloquear usuário', message: `Bloquear o acesso de ${user.name}? Ele não poderá mais fazer login.` },
     }[action];
+    const targetStatus: UserStatus = { activate: 'ACTIVE', inactivate: 'INACTIVE', block: 'BLOCKED' }[action] as UserStatus;
 
     const ref = this.dialog.open(ConfirmDialogComponent, {
       width: '420px',
@@ -122,34 +123,10 @@ export class UsersListComponent implements OnInit {
     });
     ref.afterClosed().subscribe((confirmed) => {
       if (!confirmed) return;
-      const call = this.usersService[action](user.id);
-      call.subscribe({
+      this.usersService.updateStatus(user.id, targetStatus).subscribe({
         next: () => {
           this.snackBar.open('Status atualizado.', 'Fechar', { duration: 3000 });
           this.load();
-        },
-        error: (err) => this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
-      });
-    });
-  }
-
-  resetPassword(user: User): void {
-    const ref = this.dialog.open(ConfirmDialogComponent, {
-      width: '420px',
-      data: {
-        title: 'Redefinir senha',
-        message: `Gerar uma nova senha temporária para ${user.name}?`,
-        confirmLabel: 'Redefinir',
-      },
-    });
-    ref.afterClosed().subscribe((confirmed) => {
-      if (!confirmed) return;
-      this.usersService.resetPassword(user.id).subscribe({
-        next: (res) => {
-          const msg = res.temporaryPassword
-            ? `Senha redefinida. Senha temporária: ${res.temporaryPassword}`
-            : 'Senha redefinida. O usuário receberá instruções por e-mail.';
-          this.snackBar.open(msg, 'Fechar', { duration: 8000 });
         },
         error: (err) => this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
       });

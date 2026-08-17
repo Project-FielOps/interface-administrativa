@@ -60,7 +60,7 @@ export class ClientsListComponent implements OnInit {
     this.state.set(loadingState());
     const { search, status } = this.filterForm.getRawValue();
     this.clientsService
-      .list({ search: search || undefined, status: status || undefined, page: this.pageIndex(), size: this.pageSize(), sort: 'name,asc' })
+      .list({ name: search || undefined, status: status || undefined, page: this.pageIndex(), size: this.pageSize(), sort: 'name,asc' })
       .subscribe({
         next: (page) => {
           this.totalElements.set(page.totalElements);
@@ -114,8 +114,7 @@ export class ClientsListComponent implements OnInit {
     });
     ref.afterClosed().subscribe((confirmed) => {
       if (!confirmed) return;
-      const call = activating ? this.clientsService.activate(client.id) : this.clientsService.inactivate(client.id);
-      call.subscribe({
+      this.clientsService.updateStatus(client.id, activating ? 'ACTIVE' : 'INACTIVE').subscribe({
         next: () => {
           this.snackBar.open('Status atualizado.', 'Fechar', { duration: 3000 });
           this.load();

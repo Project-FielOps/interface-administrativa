@@ -8,6 +8,7 @@ export interface InspectionTemplate {
   category: string;
   status: TemplateStatus;
   currentVersion?: number;
+  hasOpenDraft?: boolean;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -31,7 +32,8 @@ export interface TemplateItem {
   required: boolean;
   observationRequiredOnFailure: boolean;
   evidenceRequiredOnFailure: boolean;
-  optionsJson?: string[];
+  /** JSON-encoded array of option strings for SINGLE_CHOICE items, e.g. '["A","B"]'. Raw string on the wire. */
+  optionsJson?: string;
   displayOrder: number;
 }
 
@@ -43,13 +45,13 @@ export interface TemplateItemRequest {
   required: boolean;
   observationRequiredOnFailure: boolean;
   evidenceRequiredOnFailure: boolean;
-  optionsJson?: string[];
+  /** JSON-encoded array of option strings, e.g. '["A","B"]'. */
+  optionsJson?: string;
   displayOrder: number;
 }
 
 export interface TemplateSection {
   id: string;
-  templateId: string;
   title: string;
   description?: string;
   displayOrder: number;
@@ -68,8 +70,10 @@ export interface InspectionTemplateVersion {
   versionNumber: number;
   titleSnapshot: string;
   descriptionSnapshot?: string;
-  publishedBy: string;
-  publishedAt: string;
+  publishedBy?: string;
+  publishedAt?: string;
   activeForNewInspections: boolean;
-  createdAt: string;
+  /** false while this is still the unpublished editable draft returned by GET .../draft */
+  published: boolean;
+  sections: TemplateSection[];
 }

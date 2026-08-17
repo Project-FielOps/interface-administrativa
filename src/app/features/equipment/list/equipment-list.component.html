@@ -1,11 +1,29 @@
 <div class="fo-page">
   <app-page-header title="Equipamentos" subtitle="Ativos físicos inspecionáveis, identificados por código QR.">
-    <button mat-raised-button color="primary" (click)="openCreate()">
+    <button mat-raised-button color="primary" (click)="openCreate()" [disabled]="!siteId && !selectedSiteId()">
       <mat-icon>add</mat-icon> Novo equipamento
     </button>
   </app-page-header>
 
   <form [formGroup]="filterForm" class="fo-filters">
+    @if (!siteId) {
+      <mat-form-field>
+        <mat-label>Cliente</mat-label>
+        <mat-select [value]="selectedClientId()" (selectionChange)="onClientChange($event.value)">
+          @for (c of clients(); track c.id) {
+            <mat-option [value]="c.id">{{ c.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Local</mat-label>
+        <mat-select [value]="selectedSiteId()" (selectionChange)="onSiteChange($event.value)" [disabled]="sites().length === 0">
+          @for (s of sites(); track s.id) {
+            <mat-option [value]="s.id">{{ s.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
     <mat-form-field>
       <mat-label>Buscar por nome/patrimônio</mat-label>
       <input matInput formControlName="search" />
@@ -30,14 +48,14 @@
   <app-state-container
     [phase]="state().phase"
     [errorMessage]="state().errorMessage || ''"
-    emptyMessage="Nenhum equipamento cadastrado."
+    [emptyMessage]="siteId || selectedSiteId() ? 'Nenhum equipamento cadastrado neste local.' : 'Selecione um local (ou busque por código QR) para ver os equipamentos.'"
     emptyIcon="precision_manufacturing"
     [retry]="load.bind(this)"
     [content]="tableTpl"
   ></app-state-container>
 
   <ng-template #tableTpl>
-    <table mat-table [dataSource]="state().data || []">
+    <table mat-table [dataSource]="filtered()">
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>Nome</th>
         <td mat-cell *matCellDef="let e">{{ e.name }}</td>
@@ -79,6 +97,5 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-    <mat-paginator [length]="totalElements()" [pageSize]="pageSize()" [pageIndex]="pageIndex()" [pageSizeOptions]="[10,25,50]" (page)="onPage($event)"></mat-paginator>
   </ng-template>
 </div>

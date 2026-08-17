@@ -11,6 +11,7 @@ import {
   TemplateRequest,
   TemplateSection,
   TemplateSectionRequest,
+  TemplateStatus,
 } from '../../core/models/template.model';
 
 @Injectable({ providedIn: 'root' })
@@ -19,8 +20,9 @@ export class TemplatesService extends CrudService<InspectionTemplate, TemplateRe
     super(http, `${environment.apiUrl}/inspection-templates`);
   }
 
-  getSections(templateId: string): Observable<TemplateSection[]> {
-    return this.http.get<TemplateSection[]>(`${this.baseUrl}/${templateId}/sections`);
+  /** Returns the current editable draft (sections + items). There is no separate flat sections endpoint. */
+  getDraft(templateId: string): Observable<InspectionTemplateVersion> {
+    return this.http.get<InspectionTemplateVersion>(`${this.baseUrl}/${templateId}/draft`);
   }
 
   createSection(templateId: string, req: TemplateSectionRequest): Observable<TemplateSection> {
@@ -35,10 +37,6 @@ export class TemplatesService extends CrudService<InspectionTemplate, TemplateRe
     return this.http.delete<void>(`${this.baseUrl}/${templateId}/sections/${sectionId}`);
   }
 
-  reorderSections(templateId: string, orderedSectionIds: string[]): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/${templateId}/sections/reorder`, { orderedSectionIds });
-  }
-
   createItem(templateId: string, sectionId: string, req: TemplateItemRequest): Observable<TemplateItem> {
     return this.http.post<TemplateItem>(`${this.baseUrl}/${templateId}/sections/${sectionId}/items`, req);
   }
@@ -51,10 +49,6 @@ export class TemplatesService extends CrudService<InspectionTemplate, TemplateRe
     return this.http.delete<void>(`${this.baseUrl}/${templateId}/sections/${sectionId}/items/${itemId}`);
   }
 
-  reorderItems(templateId: string, sectionId: string, orderedItemIds: string[]): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/${templateId}/sections/${sectionId}/items/reorder`, { orderedItemIds });
-  }
-
   publish(templateId: string): Observable<InspectionTemplateVersion> {
     return this.http.post<InspectionTemplateVersion>(`${this.baseUrl}/${templateId}/publish`, {});
   }
@@ -63,13 +57,12 @@ export class TemplatesService extends CrudService<InspectionTemplate, TemplateRe
     return this.http.get<InspectionTemplateVersion[]>(`${this.baseUrl}/${templateId}/versions`);
   }
 
-  getVersion(templateId: string, versionId: string): Observable<InspectionTemplateVersion & { sections: TemplateSection[] }> {
-    return this.http.get<InspectionTemplateVersion & { sections: TemplateSection[] }>(
-      `${this.baseUrl}/${templateId}/versions/${versionId}`,
-    );
+  /** versionNumber is the integer version number (1, 2, ...), not a version UUID. */
+  getVersion(templateId: string, versionNumber: number): Observable<InspectionTemplateVersion> {
+    return this.http.get<InspectionTemplateVersion>(`${this.baseUrl}/${templateId}/versions/${versionNumber}`);
   }
 
-  inactivate(id: string): Observable<InspectionTemplate> {
-    return this.http.post<InspectionTemplate>(`${this.baseUrl}/${id}/inactivate`, {});
+  updateStatus(id: string, status: TemplateStatus): Observable<InspectionTemplate> {
+    return this.http.patch<InspectionTemplate>(`${this.baseUrl}/${id}/status`, { status });
   }
 }

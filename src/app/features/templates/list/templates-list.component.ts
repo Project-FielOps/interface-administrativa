@@ -98,7 +98,7 @@ export class TemplatesListComponent implements OnInit {
     });
     ref.afterClosed().subscribe((confirmed) => {
       if (!confirmed) return;
-      this.templatesService.inactivate(t.id).subscribe({
+      this.templatesService.updateStatus(t.id, 'INACTIVE').subscribe({
         next: () => {
           this.snackBar.open('Modelo inativado.', 'Fechar', { duration: 3000 });
           this.load();

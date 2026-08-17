@@ -14,6 +14,17 @@ export interface ItemFormDialogData {
   item?: TemplateItem;
 }
 
+/** optionsJson travels the wire as a JSON-encoded string, e.g. '["A","B"]'. */
+function parseOptions(optionsJson: string | undefined): string[] {
+  if (!optionsJson) return [];
+  try {
+    const parsed = JSON.parse(optionsJson);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 const RESPONSE_TYPES: { value: ResponseType; label: string }[] = [
   { value: 'TEXT_SHORT', label: 'Texto curto' },
   { value: 'TEXT_LONG', label: 'Texto longo' },
@@ -44,7 +55,7 @@ export class ItemFormDialogComponent {
     required: [this.data.item?.required ?? true],
     observationRequiredOnFailure: [this.data.item?.observationRequiredOnFailure ?? false],
     evidenceRequiredOnFailure: [this.data.item?.evidenceRequiredOnFailure ?? false],
-    options: this.fb.array((this.data.item?.optionsJson ?? []).map((o) => this.fb.control(o, Validators.required))),
+    options: this.fb.array(parseOptions(this.data.item?.optionsJson).map((o) => this.fb.control(o, Validators.required))),
   });
 
   constructor(
@@ -83,7 +94,7 @@ export class ItemFormDialogComponent {
       required: raw.required,
       observationRequiredOnFailure: raw.observationRequiredOnFailure,
       evidenceRequiredOnFailure: raw.evidenceRequiredOnFailure,
-      optionsJson: this.isSingleChoice ? raw.options : undefined,
+      optionsJson: this.isSingleChoice ? JSON.stringify(raw.options) : undefined,
     });
   }
 }

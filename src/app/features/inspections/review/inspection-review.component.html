@@ -14,59 +14,101 @@
           <div><span class="fo-muted">Enviada em</span><p>{{ data.inspection.submittedAtServer | date: 'dd/MM/yyyy HH:mm' }}</p></div>
           <div><span class="fo-muted">Cliente/Local</span><p>{{ data.inspection.clientName }} / {{ data.inspection.siteName }}</p></div>
           <div><span class="fo-muted">Ciclo atual</span><p>{{ data.reviews.length + 1 }}</p></div>
+          <div><span class="fo-muted">Status</span><p>{{ data.inspection.status }}</p></div>
         </div>
       </mat-card>
 
-      <p class="fo-readonly-note">
-        <mat-icon>lock</mat-icon>
-        As respostas abaixo são exibidas em modo somente leitura. O supervisor não pode alterar as respostas originais do técnico — apenas aprovar ou solicitar correção.
-      </p>
-
-      <h3>Checklist respondido</h3>
-      @for (item of data.items; track item.id) {
-        <mat-card class="fo-item-card">
-          <p><strong>{{ item.sectionTitle }}</strong></p>
-          <p>{{ item.itemTitle }}</p>
-          <p class="fo-response"><span class="fo-muted">Resposta:</span> {{ responseSummary(item) }}</p>
-          @if (item.response?.observation) {
-            <p class="fo-muted">Observação: {{ item.response?.observation }}</p>
-          }
-          @if (item.response?.evidence?.length) {
-            <p class="fo-muted">{{ item.response?.evidence?.length }} evidência(s) anexada(s)</p>
-          }
-        </mat-card>
-      }
-
-      <h3>Não conformidades registradas</h3>
-      @if (data.nonConformities.length === 0) {
-        <p class="fo-muted">Nenhuma não conformidade registrada nesta inspeção.</p>
-      }
-      @for (nc of data.nonConformities; track nc.id) {
-        <mat-card class="fo-item-card">
-          <p><strong>{{ nc.title }}</strong> <span [class]="'fo-severity-' + nc.severity.toLowerCase()">{{ nc.severity }}</span></p>
-          @if (nc.description) { <p>{{ nc.description }}</p> }
-        </mat-card>
-      }
-
-      <h3>Histórico de ciclos de revisão</h3>
-      @if (data.reviews.length === 0) {
-        <p class="fo-muted">Este é o primeiro ciclo de revisão.</p>
-      }
-      @for (r of data.reviews; track r.id) {
-        <mat-card class="fo-item-card">
-          <p><strong>Ciclo {{ r.reviewCycle }}</strong> — {{ r.decision }} em {{ r.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
-          @if (r.reason) { <p>Motivo: {{ r.reason }}</p> }
-        </mat-card>
-      }
-
-      <div class="fo-actions-row">
-        <button mat-stroked-button color="warn" (click)="reject()" [disabled]="submittingDecision()">
-          <mat-icon>thumb_down</mat-icon> Reprovar / solicitar correção
+      @if (needsBeginReview) {
+        <p class="fo-readonly-note">
+          <mat-icon>info</mat-icon>
+          Esta inspeção ainda está como "Enviada". Inicie a revisão para movê-la para "Em revisão" antes de aprovar ou reprovar.
+        </p>
+        <button mat-raised-button color="primary" (click)="beginReview()" [disabled]="startingReview()">
+          <mat-icon>play_arrow</mat-icon> Iniciar revisão
         </button>
-        <button mat-raised-button color="primary" (click)="approve()" [disabled]="submittingDecision()">
-          <mat-icon>thumb_up</mat-icon> Aprovar
-        </button>
-      </div>
+      } @else {
+        <p class="fo-readonly-note">
+          <mat-icon>lock</mat-icon>
+          As respostas abaixo são exibidas em modo somente leitura. O supervisor não pode alterar as respostas originais do técnico — apenas aprovar ou solicitar correção.
+        </p>
+
+        <h3>Checklist respondido</h3>
+        @for (item of data.items; track item.id) {
+          <mat-card class="fo-item-card">
+            <p><strong>{{ item.sectionTitle }}</strong></p>
+            <p>{{ item.itemTitle }}</p>
+            <p class="fo-response"><span class="fo-muted">Resposta:</span> {{ responseSummary(item) }}</p>
+            @if (item.answer?.observation) {
+              <p class="fo-muted">Observação: {{ item.answer?.observation }}</p>
+            }
+            @if (evidenceFor(item).length) {
+              <p class="fo-muted">
+                {{ evidenceFor(item).length }} evidência(s):
+                @for (e of evidenceFor(item); track e.id; let last = $last) {
+                  {{ e.originalFileName || e.id }}{{ e.description ? ' (' + e.description + ')' : '' }}{{ last ? '' : ', ' }}
+                }
+              </p>
+            }
+          </mat-card>
+        }
+
+        <h3>Não conformidades registradas</h3>
+        @if (data.nonConformities.length === 0) {
+          <p class="fo-muted">Nenhuma não conformidade registrada nesta inspeção.</p>
+        }
+        @for (nc of data.nonConformities; track nc.id) {
+          <mat-card class="fo-item-card">
+            <p><strong>{{ nc.title }}</strong> <span [class]="'fo-severity-' + nc.severity.toLowerCase()">{{ nc.severity }}</span></p>
+            @if (nc.description) { <p>{{ nc.description }}</p> }
+          </mat-card>
+        }
+
+        <h3>Histórico de ciclos de revisão</h3>
+        @if (data.reviews.length === 0) {
+          <p class="fo-muted">Este é o primeiro ciclo de revisão.</p>
+        }
+        @for (r of data.reviews; track r.id) {
+          <mat-card class="fo-item-card">
+            <p><strong>Ciclo {{ r.reviewCycle }}</strong> — {{ r.decision }} em {{ r.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+            @if (r.reason) { <p>Motivo: {{ r.reason }}</p> }
+          </mat-card>
+        }
+
+        @if (data.inspection.status === 'UNDER_REVIEW') {
+          @if (showRejectForm()) {
+            <mat-card class="fo-item-card">
+              <form [formGroup]="rejectForm" (ngSubmit)="submitReject()">
+                <mat-form-field class="fo-full">
+                  <mat-label>Motivo da reprovação</mat-label>
+                  <textarea matInput rows="2" formControlName="reason"></textarea>
+                  @if (rejectForm.controls.reason.hasError('required') && rejectForm.controls.reason.touched) {
+                    <mat-error>O motivo é obrigatório</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field class="fo-full">
+                  <mat-label>Comentários (opcional)</mat-label>
+                  <textarea matInput rows="2" formControlName="comments"></textarea>
+                </mat-form-field>
+                <div class="fo-actions-row">
+                  <button mat-button type="button" (click)="toggleRejectForm()">Cancelar</button>
+                  <button mat-raised-button color="warn" type="submit" [disabled]="submittingDecision()">
+                    <mat-icon>thumb_down</mat-icon> Confirmar reprovação
+                  </button>
+                </div>
+              </form>
+            </mat-card>
+          } @else {
+            <div class="fo-actions-row">
+              <button mat-stroked-button color="warn" (click)="toggleRejectForm()" [disabled]="submittingDecision()">
+                <mat-icon>thumb_down</mat-icon> Reprovar / solicitar correção
+              </button>
+              <button mat-raised-button color="primary" (click)="approve()" [disabled]="submittingDecision()">
+                <mat-icon>thumb_up</mat-icon> Aprovar
+              </button>
+            </div>
+          }
+        }
+      }
     }
   </ng-template>
 </div>

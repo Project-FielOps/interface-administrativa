@@ -43,7 +43,7 @@
                 }
                 @case ('SINGLE_CHOICE') {
                   <mat-radio-group disabled>
-                    @for (opt of item.optionsJson; track opt) {
+                    @for (opt of parseOptions(item.optionsJson); track opt) {
                       <mat-radio-button [checked]="false">{{ opt }}</mat-radio-button>
                     }
                   </mat-radio-group>

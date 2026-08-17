@@ -77,9 +77,6 @@
             <button mat-menu-item (click)="openEdit(u)">
               <mat-icon>edit</mat-icon><span>Editar</span>
             </button>
-            <button mat-menu-item (click)="resetPassword(u)">
-              <mat-icon>vpn_key</mat-icon><span>Redefinir senha</span>
-            </button>
             @if (u.status !== 'ACTIVE') {
               <button mat-menu-item (click)="changeStatus(u, 'activate')">
                 <mat-icon>check_circle</mat-icon><span>Ativar</span>

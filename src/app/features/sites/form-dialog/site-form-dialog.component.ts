@@ -86,7 +86,7 @@ export class SiteFormDialogComponent implements OnInit {
 
     const request$ = this.isEdit
       ? this.sitesService.update(this.data.site!.id, payload)
-      : this.sitesService.create(payload);
+      : this.sitesService.createForClient(raw.clientId!, payload);
 
     request$.subscribe({
       next: (site) => {

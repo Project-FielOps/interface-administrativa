@@ -26,12 +26,12 @@
 
         <mat-form-field>
           <mat-label>Versão publicada</mat-label>
-          <mat-select formControlName="templateVersionId" [disabled]="versions().length === 0">
-            @for (v of versions(); track v.id) {
-              <mat-option [value]="v.id">v{{ v.versionNumber }} — {{ v.titleSnapshot }}</mat-option>
+          <mat-select formControlName="templateVersionNumber" [disabled]="versions().length === 0">
+            @for (v of versions(); track v.versionNumber) {
+              <mat-option [value]="v.versionNumber">v{{ v.versionNumber }} — {{ v.titleSnapshot }}</mat-option>
             }
           </mat-select>
-          @if (form.controls.templateVersionId.hasError('required') && form.controls.templateVersionId.touched) {
+          @if (form.controls.templateVersionNumber.hasError('required') && form.controls.templateVersionNumber.touched) {
             <mat-error>Selecione uma versão</mat-error>
           }
         </mat-form-field>

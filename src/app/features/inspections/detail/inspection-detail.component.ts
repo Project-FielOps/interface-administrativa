@@ -17,7 +17,6 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 
 interface DetailData {
   inspection: Inspection;
-  items: InspectionItemSnapshot[];
   reviews: InspectionReview[];
 }
 
@@ -47,12 +46,11 @@ export class InspectionDetailComponent implements OnInit {
     this.state.set(loadingState());
     forkJoin({
       inspection: this.inspectionsService.get(this.inspectionId),
-      items: this.inspectionsService.getItems(this.inspectionId),
       reviews: this.inspectionsService.getReviews(this.inspectionId),
     }).subscribe({
-      next: ({ inspection, items, reviews }) => {
-        const sortedItems = [...items].sort((a, b) => a.sectionOrder - b.sectionOrder || a.itemOrder - b.itemOrder);
-        this.state.set(successState({ inspection, items: sortedItems, reviews }, false));
+      next: ({ inspection, reviews }) => {
+        const sortedItems = [...(inspection.items ?? [])].sort((a, b) => a.sectionOrder - b.sectionOrder || a.itemOrder - b.itemOrder);
+        this.state.set(successState({ inspection: { ...inspection, items: sortedItems }, reviews }, false));
       },
       error: (err) => this.state.set(errorState(extractErrorMessage(err))),
     });
@@ -101,7 +99,7 @@ export class InspectionDetailComponent implements OnInit {
   }
 
   responseSummary(item: InspectionItemSnapshot): string {
-    const r = item.response;
+    const r = item.answer;
     if (!r) return 'Sem resposta';
     if (r.valueText) return r.valueText;
     if (r.valueNumber !== undefined && r.valueNumber !== null) return String(r.valueNumber);

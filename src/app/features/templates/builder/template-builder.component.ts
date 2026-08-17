@@ -12,7 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { forkJoin } from 'rxjs';
 import { TemplatesService } from '../templates.service';
-import { InspectionTemplate, TemplateItem, TemplateSection } from '../../../core/models/template.model';
+import { InspectionTemplate, TemplateItem, TemplateItemRequest, TemplateSection, TemplateSectionRequest } from '../../../core/models/template.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
@@ -63,9 +63,10 @@ export class TemplateBuilderComponent implements OnInit {
     this.state.set(loadingState());
     forkJoin({
       template: this.templatesService.get(this.templateId),
-      sections: this.templatesService.getSections(this.templateId),
+      draft: this.templatesService.getDraft(this.templateId),
     }).subscribe({
-      next: ({ template, sections }) => {
+      next: ({ template, draft }) => {
+        const sections = draft.sections;
         const sorted = [...sections].sort((a, b) => a.displayOrder - b.displayOrder);
         sorted.forEach((s) => s.items.sort((a, b) => a.displayOrder - b.displayOrder));
         this.metaForm.patchValue({ title: template.title, description: template.description, category: template.category });
@@ -141,12 +142,20 @@ export class TemplateBuilderComponent implements OnInit {
   moveSection(sections: TemplateSection[], index: number, direction: -1 | 1): void {
     const target = index + direction;
     if (target < 0 || target >= sections.length) return;
-    const reordered = [...sections];
-    [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
-    this.templatesService.reorderSections(this.templateId, reordered.map((s) => s.id)).subscribe({
+    const a = sections[index];
+    const b = sections[target];
+    // Swap displayOrder between the two sections via individual PUTs (no bulk reorder endpoint exists).
+    forkJoin([
+      this.templatesService.updateSection(this.templateId, a.id, this.toSectionRequest(a, b.displayOrder)),
+      this.templatesService.updateSection(this.templateId, b.id, this.toSectionRequest(b, a.displayOrder)),
+    ]).subscribe({
       next: () => this.load(),
       error: (err) => this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
     });
+  }
+
+  private toSectionRequest(section: TemplateSection, displayOrder: number): TemplateSectionRequest {
+    return { title: section.title, description: section.description, displayOrder };
   }
 
   addItem(section: TemplateSection): void {
@@ -189,12 +198,30 @@ export class TemplateBuilderComponent implements OnInit {
   moveItem(section: TemplateSection, index: number, direction: -1 | 1): void {
     const target = index + direction;
     if (target < 0 || target >= section.items.length) return;
-    const reordered = [...section.items];
-    [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
-    this.templatesService.reorderItems(this.templateId, section.id, reordered.map((i) => i.id)).subscribe({
+    const a = section.items[index];
+    const b = section.items[target];
+    // Swap displayOrder between the two items via individual PUTs (no bulk reorder endpoint exists).
+    forkJoin([
+      this.templatesService.updateItem(this.templateId, section.id, a.id, this.toItemRequest(a, b.displayOrder)),
+      this.templatesService.updateItem(this.templateId, section.id, b.id, this.toItemRequest(b, a.displayOrder)),
+    ]).subscribe({
       next: () => this.load(),
       error: (err) => this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
     });
+  }
+
+  private toItemRequest(item: TemplateItem, displayOrder: number): TemplateItemRequest {
+    return {
+      code: item.code,
+      title: item.title,
+      description: item.description,
+      responseType: item.responseType,
+      required: item.required,
+      observationRequiredOnFailure: item.observationRequiredOnFailure,
+      evidenceRequiredOnFailure: item.evidenceRequiredOnFailure,
+      optionsJson: item.optionsJson,
+      displayOrder,
+    };
   }
 
   publish(): void {
