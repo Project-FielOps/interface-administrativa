@@ -5,14 +5,12 @@ cadastros de clientes/locais/equipamentos, gestão de usuários, construção de
 (checklists versionados), planejamento e acompanhamento de inspeções, revisão de supervisores,
 não conformidades e auditoria.
 
-> **Nota sobre a especificação**: o documento fornecido em `docs/fieldops-spec.md` continha apenas a
-> seção 10 (Modelo de Dados). As seções 11 (Arquitetura), 12 (API REST), 14 (Interface Administrativa)
-> e 17-19 (critérios de aceite/avaliação) mencionadas no briefing não estavam presentes no arquivo.
-> Este projeto foi construído seguindo fielmente o mapa de navegação, as regras de tela e o contrato
-> de API descritos no próprio briefing da tarefa (que reproduzia esses trechos), complementados por
-> convenções REST padrão coerentes com o modelo de dados da seção 10. Os endpoints exatos devem ser
-> conferidos contra a implementação real do `fieldops-api` e ajustados nos serviços em
-> `src/app/features/*/*.service.ts` caso divirjam.
+> **Integração com a API**: os serviços em `src/app/features/*/*.service.ts` foram conferidos e
+> ajustados contra a implementação real do `fieldops-api` (endpoints de status via `PATCH .../status`,
+> draft de modelos via `GET .../draft`, fluxo de revisão em três etapas `begin-review`/`approve`/
+> `reject`, não conformidades e evidências aninhadas em `/inspections/{id}/...`). O contrato completo
+> está documentado em `../docs/fieldops-spec.md` (seção 12) e navegável via Swagger UI da API em
+> `http://localhost:8080/swagger-ui.html`.
 
 ## Como rodar
 
