@@ -1,0 +1,75 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Equipamento' : 'Novo Equipamento' }}</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <div class="fo-form-grid">
+      <mat-form-field class="fo-full">
+        <mat-label>Local</mat-label>
+        <mat-select formControlName="siteId">
+          @for (s of sites(); track s.id) {
+            <mat-option [value]="s.id">{{ s.name }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.siteId.hasError('required') && form.controls.siteId.touched) {
+          <mat-error>Selecione um local</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="fo-full">
+        <mat-label>Nome do equipamento</mat-label>
+        <input matInput formControlName="name" />
+        @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+          <mat-error>Nome é obrigatório</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Nº de patrimônio</mat-label>
+        <input matInput formControlName="assetNumber" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Nº de série</mat-label>
+        <input matInput formControlName="serialNumber" />
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Fabricante</mat-label>
+        <input matInput formControlName="manufacturer" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Modelo</mat-label>
+        <input matInput formControlName="model" />
+      </mat-form-field>
+
+      <mat-form-field class="fo-full">
+        <mat-label>Descrição</mat-label>
+        <input matInput formControlName="description" />
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Código QR</mat-label>
+        <input matInput formControlName="qrCode" />
+        @if (form.controls.qrCode.hasError('required') && form.controls.qrCode.touched) {
+          <mat-error>Código QR é obrigatório</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Data de instalação</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="installedAt" />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="fo-dialog-error">{{ errorMessage() }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close [disabled]="saving()">Cancelar</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+      @if (saving()) { <mat-spinner diameter="18"></mat-spinner> } @else { Salvar }
+    </button>
+  </mat-dialog-actions>
+</form>

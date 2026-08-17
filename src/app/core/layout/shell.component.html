@@ -1,0 +1,42 @@
+<mat-sidenav-container class="fo-shell">
+  <mat-sidenav mode="side" opened class="fo-sidenav">
+    <div class="fo-brand" (click)="goToDashboard()">
+      <mat-icon>domain_verification</mat-icon>
+      <span>FieldOps</span>
+    </div>
+    <mat-nav-list>
+      @for (item of visibleNavItems; track item.route) {
+        <a mat-list-item [routerLink]="item.route" routerLinkActive="fo-active" [routerLinkActiveOptions]="{ exact: false }">
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" class="fo-toolbar-top">
+      <span class="fo-toolbar-title">Interface Administrativa</span>
+      <span class="fo-spacer"></span>
+      @if (auth.currentUser(); as user) {
+        <button mat-button [matMenuTriggerFor]="userMenu">
+          <mat-icon>account_circle</mat-icon>
+          {{ user.name }}
+          <span class="fo-role-badge">{{ user.role }}</span>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item disabled>{{ user.email }}</button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Sair</span>
+          </button>
+        </mat-menu>
+      }
+    </mat-toolbar>
+
+    <main class="fo-content">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

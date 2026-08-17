@@ -1,0 +1,53 @@
+<div class="fo-page">
+  <app-page-header title="Não Conformidades" subtitle="Problemas e desvios identificados durante as inspeções."></app-page-header>
+
+  <form [formGroup]="filterForm" class="fo-filters">
+    <mat-form-field>
+      <mat-label>Severidade</mat-label>
+      <mat-select formControlName="severity">
+        <mat-option value="">Todas</mat-option>
+        <mat-option value="LOW">Baixa</mat-option>
+        <mat-option value="MEDIUM">Média</mat-option>
+        <mat-option value="HIGH">Alta</mat-option>
+        <mat-option value="CRITICAL">Crítica</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>ID da inspeção</mat-label>
+      <input matInput formControlName="inspectionId" />
+    </mat-form-field>
+  </form>
+
+  <app-state-container
+    [phase]="state().phase"
+    [errorMessage]="state().errorMessage || ''"
+    emptyMessage="Nenhuma não conformidade encontrada."
+    emptyIcon="report_problem"
+    [retry]="load.bind(this)"
+    [content]="listTpl"
+  ></app-state-container>
+
+  <ng-template #listTpl>
+    <mat-accordion multi>
+      @for (nc of state().data; track nc.id) {
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>{{ nc.title }}</mat-panel-title>
+            <mat-panel-description>
+              <span [class]="'fo-severity-' + nc.severity.toLowerCase()">{{ nc.severity }}</span>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          @if (nc.description) { <p>{{ nc.description }}</p> }
+          <p class="fo-muted">Inspeção: {{ nc.inspectionTitle || nc.inspectionId }}</p>
+          @if (nc.evidence?.length) {
+            <p class="fo-muted">{{ nc.evidence?.length }} evidência(s) anexada(s)</p>
+          }
+          <button mat-button color="primary" (click)="viewInspection(nc)">
+            <mat-icon>open_in_new</mat-icon> Ver inspeção
+          </button>
+        </mat-expansion-panel>
+      }
+    </mat-accordion>
+    <mat-paginator [length]="totalElements()" [pageSize]="pageSize()" [pageIndex]="pageIndex()" [pageSizeOptions]="[10,25,50]" (page)="onPage($event)"></mat-paginator>
+  </ng-template>
+</div>

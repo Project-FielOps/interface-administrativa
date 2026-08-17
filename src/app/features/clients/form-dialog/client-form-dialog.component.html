@@ -1,0 +1,48 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Cliente' : 'Novo Cliente' }}</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <div class="fo-form-grid">
+      <mat-form-field class="fo-full">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="name" />
+        @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+          <mat-error>Nome é obrigatório</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Razão social</mat-label>
+        <input matInput formControlName="legalName" />
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Documento (CNPJ/CPF)</mat-label>
+        <input matInput formControlName="document" />
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>E-mail</mat-label>
+        <input matInput type="email" formControlName="email" />
+        @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+          <mat-error>E-mail inválido</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Telefone</mat-label>
+        <input matInput formControlName="phone" />
+      </mat-form-field>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="fo-dialog-error">{{ errorMessage() }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close [disabled]="saving()">Cancelar</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+      @if (saving()) { <mat-spinner diameter="18"></mat-spinner> } @else { Salvar }
+    </button>
+  </mat-dialog-actions>
+</form>

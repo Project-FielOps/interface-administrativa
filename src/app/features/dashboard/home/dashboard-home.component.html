@@ -1,0 +1,51 @@
+<div class="fo-page">
+  <app-page-header [title]="'Olá, ' + (auth.currentUser()?.name || '')" subtitle="Visão geral das inspeções e não conformidades.">
+    <button mat-raised-button color="primary" (click)="createInspection()">
+      <mat-icon>add</mat-icon> Nova inspeção
+    </button>
+    <button mat-stroked-button (click)="reviewPending()">
+      <mat-icon>rate_review</mat-icon> Revisar pendentes
+    </button>
+  </app-page-header>
+
+  <app-state-container
+    [phase]="state().phase"
+    [errorMessage]="state().errorMessage || ''"
+    [retry]="load.bind(this)"
+    [content]="dashboardTpl"
+  ></app-state-container>
+
+  <ng-template #dashboardTpl>
+    @if (state().data; as summary) {
+      <div class="fo-cards-grid">
+        @for (s of statusEntries(summary); track s.key) {
+          <mat-card class="fo-stat-card">
+            <span class="fo-stat-value">{{ s.value }}</span>
+            <span class="fo-stat-label">{{ s.label }}</span>
+          </mat-card>
+        }
+      </div>
+
+      <div class="fo-cards-grid">
+        <mat-card class="fo-stat-card fo-stat-card--warn">
+          <span class="fo-stat-value">{{ summary.overdueCount }}</span>
+          <span class="fo-stat-label">Inspeções atrasadas</span>
+        </mat-card>
+        <mat-card class="fo-stat-card fo-stat-card--info">
+          <span class="fo-stat-value">{{ summary.awaitingReviewCount }}</span>
+          <span class="fo-stat-label">Aguardando revisão</span>
+        </mat-card>
+      </div>
+
+      <h2>Não conformidades por severidade</h2>
+      <div class="fo-cards-grid">
+        @for (sv of severityEntries(summary); track sv.key) {
+          <mat-card class="fo-stat-card">
+            <span class="fo-stat-value" [class]="'fo-severity-' + sv.key.toLowerCase()">{{ sv.value }}</span>
+            <span class="fo-stat-label">{{ sv.key }}</span>
+          </mat-card>
+        }
+      </div>
+    }
+  </ng-template>
+</div>

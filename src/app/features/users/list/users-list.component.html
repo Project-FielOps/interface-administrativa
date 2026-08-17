@@ -1,0 +1,114 @@
+<div class="fo-page">
+  <app-page-header title="Usuários" subtitle="Gestão de acesso da equipe (administradores, supervisores e técnicos).">
+    <button mat-raised-button color="primary" (click)="openCreate()">
+      <mat-icon>add</mat-icon> Novo usuário
+    </button>
+  </app-page-header>
+
+  <form [formGroup]="filterForm" class="fo-filters">
+    <mat-form-field>
+      <mat-label>Buscar por nome ou e-mail</mat-label>
+      <input matInput formControlName="search" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Perfil</mat-label>
+      <mat-select formControlName="role">
+        <mat-option value="">Todos</mat-option>
+        <mat-option value="ADMIN">Administrador</mat-option>
+        <mat-option value="SUPERVISOR">Supervisor</mat-option>
+        <mat-option value="TECHNICIAN">Técnico</mat-option>
+        <mat-option value="CLIENT_VIEWER">Cliente (visualização)</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option value="">Todos</mat-option>
+        <mat-option value="ACTIVE">Ativo</mat-option>
+        <mat-option value="INACTIVE">Inativo</mat-option>
+        <mat-option value="BLOCKED">Bloqueado</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+
+  <app-state-container
+    [phase]="state().phase"
+    [errorMessage]="state().errorMessage || ''"
+    emptyMessage="Nenhum usuário encontrado com os filtros atuais."
+    emptyIcon="people_outline"
+    [retry]="load.bind(this)"
+    [content]="tableTpl"
+  ></app-state-container>
+
+  <ng-template #tableTpl>
+    <table mat-table [dataSource]="state().data || []">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let u">{{ u.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>E-mail</th>
+        <td mat-cell *matCellDef="let u">{{ u.email }}</td>
+      </ng-container>
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef>Perfil</th>
+        <td mat-cell *matCellDef="let u">{{ u.role }}</td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let u">
+          <span [class]="'fo-chip-' + u.status.toLowerCase()">{{ u.status }}</span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="phone">
+        <th mat-header-cell *matHeaderCellDef>Telefone</th>
+        <td mat-cell *matCellDef="let u">{{ u.phone || '-' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let u">
+          <button mat-icon-button [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="openEdit(u)">
+              <mat-icon>edit</mat-icon><span>Editar</span>
+            </button>
+            <button mat-menu-item (click)="resetPassword(u)">
+              <mat-icon>vpn_key</mat-icon><span>Redefinir senha</span>
+            </button>
+            @if (u.status !== 'ACTIVE') {
+              <button mat-menu-item (click)="changeStatus(u, 'activate')">
+                <mat-icon>check_circle</mat-icon><span>Ativar</span>
+              </button>
+            }
+            @if (u.status !== 'INACTIVE') {
+              <button mat-menu-item (click)="changeStatus(u, 'inactivate')">
+                <mat-icon>block</mat-icon><span>Inativar</span>
+              </button>
+            }
+            @if (u.status !== 'BLOCKED') {
+              <button mat-menu-item (click)="changeStatus(u, 'block')">
+                <mat-icon>gpp_bad</mat-icon><span>Bloquear</span>
+              </button>
+            }
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="[10, 25, 50]"
+      (page)="onPage($event)"
+    ></mat-paginator>
+  </ng-template>
+</div>

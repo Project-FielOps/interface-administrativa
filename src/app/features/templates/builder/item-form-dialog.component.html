@@ -1,0 +1,68 @@
+<h2 mat-dialog-title>{{ data.item ? 'Editar Item' : 'Novo Item' }}</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <div class="fo-form-grid">
+      <mat-form-field>
+        <mat-label>Código (opcional)</mat-label>
+        <input matInput formControlName="code" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Tipo de resposta</mat-label>
+        <mat-select formControlName="responseType">
+          @for (rt of responseTypes; track rt.value) {
+            <mat-option [value]="rt.value">{{ rt.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="fo-full">
+        <mat-label>Pergunta / instrução</mat-label>
+        <input matInput formControlName="title" />
+        @if (form.controls.title.hasError('required') && form.controls.title.touched) {
+          <mat-error>Título é obrigatório</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="fo-full">
+        <mat-label>Descrição / ajuda (opcional)</mat-label>
+        <textarea matInput rows="2" formControlName="description"></textarea>
+      </mat-form-field>
+    </div>
+
+    @if (isSingleChoice) {
+      <div class="fo-options-editor">
+        <p><strong>Alternativas</strong></p>
+        <div formArrayName="options">
+          @for (opt of options.controls; track $index) {
+            <div class="fo-option-row">
+              <mat-form-field style="flex:1">
+                <mat-label>Opção {{ $index + 1 }}</mat-label>
+                <input matInput [formControlName]="$index" />
+              </mat-form-field>
+              <button mat-icon-button type="button" (click)="removeOption($index)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+        <button mat-stroked-button type="button" (click)="addOption()">
+          <mat-icon>add</mat-icon> Adicionar alternativa
+        </button>
+        @if (options.length === 0 && form.touched) {
+          <p class="fo-dialog-error">Adicione ao menos uma alternativa.</p>
+        }
+      </div>
+    }
+
+    <div class="fo-toggles">
+      <mat-checkbox formControlName="required">Resposta obrigatória</mat-checkbox>
+      <mat-checkbox formControlName="observationRequiredOnFailure">Exigir observação quando não conforme</mat-checkbox>
+      <mat-checkbox formControlName="evidenceRequiredOnFailure">Exigir evidência (foto) quando não conforme</mat-checkbox>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancelar</button>
+    <button mat-raised-button color="primary" type="submit">Salvar</button>
+  </mat-dialog-actions>
+</form>

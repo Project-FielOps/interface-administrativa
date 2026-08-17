@@ -1,0 +1,70 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Usuário' : 'Novo Usuário' }}</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <div class="fo-form-grid">
+      <mat-form-field class="fo-full">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="name" />
+        @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+          <mat-error>Nome é obrigatório</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>E-mail</mat-label>
+        <input matInput type="email" formControlName="email" [readonly]="isEdit" />
+        @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+          <mat-error>E-mail é obrigatório</mat-error>
+        }
+        @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+          <mat-error>E-mail inválido</mat-error>
+        }
+        @if (form.controls.email.hasError('server')) {
+          <mat-error>{{ form.controls.email.errors?.['server'] }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Telefone</mat-label>
+        <input matInput formControlName="phone" />
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Perfil</mat-label>
+        <mat-select formControlName="role">
+          @for (r of roles; track r.value) {
+            <mat-option [value]="r.value">{{ r.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      @if (!isEdit) {
+        <mat-form-field class="fo-full">
+          <mat-label>Senha inicial</mat-label>
+          <input matInput type="password" formControlName="password" />
+          @if (form.controls.password.hasError('required') && form.controls.password.touched) {
+            <mat-error>Senha é obrigatória</mat-error>
+          }
+          @if (form.controls.password.hasError('minlength') && form.controls.password.touched) {
+            <mat-error>Mínimo de 6 caracteres</mat-error>
+          }
+        </mat-form-field>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <p class="fo-dialog-error">{{ errorMessage() }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close [disabled]="saving()">Cancelar</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+      @if (saving()) {
+        <mat-spinner diameter="18"></mat-spinner>
+      } @else {
+        Salvar
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

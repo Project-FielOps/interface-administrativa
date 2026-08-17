@@ -1,0 +1,63 @@
+<div class="fo-page">
+  <app-page-header title="Pré-visualização" subtitle="Como o checklist será apresentado ao técnico em campo (somente leitura).">
+    <button mat-button (click)="back()"><mat-icon>arrow_back</mat-icon> Voltar ao editor</button>
+  </app-page-header>
+
+  <app-state-container [phase]="state().phase" [errorMessage]="state().errorMessage || ''" [retry]="load.bind(this)" [content]="previewTpl"></app-state-container>
+
+  <ng-template #previewTpl>
+    @if (state().data; as data) {
+      <mat-card class="fo-meta-card">
+        <h2>{{ data.template.title }}</h2>
+        @if (data.template.description) { <p>{{ data.template.description }}</p> }
+        <p class="fo-muted">Categoria: {{ data.template.category }}</p>
+      </mat-card>
+
+      @for (section of data.sections; track section.id; let sIndex = $index) {
+        <mat-card class="fo-section-card">
+          <h3>{{ sIndex + 1 }}. {{ section.title }}</h3>
+          @if (section.description) { <p class="fo-muted">{{ section.description }}</p> }
+
+          @for (item of section.items; track item.id; let iIndex = $index) {
+            <div class="fo-preview-item">
+              <p><strong>{{ iIndex + 1 }}. {{ item.title }}</strong> @if (item.required) { <span class="fo-required">*</span> }</p>
+              @if (item.description) { <p class="fo-muted">{{ item.description }}</p> }
+
+              @switch (item.responseType) {
+                @case ('TEXT_SHORT') { <input type="text" disabled placeholder="Resposta curta" /> }
+                @case ('TEXT_LONG') { <textarea disabled rows="2" placeholder="Resposta longa"></textarea> }
+                @case ('NUMBER') { <input type="number" disabled placeholder="0" /> }
+                @case ('DATE') { <input type="date" disabled /> }
+                @case ('BOOLEAN') {
+                  <mat-radio-group disabled>
+                    <mat-radio-button [checked]="false">Sim</mat-radio-button>
+                    <mat-radio-button [checked]="false">Não</mat-radio-button>
+                  </mat-radio-group>
+                }
+                @case ('CONFORMITY') {
+                  <mat-radio-group disabled>
+                    <mat-radio-button [checked]="false">Conforme</mat-radio-button>
+                    <mat-radio-button [checked]="false">Não conforme</mat-radio-button>
+                    <mat-radio-button [checked]="false">Não se aplica</mat-radio-button>
+                  </mat-radio-group>
+                }
+                @case ('SINGLE_CHOICE') {
+                  <mat-radio-group disabled>
+                    @for (opt of item.optionsJson; track opt) {
+                      <mat-radio-button [checked]="false">{{ opt }}</mat-radio-button>
+                    }
+                  </mat-radio-group>
+                }
+              }
+
+              <p class="fo-item-meta">
+                @if (item.observationRequiredOnFailure) { Observação obrigatória em caso de falha. }
+                @if (item.evidenceRequiredOnFailure) { Evidência fotográfica obrigatória em caso de falha. }
+              </p>
+            </div>
+          }
+        </mat-card>
+      }
+    }
+  </ng-template>
+</div>

@@ -1,0 +1,36 @@
+<div class="fo-state">
+  @switch (phase) {
+    @case ('loading') {
+      <div class="fo-state__center">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Carregando...</p>
+      </div>
+    }
+    @case ('processing') {
+      <div class="fo-state__center">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Processando...</p>
+      </div>
+    }
+    @case ('error') {
+      <div class="fo-state__center fo-state__error">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ errorMessage || 'Ocorreu um erro ao carregar os dados.' }}</p>
+        @if (retry) {
+          <button mat-stroked-button color="primary" (click)="retry!()">
+            <mat-icon>refresh</mat-icon> Tentar novamente
+          </button>
+        }
+      </div>
+    }
+    @case ('empty') {
+      <div class="fo-state__center fo-state__empty">
+        <mat-icon>{{ emptyIcon }}</mat-icon>
+        <p>{{ emptyMessage }}</p>
+      </div>
+    }
+    @default {
+      <ng-container *ngTemplateOutlet="content ?? null"></ng-container>
+    }
+  }
+</div>
