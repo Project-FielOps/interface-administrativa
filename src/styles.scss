@@ -1,5 +1,14 @@
-/* Global styles */
+// =============================================================================
+// FieldOps — Interface Administrativa
+// Estética: FieldOps Precision System (ver src/styles/_tokens.scss)
+//
+// A grade de tokens é aplicada por cima do tema Material, então todos os
+// componentes (tabelas, campos, menus, diálogos) herdam a identidade sem
+// precisar alterar template nem lógica de nenhuma tela.
+// =============================================================================
+
 @use '@angular/material' as mat;
+@use './styles/tokens';
 
 html {
   @include mat.theme((
@@ -8,7 +17,13 @@ html {
       primary: mat.$azure-palette,
       tertiary: mat.$blue-palette,
     ),
-    typography: Roboto,
+    typography: (
+      plain-family: 'Inter',
+      brand-family: 'Plus Jakarta Sans',
+      bold-weight: 700,
+      medium-weight: 600,
+      regular-weight: 400,
+    ),
     density: 0,
   ));
 }
@@ -16,25 +31,204 @@ html {
 html, body {
   height: 100%;
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font: var(--fo-body-md);
+  color: var(--mat-sys-on-surface);
+  background: var(--fo-level-0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
   box-sizing: border-box;
 }
 
+// =============================================================================
+// Tokens de componente do Angular Material (v22 usa `--mat-<componente>-*`).
+// Declarados em :root para atravessar a cascata sem duelo de especificidade —
+// os estilos de componente do Material são injetados depois da folha global.
+// =============================================================================
+
+:root {
+  // --- Botões: primário sólido 12px, alvo de toque 44px ----------------------
+  --mat-button-protected-container-shape: var(--fo-radius-md);
+  --mat-button-protected-container-color: var(--mat-sys-primary-container);
+  --mat-button-protected-label-text-color: #ffffff;
+  --mat-button-protected-container-height: var(--fo-touch-target);
+  --mat-button-protected-container-elevation-shadow: var(--fo-shadow-primary);
+  --mat-button-protected-hover-container-elevation-shadow: var(--fo-shadow-primary-hover);
+  --mat-button-protected-focus-container-elevation-shadow: var(--fo-shadow-primary-hover);
+  --mat-button-protected-pressed-container-elevation-shadow: var(--fo-shadow-1);
+  --mat-button-protected-label-text-font: var(--fo-font-body);
+  --mat-button-protected-label-text-weight: 600;
+  --mat-button-protected-horizontal-padding: 20px;
+  --mat-button-protected-state-layer-color: #ffffff;
+  --mat-button-protected-ripple-color: rgba(255, 255, 255, 0.2);
+
+  --mat-button-filled-container-shape: var(--fo-radius-md);
+  --mat-button-filled-container-color: var(--mat-sys-primary-container);
+  --mat-button-filled-label-text-color: #ffffff;
+  --mat-button-filled-container-height: var(--fo-touch-target);
+  --mat-button-filled-label-text-font: var(--fo-font-body);
+  --mat-button-filled-label-text-weight: 600;
+
+  // Secundário: branco, contorno de 1px, texto escuro.
+  --mat-button-outlined-container-shape: var(--fo-radius-md);
+  --mat-button-outlined-container-height: var(--fo-touch-target);
+  --mat-button-outlined-outline-color: var(--fo-hairline);
+  --mat-button-outlined-label-text-color: var(--mat-sys-on-surface);
+  --mat-button-outlined-label-text-font: var(--fo-font-body);
+  --mat-button-outlined-label-text-weight: 600;
+  --mat-button-outlined-horizontal-padding: 18px;
+
+  // Ghost: sem caixa, texto primário.
+  --mat-button-text-container-shape: var(--fo-radius-md);
+  --mat-button-text-container-height: var(--fo-touch-target);
+  --mat-button-text-label-text-color: var(--mat-sys-primary);
+  --mat-button-text-label-text-font: var(--fo-font-body);
+  --mat-button-text-label-text-weight: 600;
+
+  --mat-button-tonal-container-shape: var(--fo-radius-md);
+  --mat-button-tonal-container-height: var(--fo-touch-target);
+  --mat-button-tonal-label-text-font: var(--fo-font-body);
+
+  // --- Campos: 12px, contorno hairline, foco no azul de ação ----------------
+  --mat-form-field-outlined-container-shape: var(--fo-radius-md);
+  --mat-form-field-outlined-outline-color: var(--fo-hairline);
+  --mat-form-field-outlined-hover-outline-color: var(--mat-sys-outline);
+  --mat-form-field-outlined-focus-outline-color: var(--mat-sys-primary-container);
+  --mat-form-field-outlined-focus-outline-width: 2px;
+  --mat-form-field-outlined-label-text-color: var(--mat-sys-on-surface-variant);
+  --mat-form-field-outlined-focus-label-text-color: var(--mat-sys-primary-container);
+  --mat-form-field-outlined-label-text-font: var(--fo-font-body);
+  --mat-form-field-outlined-input-text-color: var(--mat-sys-on-surface);
+  --mat-form-field-outlined-input-text-placeholder-color: var(--mat-sys-outline);
+  --mat-form-field-outlined-caret-color: var(--mat-sys-primary-container);
+  --mat-form-field-outlined-error-outline-color: var(--fo-danger);
+  --mat-form-field-outlined-error-label-text-color: var(--fo-danger);
+  --mat-form-field-filled-container-shape: var(--fo-radius-md);
+  --mat-form-field-filled-container-color: var(--mat-sys-surface-container-low);
+  --mat-form-field-container-text-font: var(--fo-font-body);
+  --mat-form-field-subscript-text-font: var(--fo-font-body);
+  --mat-form-field-error-text-color: var(--fo-danger);
+  --mat-form-field-leading-icon-color: var(--mat-sys-outline);
+  --mat-form-field-trailing-icon-color: var(--mat-sys-outline);
+
+  // --- Cards: Nível 1 do sistema de elevação --------------------------------
+  --mat-card-elevated-container-shape: var(--fo-radius-lg);
+  --mat-card-elevated-container-color: var(--fo-level-1);
+  --mat-card-elevated-container-elevation: var(--fo-shadow-1);
+  --mat-card-outlined-container-shape: var(--fo-radius-lg);
+  --mat-card-outlined-container-color: var(--fo-level-1);
+  --mat-card-outlined-outline-color: var(--fo-hairline);
+  --mat-card-outlined-container-elevation: var(--fo-shadow-1);
+  --mat-card-title-text-font: var(--fo-font-headline);
+  --mat-card-subtitle-text-font: var(--fo-font-body);
+  --mat-card-subtitle-text-color: var(--mat-sys-on-surface-variant);
+
+  // --- Tabelas: cabeçalho em label-caps, divisores hairline -----------------
+  --mat-table-header-headline-font: var(--fo-font-body);
+  --mat-table-header-headline-size: 12px;
+  --mat-table-header-headline-weight: 600;
+  --mat-table-header-headline-tracking: 0.05em;
+  --mat-table-header-headline-color: var(--mat-sys-on-surface-variant);
+  --mat-table-row-item-label-text-font: var(--fo-font-body);
+  --mat-table-row-item-label-text-size: 14px;
+  --mat-table-row-item-label-text-color: var(--mat-sys-on-surface);
+  --mat-table-row-item-outline-color: var(--fo-hairline);
+  --mat-paginator-container-text-font: var(--fo-font-body);
+
+  // --- Sobreposições: Nível 2 -----------------------------------------------
+  --mat-menu-container-shape: var(--fo-radius-md);
+  --mat-menu-container-color: var(--fo-level-1);
+  --mat-menu-container-elevation-shadow: var(--fo-shadow-2);
+  --mat-menu-item-label-text-font: var(--fo-font-body);
+  --mat-menu-item-label-text-color: var(--mat-sys-on-surface);
+  --mat-select-container-elevation-shadow: var(--fo-shadow-2);
+  --mat-select-trigger-text-font: var(--fo-font-body);
+  --mat-dialog-container-shape: var(--fo-radius-lg);
+  --mat-dialog-container-color: var(--fo-level-1);
+  --mat-dialog-container-elevation-shadow: var(--fo-shadow-2);
+  --mat-dialog-supporting-text-font: var(--fo-font-body);
+  --mat-dialog-supporting-text-color: var(--mat-sys-on-surface-variant);
+  --mat-snack-bar-container-shape: var(--fo-radius-md);
+  --mat-datepicker-calendar-container-background-color: var(--fo-level-1);
+  --mat-datepicker-calendar-container-shape: var(--fo-radius-lg);
+  --mat-datepicker-calendar-container-elevation-shadow: var(--fo-shadow-2);
+  --mat-datepicker-calendar-text-font: var(--fo-font-body);
+  --mat-datepicker-calendar-date-today-outline-color: var(--mat-sys-primary-container);
+
+  // --- Diversos --------------------------------------------------------------
+  --mat-chip-container-shape-radius: var(--fo-radius);
+  --mat-chip-label-text-font: var(--fo-font-body);
+  --mat-chip-outline-color: var(--fo-hairline);
+  --mat-list-list-item-label-text-font: var(--fo-font-body);
+  --mat-list-list-item-container-shape: var(--fo-radius-md);
+}
+
+// O destrutivo continua vermelho, mesmo com o primário sólido como padrão.
+.mat-mdc-raised-button.mat-warn,
+.mat-mdc-unelevated-button.mat-warn {
+  --mat-button-protected-container-color: var(--fo-danger);
+  --mat-button-protected-container-elevation-shadow: 0 4px 12px rgba(186, 26, 26, 0.2);
+  --mat-button-protected-hover-container-elevation-shadow: 0 6px 16px rgba(186, 26, 26, 0.3);
+  --mat-button-filled-container-color: var(--fo-danger);
+}
+
+// Hierarquia narrativa: Jakarta nos títulos, Inter no resto.
+h1, h2, h3, h4 {
+  font-family: var(--fo-font-headline);
+  color: var(--mat-sys-on-surface);
+  letter-spacing: -0.01em;
+}
+
+h1 { font: var(--fo-headline-md); letter-spacing: -0.02em; margin: 0 0 var(--fo-space-xs); }
+h2 { font: var(--fo-headline-sm); margin: var(--fo-space-lg) 0 var(--fo-space-sm); }
+h3 { font: 600 16px/24px var(--fo-font-headline); margin: 0 0 var(--fo-space-xs); }
+
+// Dados industriais brutos (série, patrimônio, coordenadas, IDs) em monoespaçada.
+code, kbd, samp, .fo-mono {
+  font: var(--fo-data-mono);
+  color: var(--mat-sys-on-surface);
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.16);
+}
+
+// Barras de rolagem discretas, coerentes com o "less but better".
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mat-sys-outline-variant) transparent;
+}
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: var(--mat-sys-outline-variant);
+  border: 3px solid transparent;
+  border-radius: var(--fo-radius-full);
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--mat-sys-outline); background-clip: content-box; }
+
+// =============================================================================
+// Layout de página
+// =============================================================================
+
 .fo-page {
-  padding: 24px;
-  max-width: 1400px;
+  padding: var(--fo-space-lg) var(--fo-space-xl) var(--fo-space-xl);
+  max-width: 1440px;
   margin: 0 auto;
+
+  @media (max-width: 720px) {
+    padding: var(--fo-space-md) var(--fo-gutter) var(--fo-space-lg);
+  }
 }
 
 .fo-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: var(--fo-space-md);
+  margin-bottom: var(--fo-space-md);
   flex-wrap: wrap;
 }
 
@@ -42,18 +236,48 @@ html, body {
   flex: 1 1 auto;
 }
 
+// Cabeçalho de página (shared/components/page-header)
+.fo-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--fo-space-md);
+  margin-bottom: var(--fo-space-lg);
+  padding-bottom: var(--fo-space-md);
+  border-bottom: 1px solid var(--fo-hairline);
+  flex-wrap: wrap;
+}
+
+// =============================================================================
+// Filtros — barra própria, elevada sobre o fundo
+// =============================================================================
+
 .fo-filters {
   display: flex;
-  gap: 12px;
+  gap: var(--fo-space-sm);
   flex-wrap: wrap;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: var(--fo-space-md);
+  padding: var(--fo-space-md) var(--fo-space-md) var(--fo-space-base);
+  background: var(--fo-level-1);
+  border: 1px solid var(--fo-hairline);
+  border-radius: var(--fo-radius-lg);
+  box-shadow: var(--fo-shadow-1);
+
+  // 240px evita que rótulos longos ("Buscar por nome ou e-mail") colidam
+  // com o ícone de sufixo do campo.
+  .mat-mdc-form-field { min-width: 280px; }
+  .mat-mdc-checkbox { margin-bottom: var(--fo-space-sm); }
 }
+
+// =============================================================================
+// Formulários
+// =============================================================================
 
 .fo-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 16px;
+  gap: 0 var(--fo-space-md);
 
   @media (max-width: 720px) {
     grid-template-columns: 1fr;
@@ -70,83 +294,320 @@ html, body {
 
 .fo-actions-row {
   display: flex;
-  gap: 12px;
+  gap: var(--fo-space-sm);
   justify-content: flex-end;
-  margin-top: 16px;
+  margin-top: var(--fo-space-md);
 }
 
-table.mat-mdc-table {
-  width: 100%;
+// Fundo branco + brilho externo suave no foco (10% do primário), como no protótipo.
+.mat-mdc-form-field .mdc-text-field--outlined {
+  background: var(--fo-level-1);
+  border-radius: var(--fo-radius-md);
+  transition: box-shadow 0.2s ease;
 }
 
+.mat-mdc-form-field .mdc-text-field--outlined.mdc-text-field--focused {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+// Rótulo em repouso não pode passar por baixo dos ícones de prefixo/sufixo: o
+// "notch" do contorno é dimensionado pelo texto do rótulo, e um rótulo longo
+// ("Buscar por nome ou documento") invadia o ícone de busca.
+//
+// O Material só desconta a largura de prefixo/sufixo quando seu próprio código
+// recalcula o notch — o que não acontece com o rótulo em repouso. Alimentamos
+// então a variável que ele já lê, em vez de disputar `max-width` na cascata
+// (a regra dele tem especificidade maior). Com o teto, o rótulo trunca com
+// reticências antes de encostar no ícone.
+.mat-mdc-form-field-has-icon-suffix {
+  --mat-form-field-notch-max-width: calc(100% - 68px);
+}
+
+.mat-mdc-form-field-has-icon-prefix {
+  --mat-form-field-notch-max-width: calc(100% - 56px);
+}
+
+.mat-mdc-form-field-has-icon-prefix.mat-mdc-form-field-has-icon-suffix {
+  --mat-form-field-notch-max-width: calc(100% - 112px);
+}
+
+.mat-mdc-form-field-error,
 .fo-dialog-error {
-  color: #c62828;
+  color: var(--fo-danger);
+  font: var(--fo-body-md);
   font-size: 13px;
 }
 
-.fo-chip-active { color: #2e7d32; }
-.fo-chip-inactive { color: #757575; }
-.fo-chip-blocked, .fo-chip-danger { color: #c62828; }
+.fo-required { color: var(--fo-danger); }
 
-.fo-severity-low { color: #2e7d32; }
-.fo-severity-medium { color: #f9a825; }
-.fo-severity-high { color: #ef6c00; }
-.fo-severity-critical { color: #c62828; font-weight: 600; }
+// =============================================================================
+// Botões — primário 12px sólido, secundário branco com contorno, ghost sem caixa
+// Alvo de toque nunca abaixo de 44px, mesmo no desktop.
+// =============================================================================
+
+.mat-mdc-button-base {
+  letter-spacing: 0.01em;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+}
+
+// Elevação reage ao ponteiro: sobe 1px no hover, assenta no clique.
+.mat-mdc-raised-button:not(:disabled) {
+  &:hover { transform: translateY(-1px); }
+  &:active { transform: translateY(0); }
+}
+
+.mat-mdc-outlined-button:not(:disabled) {
+  background: var(--fo-level-1);
+
+  &:hover { background: var(--mat-sys-surface-container-low); }
+}
+
+.mat-mdc-icon-button {
+  color: var(--mat-sys-on-surface-variant);
+
+  &:hover { color: var(--mat-sys-on-surface); }
+}
+
+// =============================================================================
+// Cards — Nível 1: branco, contorno 1px, raio 16px, sombra difusa
+// =============================================================================
+
+// Nível 3 do sistema: todo card ganha contorno de 1px para manter definição
+// em ambiente de alto brilho (uso em campo, tela sob sol).
+.mat-mdc-card {
+  border: 1px solid var(--fo-hairline);
+  box-shadow: var(--fo-shadow-1);
+}
+
+.fo-meta-card,
+.fo-section-card {
+  padding: var(--fo-space-lg);
+  margin-bottom: var(--fo-space-md);
+}
+
+.fo-item-card {
+  padding: var(--fo-space-md) var(--fo-space-lg);
+  margin-bottom: var(--fo-space-sm);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--fo-shadow-2) !important;
+    border-color: var(--mat-sys-outline-variant);
+  }
+}
+
+// =============================================================================
+// Tabelas — superfície própria, cabeçalho em label-caps, divisores 1px
+// =============================================================================
+
+table.mat-mdc-table {
+  width: 100%;
+  background: var(--fo-level-1);
+  border: 1px solid var(--fo-hairline);
+  border-radius: var(--fo-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--fo-shadow-1);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.mat-mdc-header-row {
+  background: var(--mat-sys-surface-container-low);
+  height: 48px;
+}
+
+.mat-mdc-header-cell {
+  font: var(--fo-label-caps);
+  letter-spacing: var(--fo-tracking-caps);
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
+  border-bottom: 1px solid var(--fo-hairline);
+  padding: 0 var(--fo-space-md);
+}
+
+.mat-mdc-cell {
+  font: var(--fo-body-md);
+  color: var(--mat-sys-on-surface);
+  border-bottom: 1px solid var(--fo-hairline);
+  padding: var(--fo-space-md);
+}
+
+.mat-mdc-row {
+  transition: background-color 0.15s ease;
+
+  &:hover { background: var(--mat-sys-surface-container-low); }
+  &:last-child .mat-mdc-cell { border-bottom: none; }
+}
+
+// Paginador colado à tabela, sem competir com o conteúdo.
+.mat-mdc-paginator {
+  background: transparent;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--fo-body-md);
+  margin-top: var(--fo-space-xs);
+}
+
+// =============================================================================
+// Status badges — "Soft Fill": 10% da cor semântica no fundo, 100% no texto.
+// Os templates já emitem <span class="fo-chip-*"> e <span class="fo-severity-*">,
+// então o badge nasce puramente do CSS — nenhuma tela precisou mudar.
+// =============================================================================
+
+%fo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--fo-radius);
+  font: var(--fo-label-caps);
+  letter-spacing: var(--fo-tracking-caps);
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 16px;
+}
+
+.fo-chip-active,
+.fo-chip-inactive,
+.fo-chip-blocked,
+.fo-chip-danger,
+.fo-chip-draft,
+.fo-chip-published,
+.fo-chip-archived,
+.fo-chip-assigned,
+.fo-chip-in_progress,
+.fo-chip-submitted,
+.fo-chip-under_review,
+.fo-chip-approved,
+.fo-chip-rejected,
+.fo-chip-canceled,
+.fo-chip-open,
+.fo-chip-resolved,
+.fo-chip-closed,
+.fo-severity-low,
+.fo-severity-medium,
+.fo-severity-high,
+.fo-severity-critical {
+  @extend %fo-badge;
+}
+
+// Cadastro
+.fo-chip-active   { background: var(--fo-success-soft); color: var(--fo-success); }
+.fo-chip-inactive { background: var(--fo-neutral-soft); color: var(--fo-neutral); }
+.fo-chip-blocked,
+.fo-chip-danger   { background: var(--fo-danger-soft);  color: var(--fo-danger); }
+
+// Modelos de inspeção
+.fo-chip-draft     { background: var(--fo-neutral-soft); color: var(--fo-neutral); }
+.fo-chip-published { background: var(--fo-success-soft); color: var(--fo-success); }
+.fo-chip-archived  { background: var(--fo-neutral-soft); color: var(--fo-neutral); }
+
+// Ciclo de vida da inspeção — o azul marca o fluxo normal, o âmbar marca
+// trabalho em curso, o vermelho marca bloqueio. Mesma leitura do protótipo.
+.fo-chip-assigned     { background: var(--fo-info-soft);    color: var(--fo-info); }
+.fo-chip-in_progress  { background: var(--fo-warning-soft); color: var(--fo-warning); }
+.fo-chip-submitted    { background: var(--fo-info-soft);    color: var(--fo-info); }
+.fo-chip-under_review { background: var(--fo-info-soft);    color: var(--fo-info); }
+.fo-chip-approved     { background: var(--fo-success-soft); color: var(--fo-success); }
+.fo-chip-rejected     { background: var(--fo-danger-soft);  color: var(--fo-danger); }
+.fo-chip-canceled     { background: var(--fo-neutral-soft); color: var(--fo-neutral); }
+
+// Não conformidades
+.fo-chip-open     { background: var(--fo-danger-soft);  color: var(--fo-danger); }
+.fo-chip-resolved { background: var(--fo-success-soft); color: var(--fo-success); }
+.fo-chip-closed   { background: var(--fo-neutral-soft); color: var(--fo-neutral); }
+
+.fo-severity-low      { background: var(--fo-success-soft); color: var(--fo-success); }
+.fo-severity-medium   { background: var(--fo-warning-soft); color: var(--fo-warning); }
+.fo-severity-high     { background: var(--fo-high-soft);    color: var(--fo-high); }
+.fo-severity-critical { background: var(--fo-danger-soft);  color: var(--fo-danger); font-weight: 700; }
+
+// Badge de perfil no topo (ADMIN / SUPERVISOR / ...)
+.fo-role-badge {
+  margin-left: var(--fo-space-xs);
+  padding: 3px 8px;
+  border-radius: var(--fo-radius);
+  background: var(--fo-info-soft);
+  color: var(--mat-sys-primary);
+  font: var(--fo-label-caps);
+  font-size: 10px;
+  letter-spacing: var(--fo-tracking-caps);
+  text-transform: uppercase;
+}
+
+// Chips do Material alinhados ao mesmo vocabulário
+.mat-mdc-chip {
+  font: var(--fo-label-caps);
+  letter-spacing: var(--fo-tracking-caps);
+}
+
+// =============================================================================
+// Links e texto de apoio
+// =============================================================================
 
 .fo-link {
-  color: #3f51b5;
+  color: var(--mat-sys-primary);
   cursor: pointer;
   text-decoration: none;
+  font-weight: 500;
+  border-radius: var(--fo-radius-sm);
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--mat-sys-primary-container); text-decoration: underline; }
+  &:focus-visible { outline: 2px solid var(--mat-sys-primary-container); outline-offset: 2px; }
 }
-.fo-link:hover { text-decoration: underline; }
+
+.fo-muted {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 13px;
+}
+
+// =============================================================================
+// Editor de modelos de inspeção
+// =============================================================================
 
 .fo-options-editor {
-  margin: 8px 0 16px;
-  padding: 12px;
-  background: #f5f5f5;
-  border-radius: 8px;
+  margin: var(--fo-space-xs) 0 var(--fo-space-md);
+  padding: var(--fo-space-md);
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--fo-hairline);
+  border-radius: var(--fo-radius-md);
 }
 
 .fo-option-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--fo-space-xs);
 }
 
 .fo-toggles {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-top: 8px;
+  gap: var(--fo-space-base);
+  margin-top: var(--fo-space-xs);
 }
-
-.fo-muted { color: #757575; font-size: 13px; }
 
 .fo-status-row {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: var(--fo-space-md);
+  margin-bottom: var(--fo-space-md);
+  flex-wrap: wrap;
 }
 
-.fo-meta-card, .fo-section-card {
-  padding: 16px 20px;
-  margin-bottom: 16px;
-}
-
+// 24px separa seções lógicas distintas; 16px separa itens dentro delas.
 .fo-sections-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 24px 0 12px;
+  margin: var(--fo-space-lg) 0 var(--fo-space-sm);
 }
 
 .fo-section-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: var(--fo-space-sm);
+  margin-bottom: var(--fo-space-xs);
 }
 
 .fo-section-header h3 { margin: 0; }
@@ -157,13 +618,14 @@ table.mat-mdc-table {
   flex-shrink: 0;
 }
 
+// Listas: divisor 1px, 16px de respiro vertical.
 .fo-item-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 8px 0;
-  border-top: 1px solid #eee;
+  gap: var(--fo-space-sm);
+  padding: var(--fo-space-sm) 0;
+  border-top: 1px solid var(--fo-hairline);
 }
 
 .fo-item-info {
@@ -173,86 +635,207 @@ table.mat-mdc-table {
 }
 
 .fo-item-meta {
+  font: var(--fo-data-mono);
   font-size: 12px;
-  color: #757575;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .fo-preview-item {
-  padding: 12px 0;
-  border-top: 1px solid #eee;
+  padding: var(--fo-space-sm) 0;
+  border-top: 1px solid var(--fo-hairline);
 
   input, textarea {
     width: 100%;
-    max-width: 360px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-family: inherit;
-    background: #fafafa;
+    max-width: 380px;
+    padding: 10px var(--fo-space-sm);
+    border: 1px solid var(--fo-hairline);
+    border-radius: var(--fo-radius-md);
+    font: var(--fo-body-md);
+    background: var(--fo-level-1);
+    color: var(--mat-sys-on-surface);
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+      border-color: var(--mat-sys-primary-container);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
   }
 }
 
-.fo-required { color: #c62828; }
+// =============================================================================
+// Detalhe da inspeção
+// =============================================================================
 
+// Data Strip: leituras técnicas em monoespaçada sobre fundo próprio.
 .fo-detail-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px 24px;
-  margin: 12px 0;
+  gap: var(--fo-space-sm) var(--fo-space-lg);
+  margin: var(--fo-space-sm) 0 var(--fo-space-md);
+  padding: var(--fo-space-md);
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--fo-hairline);
+  border-radius: var(--fo-radius-md);
 
-  span { display: block; font-size: 12px; }
-  p { margin: 2px 0 0; }
+  span {
+    display: block;
+    font: var(--fo-label-caps);
+    letter-spacing: var(--fo-tracking-caps);
+    text-transform: uppercase;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  p {
+    margin: var(--fo-space-base) 0 0;
+    font: var(--fo-data-mono);
+    color: var(--mat-sys-on-surface);
+  }
 
   @media (max-width: 900px) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.fo-item-card {
-  padding: 12px 16px;
-  margin-bottom: 10px;
-}
+.fo-response { font-weight: 600; }
 
-.fo-response { font-weight: 500; }
-
+// Aviso de somente-leitura: alerta contido, sem gritar.
 .fo-readonly-note {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: #fff3e0;
-  color: #e65100;
-  padding: 10px 14px;
-  border-radius: 8px;
+  gap: var(--fo-space-xs);
+  background: var(--fo-warning-soft);
+  color: var(--fo-warning);
+  padding: var(--fo-space-sm) var(--fo-space-md);
+  border: 1px solid rgba(180, 83, 9, 0.2);
+  border-radius: var(--fo-radius-md);
   font-size: 13px;
-  margin: 12px 0;
+  font-weight: 500;
+  margin: var(--fo-space-sm) 0;
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; }
 }
+
+// =============================================================================
+// Dashboard — grade de 2 colunas em telas densas, cartões "hero" para stats
+// =============================================================================
 
 .fo-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+  gap: var(--fo-space-md);
+  margin-bottom: var(--fo-space-lg);
 }
 
 .fo-stat-card {
-  padding: 20px;
+  padding: var(--fo-space-lg);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--fo-space-base);
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--fo-shadow-2) !important;
+    transform: translateY(-2px);
+  }
 }
 
 .fo-stat-value {
-  font-size: 32px;
-  font-weight: 600;
+  font: var(--fo-display-lg);
+  letter-spacing: -0.02em;
+  color: var(--mat-sys-on-surface);
+  font-variant-numeric: tabular-nums;
 }
 
 .fo-stat-label {
-  color: #757575;
-  font-size: 13px;
+  font: var(--fo-label-caps);
+  letter-spacing: var(--fo-tracking-caps);
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
 }
 
-.fo-stat-card--warn { border-left: 4px solid #ef6c00; }
-.fo-stat-card--info { border-left: 4px solid #1976d2; }
+// Faixa de acento à esquerda, como nos cards de prioridade do protótipo.
+.fo-stat-card--warn { border-left: 3px solid var(--fo-high); }
+.fo-stat-card--info { border-left: 3px solid var(--mat-sys-primary-container); }
 
+// Nos cards de severidade o número carrega a cor semântica, sem virar badge.
+.fo-stat-value.fo-severity-low,
+.fo-stat-value.fo-severity-medium,
+.fo-stat-value.fo-severity-high,
+.fo-stat-value.fo-severity-critical {
+  background: transparent;
+  padding: 0;
+  font: var(--fo-display-lg);
+  text-transform: none;
+  letter-spacing: -0.02em;
+}
+
+.fo-stat-value.fo-severity-low      { color: var(--fo-success); }
+.fo-stat-value.fo-severity-medium   { color: var(--fo-warning); }
+.fo-stat-value.fo-severity-high     { color: var(--fo-high); }
+.fo-stat-value.fo-severity-critical { color: var(--fo-danger); }
+
+// =============================================================================
+// Sobreposições — Nível 2: modais, menus e diálogos
+// =============================================================================
+
+.mat-mdc-menu-panel,
+.mat-mdc-select-panel,
+.mat-mdc-autocomplete-panel {
+  border-radius: var(--fo-radius-md) !important;
+  border: 1px solid var(--fo-hairline);
+  box-shadow: var(--fo-shadow-2) !important;
+}
+
+.mat-mdc-menu-item {
+  font: var(--fo-body-md);
+  min-height: var(--fo-touch-target);
+}
+
+.mat-mdc-dialog-container {
+  .mat-mdc-dialog-surface {
+    border-radius: var(--fo-radius-lg);
+    border: 1px solid var(--fo-hairline);
+    box-shadow: var(--fo-shadow-2);
+  }
+}
+
+.mat-mdc-dialog-title {
+  font: var(--fo-headline-sm) !important;
+  color: var(--mat-sys-on-surface);
+  letter-spacing: -0.01em;
+}
+
+.mat-mdc-tooltip {
+  font: var(--fo-body-md);
+}
+
+// Datepicker alinhado ao mesmo sistema de formas
+.mat-datepicker-content {
+  border-radius: var(--fo-radius-lg) !important;
+  border: 1px solid var(--fo-hairline);
+  box-shadow: var(--fo-shadow-2) !important;
+}
+
+// Cabeçalho do menu de usuário (renderiza em overlay, fora do escopo do shell)
+.fo-user-menu {
+  .fo-user-menu__header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--fo-space-sm) var(--fo-space-md);
+  }
+
+  .fo-user-menu__name {
+    font: 600 14px/20px var(--fo-font-headline);
+    color: var(--mat-sys-on-surface);
+  }
+
+  .fo-user-menu__email {
+    font: var(--fo-data-mono);
+    font-size: 12px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
