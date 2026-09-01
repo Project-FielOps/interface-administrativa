@@ -55,6 +55,44 @@ Gera os artefatos em `dist/fieldops-admin/`. O build de produção foi validado 
 - Um segundo interceptor (`core/interceptors/error.interceptor.ts`) centraliza feedback de erros de
   rede, sessão expirada, permissão negada e erros de servidor via snackbar.
 
+## Identidade visual — FieldOps Precision System
+
+A interface segue o **FieldOps Precision System**, o mesmo sistema de design do protótipo mobile
+(`stitch_fieldops_mobile_app_prototype/fieldops_precision_system/DESIGN.md`). A estética é
+*Ultra-Modern Minimalism*: autoridade técnica, muito respiro e baixa carga cognitiva para quem
+opera inspeções em campo.
+
+**Onde mora**
+
+- `src/styles/_tokens.scss` — a grade de tokens (cor, tipografia, forma, espaçamento, elevação).
+  Os papéis de cor do sistema são Material 3, então o arquivo sobrescreve diretamente as variáveis
+  `--mat-sys-*` emitidas por `mat.theme()`. Alterar a marca é alterar este arquivo.
+- `src/styles.scss` — aplica os tokens de componente do Angular Material (`--mat-<componente>-*`)
+  e estiliza as classes `.fo-*` compartilhadas pelas telas.
+
+**Regras do sistema**
+
+| Eixo | Regra |
+|---|---|
+| Tipografia | Plus Jakarta Sans nos títulos, Inter no corpo, JetBrains Mono em dado técnico (ID, série, timestamp) |
+| Cor de ação | `#2563EB` no primário sólido; semânticas só em status, validação e alerta crítico |
+| Formas | 16px em cards, 12px em botões e campos, 8px em badges — aninhamento visual |
+| Elevação | Camadas tonais: fundo `#FAF8FF`, superfície `#FFFFFF` com contorno de 1px e sombra difusa |
+| Badges | *Soft fill*: 10% da cor semântica no fundo, 100% no texto |
+| Alvo de toque | Nunca abaixo de 44px, inclusive no desktop |
+
+**Status como badge, sem tocar em tela**
+
+As listas já emitiam `<span class="fo-chip-{{status}}">` e `<span class="fo-severity-{{prioridade}}">`.
+O badge nasce puramente do CSS a partir dessas classes, então acrescentar um novo estado é acrescentar
+uma regra em `styles.scss` — nenhum template muda.
+
+**Rótulos em pt-BR**
+
+`shared/pipes/fo-label.pipe.ts` traduz os enums da API (`UNDER_REVIEW`, `CRITICAL`, `ADMIN`) para
+rótulos de interface. O valor original continua sendo o que trafega em filtros e formulários — o pipe
+só afeta exibição. O paginador usa `shared/i18n/paginator-intl.pt-br.ts`.
+
 ## Estrutura
 
 ```
