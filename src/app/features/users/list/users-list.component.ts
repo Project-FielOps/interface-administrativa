@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FoLabelPipe } from '../../../shared/pipes/fo-label.pipe';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -25,6 +26,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
   selector: 'app-users-list',
   standalone: true,
   imports: [
+    FoLabelPipe,
     CommonModule,
     ReactiveFormsModule,
     MatTableModule,

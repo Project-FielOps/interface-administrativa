@@ -58,7 +58,7 @@
         }
         @for (nc of data.nonConformities; track nc.id) {
           <mat-card class="fo-item-card">
-            <p><strong>{{ nc.title }}</strong> <span [class]="'fo-severity-' + nc.severity.toLowerCase()">{{ nc.severity }}</span></p>
+            <p><strong>{{ nc.title }}</strong> <span [class]="'fo-severity-' + nc.severity.toLowerCase()">{{ nc.severity | foLabel }}</span></p>
             @if (nc.description) { <p>{{ nc.description }}</p> }
           </mat-card>
         }

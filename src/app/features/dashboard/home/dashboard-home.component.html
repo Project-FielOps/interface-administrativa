@@ -42,7 +42,7 @@
         @for (sv of severityEntries(summary); track sv.key) {
           <mat-card class="fo-stat-card">
             <span class="fo-stat-value" [class]="'fo-severity-' + sv.key.toLowerCase()">{{ sv.value }}</span>
-            <span class="fo-stat-label">{{ sv.key }}</span>
+            <span class="fo-stat-label">{{ sv.key | foLabel }}</span>
           </mat-card>
         }
       </div>

@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FoLabelPipe } from '../../../shared/pipes/fo-label.pipe';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -31,6 +32,7 @@ interface ReviewData {
   selector: 'app-inspection-review',
   standalone: true,
   imports: [
+    FoLabelPipe,
     CommonModule, ReactiveFormsModule, MatCardModule, MatButtonModule, MatIconModule,
     MatFormFieldModule, MatInputModule, StateContainerComponent, PageHeaderComponent,
   ],

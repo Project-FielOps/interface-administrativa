@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FoLabelPipe } from '../../../shared/pipes/fo-label.pipe';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,7 +25,7 @@ const STATUS_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, StateContainerComponent, PageHeaderComponent],
+  imports: [CommonModule, FoLabelPipe, MatCardModule, MatButtonModule, MatIconModule, StateContainerComponent, PageHeaderComponent],
   templateUrl: './dashboard-home.component.html',
 })
 export class DashboardHomeComponent implements OnInit {

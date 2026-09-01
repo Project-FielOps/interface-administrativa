@@ -37,11 +37,11 @@
           <mat-expansion-panel-header>
             <mat-panel-title>{{ nc.title }}</mat-panel-title>
             <mat-panel-description>
-              <span [class]="'fo-severity-' + nc.severity.toLowerCase()">{{ nc.severity }}</span>
+              <span [class]="'fo-severity-' + nc.severity.toLowerCase()">{{ nc.severity | foLabel }}</span>
             </mat-panel-description>
           </mat-expansion-panel-header>
           @if (nc.description) { <p>{{ nc.description }}</p> }
-          <p class="fo-muted">Status: {{ nc.status }}</p>
+          <p class="fo-muted">Status: {{ nc.status | foLabel }}</p>
           <button mat-button color="primary" (click)="viewInspection(nc)">
             <mat-icon>open_in_new</mat-icon> Ver inspeção
           </button>

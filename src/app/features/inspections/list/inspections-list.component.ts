@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FoLabelPipe } from '../../../shared/pipes/fo-label.pipe';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
@@ -31,6 +32,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
   selector: 'app-inspections-list',
   standalone: true,
   imports: [
+    FoLabelPipe,
     CommonModule, ReactiveFormsModule, MatTableModule, MatFormFieldModule, MatSelectModule,
     MatInputModule, MatButtonModule, MatIconModule, MatMenuModule, MatCheckboxModule,
     MatDatepickerModule, MatNativeDateModule, MatPaginatorModule, StateContainerComponent, PageHeaderComponent,

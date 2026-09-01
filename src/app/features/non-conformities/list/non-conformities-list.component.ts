@@ -1,5 +1,6 @@
 import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FoLabelPipe } from '../../../shared/pipes/fo-label.pipe';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -24,6 +25,7 @@ import { UiState, errorState, extractErrorMessage, loadingState, successState } 
   selector: 'app-non-conformities-list',
   standalone: true,
   imports: [
+    FoLabelPipe,
     CommonModule, ReactiveFormsModule, MatFormFieldModule, MatSelectModule,
     MatInputModule, MatIconModule, MatButtonModule, MatExpansionModule,
     StateContainerComponent, PageHeaderComponent,

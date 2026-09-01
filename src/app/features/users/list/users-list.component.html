@@ -55,12 +55,12 @@
       </ng-container>
       <ng-container matColumnDef="role">
         <th mat-header-cell *matHeaderCellDef>Perfil</th>
-        <td mat-cell *matCellDef="let u">{{ u.role }}</td>
+        <td mat-cell *matCellDef="let u">{{ u.role | foLabel }}</td>
       </ng-container>
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef>Status</th>
         <td mat-cell *matCellDef="let u">
-          <span [class]="'fo-chip-' + u.status.toLowerCase()">{{ u.status }}</span>
+          <span [class]="'fo-chip-' + u.status.toLowerCase()">{{ u.status | foLabel }}</span>
         </td>
       </ng-container>
       <ng-container matColumnDef="phone">
