@@ -1,31 +1,62 @@
 <mat-sidenav-container class="fo-shell">
   <mat-sidenav mode="side" opened class="fo-sidenav">
-    <div class="fo-brand" (click)="goToDashboard()">
-      <mat-icon>domain_verification</mat-icon>
-      <span>FieldOps</span>
+    <!-- Marca: bloco de logo + assinatura do sistema -->
+    <div class="fo-brand" (click)="goToDashboard()" role="button" tabindex="0" (keydown.enter)="goToDashboard()">
+      <div class="fo-brand__mark">
+        <mat-icon>domain_verification</mat-icon>
+      </div>
+      <div class="fo-brand__text">
+        <span class="fo-brand__name">FieldOps</span>
+        <span class="fo-brand__tag">Precision System</span>
+      </div>
     </div>
-    <mat-nav-list>
+
+    <nav class="fo-nav">
+      <span class="fo-nav__section">Operação</span>
       @for (item of visibleNavItems; track item.route) {
-        <a mat-list-item [routerLink]="item.route" routerLinkActive="fo-active" [routerLinkActiveOptions]="{ exact: false }">
-          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-          <span matListItemTitle>{{ item.label }}</span>
+        <a
+          class="fo-nav__item"
+          [routerLink]="item.route"
+          routerLinkActive="fo-active"
+          [routerLinkActiveOptions]="{ exact: false }"
+        >
+          <mat-icon class="fo-nav__icon">{{ item.icon }}</mat-icon>
+          <span class="fo-nav__label">{{ item.label }}</span>
         </a>
       }
-    </mat-nav-list>
+    </nav>
+
+    <!-- Rodapé de estado: espelha o indicador "Offline Ready" do protótipo -->
+    <div class="fo-sidenav__footer">
+      <span class="fo-status-dot"></span>
+      <div class="fo-sidenav__footer-text">
+        <span class="fo-sidenav__footer-label">Conectado</span>
+        <span class="fo-sidenav__footer-meta">v1.0.0 · Produção</span>
+      </div>
+    </div>
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <mat-toolbar color="primary" class="fo-toolbar-top">
-      <span class="fo-toolbar-title">Interface Administrativa</span>
+    <header class="fo-toolbar-top">
+      <div class="fo-toolbar-heading">
+        <span class="fo-toolbar-eyebrow">FieldOps</span>
+        <span class="fo-toolbar-title">Interface Administrativa</span>
+      </div>
       <span class="fo-spacer"></span>
       @if (auth.currentUser(); as user) {
-        <button mat-button [matMenuTriggerFor]="userMenu">
-          <mat-icon>account_circle</mat-icon>
-          {{ user.name }}
-          <span class="fo-role-badge">{{ user.role }}</span>
+        <button class="fo-user-chip" [matMenuTriggerFor]="userMenu" type="button">
+          <span class="fo-avatar">{{ initials(user.name) }}</span>
+          <span class="fo-user-chip__text">
+            <span class="fo-user-chip__name">{{ user.name }}</span>
+            <span class="fo-role-badge">{{ roleLabel(user.role) }}</span>
+          </span>
+          <mat-icon class="fo-user-chip__caret">expand_more</mat-icon>
         </button>
-        <mat-menu #userMenu="matMenu">
-          <button mat-menu-item disabled>{{ user.email }}</button>
+        <mat-menu #userMenu="matMenu" class="fo-user-menu">
+          <div class="fo-user-menu__header">
+            <span class="fo-user-menu__name">{{ user.name }}</span>
+            <span class="fo-user-menu__email">{{ user.email }}</span>
+          </div>
           <mat-divider></mat-divider>
           <button mat-menu-item (click)="logout()">
             <mat-icon>logout</mat-icon>
@@ -33,7 +64,7 @@
           </button>
         </mat-menu>
       }
-    </mat-toolbar>
+    </header>
 
     <main class="fo-content">
       <router-outlet></router-outlet>

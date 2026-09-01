@@ -2,10 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../auth/auth.service';
@@ -17,6 +14,14 @@ interface NavItem {
   adminOnly?: boolean;
 }
 
+/** Rótulos de perfil em português, para o badge do topo não exibir o enum cru. */
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: 'Administrador',
+  SUPERVISOR: 'Supervisor',
+  TECHNICIAN: 'Técnico',
+  CLIENT_VIEWER: 'Cliente',
+};
+
 @Component({
   selector: 'app-shell',
   standalone: true,
@@ -26,10 +31,7 @@ interface NavItem {
     RouterLink,
     RouterLinkActive,
     MatSidenavModule,
-    MatToolbarModule,
-    MatListModule,
     MatIconModule,
-    MatButtonModule,
     MatMenuModule,
     MatDividerModule,
   ],
@@ -53,6 +55,19 @@ export class ShellComponent {
 
   get visibleNavItems(): NavItem[] {
     return this.navItems.filter((item) => !item.adminOnly || this.auth.isAdmin());
+  }
+
+  /** Iniciais para o avatar do topo (primeiro e último nome). */
+  initials(name: string): string {
+    const parts = (name || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return '?';
+    const first = parts[0][0];
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+    return (first + last).toUpperCase();
+  }
+
+  roleLabel(role: string): string {
+    return ROLE_LABELS[role] || role;
   }
 
   logout(): void {

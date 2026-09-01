@@ -1,42 +1,312 @@
+// Shell administrativo no FieldOps Precision System.
+// Sidenav como superfície de navegação persistente; conteúdo sobre o fundo tonal.
+
 .fo-shell {
   height: 100vh;
+  background: var(--fo-level-0);
 }
 
 .fo-sidenav {
-  width: 260px;
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  width: var(--fo-sidenav-width);
+  background: var(--fo-level-1);
+  border-right: 1px solid var(--fo-hairline);
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--fo-space-sm);
 }
+
+// ---------------------------------------------------------------------------
+// Marca
+// ---------------------------------------------------------------------------
 
 .fo-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 20px 16px;
-  font-size: 18px;
-  font-weight: 600;
+  gap: var(--fo-space-sm);
+  padding: var(--fo-space-lg) var(--fo-space-base) var(--fo-space-md);
   cursor: pointer;
+  border-radius: var(--fo-radius-md);
+  outline: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary-container);
+    outline-offset: 2px;
+  }
 }
 
-.fo-active {
-  background: rgba(63, 81, 181, 0.1);
-  font-weight: 500;
+.fo-brand__mark {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--fo-radius-md);
+  background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-primary-container));
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--fo-shadow-primary);
+
+  mat-icon { font-size: 22px; width: 22px; height: 22px; }
+}
+
+.fo-brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  min-width: 0;
+}
+
+.fo-brand__name {
+  font: 700 18px/24px var(--fo-font-headline);
+  letter-spacing: -0.02em;
+  color: var(--mat-sys-on-surface);
+}
+
+.fo-brand__tag {
+  font: var(--fo-label-caps);
+  font-size: 10px;
+  letter-spacing: var(--fo-tracking-caps);
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
+  opacity: 0.75;
+}
+
+// ---------------------------------------------------------------------------
+// Navegação — pílulas de 12px, alvo de toque de 44px
+// ---------------------------------------------------------------------------
+
+.fo-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding-bottom: var(--fo-space-md);
+}
+
+.fo-nav__section {
+  font: var(--fo-label-caps);
+  letter-spacing: var(--fo-tracking-caps);
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
+  opacity: 0.7;
+  padding: var(--fo-space-sm) var(--fo-space-sm) var(--fo-space-base);
+}
+
+.fo-nav__item {
+  display: flex;
+  align-items: center;
+  gap: var(--fo-space-sm);
+  min-height: var(--fo-touch-target);
+  padding: 0 var(--fo-space-sm);
+  border-radius: var(--fo-radius-md);
+  color: var(--mat-sys-on-surface-variant);
+  text-decoration: none;
+  font: 500 14px/20px var(--fo-font-body);
+  position: relative;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-low);
+    color: var(--mat-sys-on-surface);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary-container);
+    outline-offset: -2px;
+  }
+}
+
+.fo-nav__icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.fo-nav__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Estado ativo: preenchimento suave do primário + acento à esquerda.
+.fo-nav__item.fo-active {
+  background: var(--fo-info-soft);
+  color: var(--mat-sys-primary);
+  font-weight: 600;
+
+  .fo-nav__icon { color: var(--mat-sys-primary); }
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 20px;
+    border-radius: 0 var(--fo-radius-sm) var(--fo-radius-sm) 0;
+    background: var(--mat-sys-primary-container);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Rodapé de estado
+// ---------------------------------------------------------------------------
+
+.fo-sidenav__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--fo-space-xs);
+  margin: 0 var(--fo-space-base) var(--fo-space-md);
+  padding: var(--fo-space-sm);
+  border-radius: var(--fo-radius-md);
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--fo-hairline);
+}
+
+.fo-status-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: var(--fo-radius-full);
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.fo-sidenav__footer-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.fo-sidenav__footer-label {
+  font: var(--fo-label-caps);
+  letter-spacing: var(--fo-tracking-caps);
+  text-transform: uppercase;
+  color: var(--fo-success);
+}
+
+.fo-sidenav__footer-meta {
+  font: var(--fo-data-mono);
+  font-size: 11px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// ---------------------------------------------------------------------------
+// Barra superior
+// ---------------------------------------------------------------------------
+
+.fo-toolbar-top {
+  height: var(--fo-topbar-height);
+  display: flex;
+  align-items: center;
+  gap: var(--fo-space-md);
+  padding: 0 var(--fo-space-xl);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--fo-hairline);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  @media (max-width: 720px) {
+    padding: 0 var(--fo-gutter);
+  }
+}
+
+.fo-toolbar-heading {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.fo-toolbar-eyebrow {
+  font: var(--fo-label-caps);
+  font-size: 10px;
+  letter-spacing: var(--fo-tracking-caps);
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
+  opacity: 0.7;
 }
 
 .fo-toolbar-title {
-  font-size: 16px;
+  font: 600 16px/22px var(--fo-font-headline);
+  letter-spacing: -0.01em;
+  color: var(--mat-sys-on-surface);
 }
 
-.fo-role-badge {
-  margin-left: 8px;
-  font-size: 11px;
-  opacity: 0.85;
-  border: 1px solid currentColor;
-  border-radius: 10px;
-  padding: 1px 8px;
+.fo-spacer { flex: 1 1 auto; }
+
+// Chip de usuário: avatar com iniciais + papel em soft fill.
+.fo-user-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--fo-space-xs);
+  height: var(--fo-touch-target);
+  padding: 0 var(--fo-space-sm);
+  border: 1px solid var(--fo-hairline);
+  border-radius: var(--fo-radius-md);
+  background: var(--fo-level-1);
+  cursor: pointer;
+  font-family: var(--fo-font-body);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-low);
+    box-shadow: var(--fo-shadow-1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary-container);
+    outline-offset: 2px;
+  }
 }
+
+.fo-avatar {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: var(--fo-radius-full);
+  background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-secondary));
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 12px/1 var(--fo-font-body);
+  letter-spacing: 0.02em;
+}
+
+.fo-user-chip__text {
+  display: flex;
+  align-items: center;
+  gap: var(--fo-space-xs);
+  min-width: 0;
+}
+
+.fo-user-chip__name {
+  font: 500 14px/20px var(--fo-font-body);
+  color: var(--mat-sys-on-surface);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.fo-user-chip__caret {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// ---------------------------------------------------------------------------
+// Conteúdo
+// ---------------------------------------------------------------------------
 
 .fo-content {
-  padding: 0;
-  min-height: calc(100vh - 64px);
-  background: #fafafa;
+  min-height: calc(100vh - var(--fo-topbar-height));
+  background: var(--fo-level-0);
 }
