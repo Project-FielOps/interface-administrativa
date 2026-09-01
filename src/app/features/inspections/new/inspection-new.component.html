@@ -107,7 +107,7 @@
         <mat-form-field>
           <mat-label>Data/hora agendada</mat-label>
           <input matInput [matDatepicker]="picker" formControlName="scheduledFor" />
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
           @if (form.controls.scheduledFor.hasError('required') && form.controls.scheduledFor.touched) {
             <mat-error>Informe a data agendada</mat-error>

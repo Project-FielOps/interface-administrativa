@@ -54,13 +54,13 @@
     <mat-form-field>
       <mat-label>De</mat-label>
       <input matInput [matDatepicker]="fromPicker" formControlName="from" />
-      <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+      <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
       <mat-datepicker #fromPicker></mat-datepicker>
     </mat-form-field>
     <mat-form-field>
       <mat-label>Até</mat-label>
       <input matInput [matDatepicker]="toPicker" formControlName="to" />
-      <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+      <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
       <mat-datepicker #toPicker></mat-datepicker>
     </mat-form-field>
 
