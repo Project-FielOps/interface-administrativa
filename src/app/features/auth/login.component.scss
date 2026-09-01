@@ -1,49 +1,182 @@
+// Login no FieldOps Precision System: fundo tonal arejado, cartão elevado,
+// aresta de marca no topo. Sem gradiente pesado — "less but better".
+
 .fo-login-page {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #303f9f, #3f51b5 60%, #5c6bc0);
+  padding: var(--fo-space-lg) var(--fo-gutter);
+  background:
+    radial-gradient(1000px 520px at 50% -10%, rgba(37, 99, 235, 0.08), transparent 70%),
+    radial-gradient(720px 420px at 100% 100%, rgba(91, 184, 254, 0.1), transparent 65%),
+    var(--fo-level-0);
 }
 
-.fo-login-card {
-  width: 380px;
-  padding: 32px;
+.fo-login-shell {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--fo-space-lg);
 }
+
+// ---------------------------------------------------------------------------
+// Marca
+// ---------------------------------------------------------------------------
 
 .fo-login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--fo-space-sm);
   text-align: center;
-  margin-bottom: 24px;
-
-  mat-icon {
-    font-size: 40px;
-    width: 40px;
-    height: 40px;
-    color: #3f51b5;
-  }
 
   h1 {
-    margin: 8px 0 0;
-    font-weight: 600;
+    font: var(--fo-headline-md);
+    letter-spacing: -0.02em;
+    margin: var(--fo-space-base) 0 0;
+    color: var(--mat-sys-on-surface);
   }
+}
 
-  p {
-    margin: 0;
-    color: #777;
+.fo-login-mark {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--fo-radius-lg);
+  background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-primary-container));
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--fo-shadow-primary);
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
   }
+}
+
+// Linha de estado com ponto pulsante, espelhando o "Offline Ready" do protótipo.
+.fo-login-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fo-space-xs);
+  margin: 0;
+  font: var(--fo-label-caps);
+  letter-spacing: var(--fo-tracking-caps);
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.fo-login-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--fo-radius-full);
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+// ---------------------------------------------------------------------------
+// Cartão
+// ---------------------------------------------------------------------------
+
+.fo-login-card {
+  width: 100%;
+  padding: var(--fo-space-xl) var(--fo-space-lg) var(--fo-space-lg);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--fo-shadow-2) !important;
+}
+
+.fo-login-edge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--mat-sys-primary), var(--mat-sys-secondary-container));
 }
 
 .fo-full {
   width: 100%;
 }
 
-.fo-login-submit {
-  margin-top: 8px;
-  height: 44px;
+.fo-login-card .mat-mdc-form-field {
+  margin-bottom: var(--fo-space-base);
+
+  // Ícone-guia à esquerda, que acende no foco.
+  [matIconPrefix] {
+    margin: 0 var(--fo-space-sm) 0 var(--fo-space-base);
+    color: var(--mat-sys-outline-variant);
+    transition: color 0.2s ease;
+  }
+
+  &.mat-focused [matIconPrefix] {
+    color: var(--mat-sys-primary-container);
+  }
 }
 
+// ---------------------------------------------------------------------------
+// Ações
+// ---------------------------------------------------------------------------
+
+.fo-login-submit {
+  margin-top: var(--fo-space-xs);
+  height: 52px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+
+  .fo-login-submit__inner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--fo-space-xs);
+  }
+
+  .fo-login-submit__arrow {
+    margin: 0;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover:not([disabled]) .fo-login-submit__arrow {
+    transform: translateX(4px);
+  }
+}
+
+// Erro: soft fill, contido, sem gritar.
 .fo-login-error {
-  color: #c62828;
+  display: flex;
+  align-items: center;
+  gap: var(--fo-space-xs);
+  margin: 0 0 var(--fo-space-sm);
+  padding: var(--fo-space-sm) var(--fo-space-sm);
+  border-radius: var(--fo-radius-md);
+  background: var(--fo-danger-soft);
+  border: 1px solid rgba(186, 26, 26, 0.2);
+  color: var(--fo-danger);
   font-size: 13px;
-  margin: -4px 0 12px;
+  font-weight: 500;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+}
+
+.fo-login-footnote {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--mat-sys-on-surface-variant);
+  opacity: 0.75;
 }
