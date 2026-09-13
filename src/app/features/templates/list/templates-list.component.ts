@@ -17,16 +17,34 @@ import { TemplatesService } from '../templates.service';
 import { InspectionTemplate } from '../../../core/models/template.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+  requestErrorState,
+} from '../../../shared/components/state-container/ui-state';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-templates-list',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatTableModule, MatFormFieldModule, MatSelectModule,
-    MatInputModule, MatButtonModule, MatIconModule, MatMenuModule, MatPaginatorModule,
-    StateContainerComponent, PageHeaderComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    MatTableModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatPaginatorModule,
+    StateContainerComponent,
+    PageHeaderComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './templates-list.component.html',
 })
@@ -59,14 +77,30 @@ export class TemplatesListComponent implements OnInit {
     this.state.set(loadingState());
     const { search, status } = this.filterForm.getRawValue();
     this.templatesService
-      .list({ search: search || undefined, status: status || undefined, page: this.pageIndex(), size: this.pageSize(), sort: 'title,asc' })
+      .list({
+        search: search || undefined,
+        status: status || undefined,
+        page: this.pageIndex(),
+        size: this.pageSize(),
+        sort: 'title,asc',
+      })
       .subscribe({
         next: (page) => {
           this.totalElements.set(page.totalElements);
-          this.state.set(successState(page.content, page.content.length === 0));
+          this.state.set(
+            successState(
+              page.content,
+              page.content.length === 0,
+              Object.values(this.filterForm.getRawValue()).some(Boolean),
+            ),
+          );
         },
-        error: (err) => this.state.set(errorState(extractErrorMessage(err))),
+        error: (err) => this.state.set(requestErrorState(err)),
       });
+  }
+
+  clearFilters(): void {
+    this.filterForm.reset({ search: '', status: '' });
   }
 
   onPage(event: PageEvent): void {
@@ -94,7 +128,11 @@ export class TemplatesListComponent implements OnInit {
   inactivate(t: InspectionTemplate): void {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       width: '420px',
-      data: { title: 'Inativar modelo', message: `Inativar o modelo "${t.title}"? Ele deixará de estar disponível para novos agendamentos.`, danger: true },
+      data: {
+        title: 'Inativar modelo',
+        message: `Inativar o modelo "${t.title}"? Ele deixará de estar disponível para novos agendamentos.`,
+        danger: true,
+      },
     });
     ref.afterClosed().subscribe((confirmed) => {
       if (!confirmed) return;

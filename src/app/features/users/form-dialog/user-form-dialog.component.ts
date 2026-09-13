@@ -96,7 +96,8 @@ export class UserFormDialogComponent {
   }
 
   private applyFieldErrors(err: unknown): void {
-    const fieldErrors = (err as { error?: { fieldErrors?: { field: string; message: string }[] } })?.error?.fieldErrors;
+    const fieldErrors = (err as { error?: { fieldErrors?: { field: string; message: string }[] } })
+      ?.error?.fieldErrors;
     fieldErrors?.forEach((fe) => {
       const control = this.form.get(fe.field);
       if (control) {

@@ -20,7 +20,16 @@ export interface SiteFormDialogData {
 @Component({
   selector: 'app-site-form-dialog',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatProgressSpinnerModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+  ],
   templateUrl: './site-form-dialog.component.html',
 })
 export class SiteFormDialogComponent implements OnInit {

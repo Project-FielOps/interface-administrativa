@@ -15,7 +15,11 @@ import {
 } from '../../core/models/template.model';
 
 @Injectable({ providedIn: 'root' })
-export class TemplatesService extends CrudService<InspectionTemplate, TemplateRequest, TemplateRequest> {
+export class TemplatesService extends CrudService<
+  InspectionTemplate,
+  TemplateRequest,
+  TemplateRequest
+> {
   constructor(http: HttpClient) {
     super(http, `${environment.apiUrl}/inspection-templates`);
   }
@@ -29,24 +33,48 @@ export class TemplatesService extends CrudService<InspectionTemplate, TemplateRe
     return this.http.post<TemplateSection>(`${this.baseUrl}/${templateId}/sections`, req);
   }
 
-  updateSection(templateId: string, sectionId: string, req: TemplateSectionRequest): Observable<TemplateSection> {
-    return this.http.put<TemplateSection>(`${this.baseUrl}/${templateId}/sections/${sectionId}`, req);
+  updateSection(
+    templateId: string,
+    sectionId: string,
+    req: TemplateSectionRequest,
+  ): Observable<TemplateSection> {
+    return this.http.put<TemplateSection>(
+      `${this.baseUrl}/${templateId}/sections/${sectionId}`,
+      req,
+    );
   }
 
   deleteSection(templateId: string, sectionId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${templateId}/sections/${sectionId}`);
   }
 
-  createItem(templateId: string, sectionId: string, req: TemplateItemRequest): Observable<TemplateItem> {
-    return this.http.post<TemplateItem>(`${this.baseUrl}/${templateId}/sections/${sectionId}/items`, req);
+  createItem(
+    templateId: string,
+    sectionId: string,
+    req: TemplateItemRequest,
+  ): Observable<TemplateItem> {
+    return this.http.post<TemplateItem>(
+      `${this.baseUrl}/${templateId}/sections/${sectionId}/items`,
+      req,
+    );
   }
 
-  updateItem(templateId: string, sectionId: string, itemId: string, req: TemplateItemRequest): Observable<TemplateItem> {
-    return this.http.put<TemplateItem>(`${this.baseUrl}/${templateId}/sections/${sectionId}/items/${itemId}`, req);
+  updateItem(
+    templateId: string,
+    sectionId: string,
+    itemId: string,
+    req: TemplateItemRequest,
+  ): Observable<TemplateItem> {
+    return this.http.put<TemplateItem>(
+      `${this.baseUrl}/${templateId}/sections/${sectionId}/items/${itemId}`,
+      req,
+    );
   }
 
   deleteItem(templateId: string, sectionId: string, itemId: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${templateId}/sections/${sectionId}/items/${itemId}`);
+    return this.http.delete<void>(
+      `${this.baseUrl}/${templateId}/sections/${sectionId}/items/${itemId}`,
+    );
   }
 
   publish(templateId: string): Observable<InspectionTemplateVersion> {
@@ -59,7 +87,9 @@ export class TemplatesService extends CrudService<InspectionTemplate, TemplateRe
 
   /** versionNumber is the integer version number (1, 2, ...), not a version UUID. */
   getVersion(templateId: string, versionNumber: number): Observable<InspectionTemplateVersion> {
-    return this.http.get<InspectionTemplateVersion>(`${this.baseUrl}/${templateId}/versions/${versionNumber}`);
+    return this.http.get<InspectionTemplateVersion>(
+      `${this.baseUrl}/${templateId}/versions/${versionNumber}`,
+    );
   }
 
   updateStatus(id: string, status: TemplateStatus): Observable<InspectionTemplate> {

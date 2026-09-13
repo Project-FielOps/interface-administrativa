@@ -12,7 +12,15 @@ import { NonConformitiesService } from '../non-conformities.service';
 import { NonConformity } from '../../../core/models/inspection.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+  requestErrorState,
+} from '../../../shared/components/state-container/ui-state';
 
 /**
  * The real backend has no flat, top-level non-conformities list — every non-conformity is
@@ -24,9 +32,17 @@ import { UiState, errorState, extractErrorMessage, loadingState, successState } 
   selector: 'app-non-conformities-list',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatFormFieldModule, MatSelectModule,
-    MatInputModule, MatIconModule, MatButtonModule, MatExpansionModule,
-    StateContainerComponent, PageHeaderComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatIconModule,
+    MatButtonModule,
+    MatExpansionModule,
+    StateContainerComponent,
+    PageHeaderComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './non-conformities-list.component.html',
 })
@@ -39,6 +55,15 @@ export class NonConformitiesListComponent {
     const severity = this.severityFilter();
     return severity ? data.filter((nc) => nc.severity === severity) : data;
   });
+  readonly displayPhase = computed(() =>
+    this.state().phase === 'success' && this.filtered().length === 0 && !!this.severityFilter()
+      ? 'no-results'
+      : this.state().phase,
+  );
+
+  clearFilters(): void {
+    this.filterForm.patchValue({ severity: '' });
+  }
 
   readonly filterForm = this.fb.group({ inspectionId: [''], severity: [''] });
 
@@ -47,7 +72,9 @@ export class NonConformitiesListComponent {
     private readonly service: NonConformitiesService,
     private readonly router: Router,
   ) {
-    this.filterForm.controls.severity.valueChanges.subscribe((v) => this.severityFilter.set(v || ''));
+    this.filterForm.controls.severity.valueChanges.subscribe((v) =>
+      this.severityFilter.set(v || ''),
+    );
   }
 
   search(): void {
@@ -55,8 +82,9 @@ export class NonConformitiesListComponent {
     if (!inspectionId) return;
     this.state.set(loadingState());
     this.service.listByInspection(inspectionId).subscribe({
-      next: (list) => this.state.set(successState(list, list.length === 0)),
-      error: (err) => this.state.set(errorState(extractErrorMessage(err))),
+      next: (list) =>
+        this.state.set(successState(list, list.length === 0, !!this.severityFilter())),
+      error: (err) => this.state.set(requestErrorState(err)),
     });
   }
 

@@ -1,7 +1,10 @@
 <div class="fo-page">
-  <app-page-header title="Nova Inspeção" subtitle="Agendamento de uma nova inspeção em campo."></app-page-header>
+  <app-page-header
+    title="Nova Inspeção"
+    subtitle="Agendamento de uma nova inspeção em campo."
+  ></app-page-header>
 
-  <mat-card style="padding:24px; max-width:820px">
+  <mat-card style="padding: 24px; max-width: 820px">
     <form [formGroup]="form" (ngSubmit)="submit()">
       <div class="fo-form-grid">
         <mat-form-field class="fo-full">
@@ -28,10 +31,15 @@
           <mat-label>Versão publicada</mat-label>
           <mat-select formControlName="templateVersionNumber" [disabled]="versions().length === 0">
             @for (v of versions(); track v.versionNumber) {
-              <mat-option [value]="v.versionNumber">v{{ v.versionNumber }} — {{ v.titleSnapshot }}</mat-option>
+              <mat-option [value]="v.versionNumber"
+                >v{{ v.versionNumber }} — {{ v.titleSnapshot }}</mat-option
+              >
             }
           </mat-select>
-          @if (form.controls.templateVersionNumber.hasError('required') && form.controls.templateVersionNumber.touched) {
+          @if (
+            form.controls.templateVersionNumber.hasError('required') &&
+            form.controls.templateVersionNumber.touched
+          ) {
             <mat-error>Selecione uma versão</mat-error>
           }
         </mat-form-field>
@@ -87,7 +95,9 @@
               <mat-option [value]="t.id">{{ t.name }}</mat-option>
             }
           </mat-select>
-          @if (form.controls.technicianId.hasError('required') && form.controls.technicianId.touched) {
+          @if (
+            form.controls.technicianId.hasError('required') && form.controls.technicianId.touched
+          ) {
             <mat-error>Selecione um técnico</mat-error>
           }
         </mat-form-field>
@@ -99,7 +109,9 @@
               <mat-option [value]="s.id">{{ s.name }}</mat-option>
             }
           </mat-select>
-          @if (form.controls.supervisorId.hasError('required') && form.controls.supervisorId.touched) {
+          @if (
+            form.controls.supervisorId.hasError('required') && form.controls.supervisorId.touched
+          ) {
             <mat-error>Selecione um supervisor</mat-error>
           }
         </mat-form-field>
@@ -109,7 +121,9 @@
           <input matInput [matDatepicker]="picker" formControlName="scheduledFor" />
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
-          @if (form.controls.scheduledFor.hasError('required') && form.controls.scheduledFor.touched) {
+          @if (
+            form.controls.scheduledFor.hasError('required') && form.controls.scheduledFor.touched
+          ) {
             <mat-error>Informe a data agendada</mat-error>
           }
         </mat-form-field>
@@ -127,7 +141,11 @@
       <div class="fo-actions-row">
         <button mat-button type="button" (click)="cancel()">Cancelar</button>
         <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
-          @if (saving()) { <mat-spinner diameter="18"></mat-spinner> } @else { Agendar inspeção }
+          @if (saving()) {
+            <mat-spinner diameter="18"></mat-spinner>
+          } @else {
+            Agendar inspeção
+          }
         </button>
       </div>
     </form>

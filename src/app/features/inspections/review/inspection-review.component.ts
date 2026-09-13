@@ -11,13 +11,26 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { forkJoin } from 'rxjs';
 import { InspectionsService } from '../inspections.service';
-import { Evidence, Inspection, InspectionItemSnapshot, InspectionReview, NonConformity } from '../../../core/models/inspection.model';
+import {
+  Evidence,
+  Inspection,
+  InspectionItemSnapshot,
+  InspectionReview,
+  NonConformity,
+} from '../../../core/models/inspection.model';
 import { NonConformitiesService } from '../../non-conformities/non-conformities.service';
 import { EvidenceService } from '../../evidence/evidence.service';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+} from '../../../shared/components/state-container/ui-state';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 interface ReviewData {
   inspection: Inspection;
@@ -31,8 +44,16 @@ interface ReviewData {
   selector: 'app-inspection-review',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatCardModule, MatButtonModule, MatIconModule,
-    MatFormFieldModule, MatInputModule, StateContainerComponent, PageHeaderComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    StateContainerComponent,
+    PageHeaderComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './inspection-review.component.html',
 })
@@ -72,8 +93,15 @@ export class InspectionReviewComponent implements OnInit {
       evidence: this.evidenceService.listByInspection(this.inspectionId),
     }).subscribe({
       next: ({ inspection, reviews, nonConformities, evidence }) => {
-        const sortedItems = [...(inspection.items ?? [])].sort((a, b) => a.sectionOrder - b.sectionOrder || a.itemOrder - b.itemOrder);
-        this.state.set(successState({ inspection, items: sortedItems, reviews, nonConformities, evidence }, false));
+        const sortedItems = [...(inspection.items ?? [])].sort(
+          (a, b) => a.sectionOrder - b.sectionOrder || a.itemOrder - b.itemOrder,
+        );
+        this.state.set(
+          successState(
+            { inspection, items: sortedItems, reviews, nonConformities, evidence },
+            false,
+          ),
+        );
       },
       error: (err) => this.state.set(errorState(extractErrorMessage(err))),
     });
@@ -89,7 +117,8 @@ export class InspectionReviewComponent implements OnInit {
     if (!r) return 'Sem resposta';
     if (r.valueText) return r.valueText;
     if (r.valueNumber !== undefined && r.valueNumber !== null) return String(r.valueNumber);
-    if (r.valueBoolean !== undefined && r.valueBoolean !== null) return r.valueBoolean ? 'Sim' : 'Não';
+    if (r.valueBoolean !== undefined && r.valueBoolean !== null)
+      return r.valueBoolean ? 'Sim' : 'Não';
     if (r.valueDate) return r.valueDate;
     if (r.conformity) return r.conformity;
     return 'Sem resposta';
@@ -118,7 +147,11 @@ export class InspectionReviewComponent implements OnInit {
   approve(): void {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       width: '460px',
-      data: { title: 'Aprovar inspeção', message: 'Confirma a aprovação desta inspeção?', confirmLabel: 'Aprovar' },
+      data: {
+        title: 'Aprovar inspeção',
+        message: 'Confirma a aprovação desta inspeção?',
+        confirmLabel: 'Aprovar',
+      },
     });
     ref.afterClosed().subscribe((confirmed) => {
       if (!confirmed) return;

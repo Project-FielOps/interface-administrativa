@@ -14,12 +14,17 @@ export class SitesService extends CrudService<InspectionSite, SiteRequest, SiteR
 
   /** POST /clients/{clientId}/sites — sites are always created nested under a client. */
   createForClient(clientId: string, payload: SiteRequest): Observable<InspectionSite> {
-    return this.http.post<InspectionSite>(`${environment.apiUrl}/clients/${clientId}/sites`, payload);
+    return this.http.post<InspectionSite>(
+      `${environment.apiUrl}/clients/${clientId}/sites`,
+      payload,
+    );
   }
 
   listByClient(clientId: string): Observable<InspectionSite[]> {
     return this.http
-      .get<Page<InspectionSite>>(`${environment.apiUrl}/clients/${clientId}/sites`, { params: { size: 200 } })
+      .get<Page<InspectionSite>>(`${environment.apiUrl}/clients/${clientId}/sites`, {
+        params: { size: 200 },
+      })
       .pipe(map((page) => page.content));
   }
 

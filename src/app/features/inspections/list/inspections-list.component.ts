@@ -24,21 +24,50 @@ import { Client } from '../../../core/models/client.model';
 import { User } from '../../../core/models/user.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+  requestErrorState,
+} from '../../../shared/components/state-container/ui-state';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-inspections-list',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatTableModule, MatFormFieldModule, MatSelectModule,
-    MatInputModule, MatButtonModule, MatIconModule, MatMenuModule, MatCheckboxModule,
-    MatDatepickerModule, MatNativeDateModule, MatPaginatorModule, StateContainerComponent, PageHeaderComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    MatTableModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatPaginatorModule,
+    StateContainerComponent,
+    PageHeaderComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './inspections-list.component.html',
 })
 export class InspectionsListComponent implements OnInit {
-  readonly displayedColumns = ['title', 'client', 'technician', 'priority', 'status', 'scheduledFor', 'actions'];
+  readonly displayedColumns = [
+    'title',
+    'client',
+    'technician',
+    'priority',
+    'status',
+    'scheduledFor',
+    'actions',
+  ];
   readonly state = signal<UiState<Inspection[]>>(loadingState());
   readonly totalElements = signal(0);
   readonly pageSize = signal(10);
@@ -57,6 +86,19 @@ export class InspectionsListComponent implements OnInit {
     awaitingReview: [false],
   });
 
+  clearFilters(): void {
+    this.filterForm.reset({
+      status: '',
+      technicianId: '',
+      clientId: '',
+      priority: '',
+      from: null,
+      to: null,
+      overdue: false,
+      awaitingReview: false,
+    });
+  }
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly inspectionsService: InspectionsService,
@@ -69,8 +111,12 @@ export class InspectionsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
-    this.clientsService.list({ size: 200, sort: 'name,asc' }).subscribe({ next: (p) => this.clients.set(p.content) });
-    this.usersService.list({ size: 200, role: 'TECHNICIAN', status: 'ACTIVE' }).subscribe({ next: (p) => this.technicians.set(p.content) });
+    this.clientsService
+      .list({ size: 200, sort: 'name,asc' })
+      .subscribe({ next: (p) => this.clients.set(p.content) });
+    this.usersService
+      .list({ size: 200, role: 'TECHNICIAN', status: 'ACTIVE' })
+      .subscribe({ next: (p) => this.technicians.set(p.content) });
     this.filterForm.valueChanges.pipe(debounceTime(350)).subscribe(() => {
       this.pageIndex.set(0);
       this.load();
@@ -97,9 +143,15 @@ export class InspectionsListComponent implements OnInit {
       .subscribe({
         next: (page) => {
           this.totalElements.set(page.totalElements);
-          this.state.set(successState(page.content, page.content.length === 0));
+          this.state.set(
+            successState(
+              page.content,
+              page.content.length === 0,
+              Object.values(this.filterForm.getRawValue()).some(Boolean),
+            ),
+          );
         },
-        error: (err) => this.state.set(errorState(extractErrorMessage(err))),
+        error: (err) => this.state.set(requestErrorState(err)),
       });
   }
 

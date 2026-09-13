@@ -10,11 +10,15 @@
   gap: 12px;
   padding: 48px 16px;
   text-align: center;
-  color: var(--mat-sys-on-surface-variant, #666);
+  min-height: 260px;
+  color: var(--fo-text-secondary);
+  background: var(--fo-surface);
+  border: 1px solid var(--fo-border);
+  border-radius: 12px;
 }
 
 .fo-state__error mat-icon {
-  color: #c62828;
+  color: var(--fo-error);
   font-size: 40px;
   width: 40px;
   height: 40px;
@@ -24,5 +28,6 @@
   font-size: 40px;
   width: 40px;
   height: 40px;
-  opacity: 0.5;
+  color: var(--fo-primary-dark);
+  opacity: 0.65;
 }

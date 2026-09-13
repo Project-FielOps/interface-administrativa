@@ -17,17 +17,35 @@ import { ClientsService } from '../clients.service';
 import { Client } from '../../../core/models/client.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+  requestErrorState,
+} from '../../../shared/components/state-container/ui-state';
 import { ClientFormDialogComponent } from '../form-dialog/client-form-dialog.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-clients-list',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatTableModule, MatFormFieldModule, MatSelectModule,
-    MatInputModule, MatButtonModule, MatIconModule, MatMenuModule, MatPaginatorModule,
-    StateContainerComponent, PageHeaderComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    MatTableModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatPaginatorModule,
+    StateContainerComponent,
+    PageHeaderComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './clients-list.component.html',
 })
@@ -60,14 +78,30 @@ export class ClientsListComponent implements OnInit {
     this.state.set(loadingState());
     const { search, status } = this.filterForm.getRawValue();
     this.clientsService
-      .list({ name: search || undefined, status: status || undefined, page: this.pageIndex(), size: this.pageSize(), sort: 'name,asc' })
+      .list({
+        name: search || undefined,
+        status: status || undefined,
+        page: this.pageIndex(),
+        size: this.pageSize(),
+        sort: 'name,asc',
+      })
       .subscribe({
         next: (page) => {
           this.totalElements.set(page.totalElements);
-          this.state.set(successState(page.content, page.content.length === 0));
+          this.state.set(
+            successState(
+              page.content,
+              page.content.length === 0,
+              Object.values(this.filterForm.getRawValue()).some(Boolean),
+            ),
+          );
         },
-        error: (err) => this.state.set(errorState(extractErrorMessage(err))),
+        error: (err) => this.state.set(requestErrorState(err)),
       });
+  }
+
+  clearFilters(): void {
+    this.filterForm.reset({ search: '', status: '' });
   }
 
   onPage(event: PageEvent): void {

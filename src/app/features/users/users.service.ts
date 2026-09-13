@@ -3,7 +3,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { CrudService } from '../../core/http/crud.service';
-import { User, UserCreateRequest, UserStatus, UserUpdateRequest } from '../../core/models/user.model';
+import {
+  User,
+  UserCreateRequest,
+  UserStatus,
+  UserUpdateRequest,
+} from '../../core/models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService extends CrudService<User, UserCreateRequest, UserUpdateRequest> {

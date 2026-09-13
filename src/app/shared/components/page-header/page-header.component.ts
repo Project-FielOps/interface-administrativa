@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="fo-page-header">
+    <header class="fo-page-header">
       <div>
         <h1>{{ title }}</h1>
         @if (subtitle) {
@@ -16,21 +16,47 @@ import { CommonModule } from '@angular/common';
       <div class="fo-page-header__actions">
         <ng-content></ng-content>
       </div>
-    </div>
+    </header>
   `,
-  styles: [`
-    .fo-page-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    h1 { margin: 0 0 4px; font-size: 22px; font-weight: 500; }
-    .fo-page-header__subtitle { margin: 0; color: #666; font-size: 14px; }
-    .fo-page-header__actions { display: flex; gap: 8px; flex-wrap: wrap; }
-  `],
+  styles: [
+    `
+      .fo-page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+      h1 {
+        margin: 0 0 4px;
+        font-size: 28px;
+        line-height: 36px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .fo-page-header__subtitle {
+        max-width: 720px;
+        margin: 0;
+        color: var(--fo-text-secondary);
+        font-size: 14px;
+      }
+      .fo-page-header__actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      @media (max-width: 760px) {
+        .fo-page-header {
+          flex-direction: column;
+        }
+        .fo-page-header__actions {
+          width: 100%;
+        }
+      }
+    `,
+  ],
 })
 export class PageHeaderComponent {
   @Input() title = '';

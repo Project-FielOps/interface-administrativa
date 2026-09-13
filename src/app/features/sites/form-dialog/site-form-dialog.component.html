@@ -73,7 +73,11 @@
   <mat-dialog-actions align="end">
     <button mat-button type="button" mat-dialog-close [disabled]="saving()">Cancelar</button>
     <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
-      @if (saving()) { <mat-spinner diameter="18"></mat-spinner> } @else { Salvar }
+      @if (saving()) {
+        <mat-spinner diameter="18"></mat-spinner>
+      } @else {
+        Salvar
+      }
     </button>
   </mat-dialog-actions>
 </form>

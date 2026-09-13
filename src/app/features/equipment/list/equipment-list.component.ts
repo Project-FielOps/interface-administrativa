@@ -14,12 +14,25 @@ import { debounceTime } from 'rxjs';
 import { EquipmentService } from '../equipment.service';
 import { SitesService } from '../../sites/sites.service';
 import { ClientsService } from '../../clients/clients.service';
-import { Client, Equipment, EquipmentStatus, InspectionSite } from '../../../core/models/client.model';
+import {
+  Client,
+  Equipment,
+  EquipmentStatus,
+  InspectionSite,
+} from '../../../core/models/client.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+  requestErrorState,
+} from '../../../shared/components/state-container/ui-state';
 import { EquipmentFormDialogComponent } from '../form-dialog/equipment-form-dialog.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 /**
  * The real backend has no flat GET /equipment list — equipment is only listable nested
@@ -32,16 +45,32 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
   selector: 'app-equipment-list',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatTableModule, MatFormFieldModule, MatSelectModule,
-    MatInputModule, MatButtonModule, MatIconModule, MatMenuModule,
-    StateContainerComponent, PageHeaderComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    MatTableModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    StateContainerComponent,
+    PageHeaderComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './equipment-list.component.html',
 })
 export class EquipmentListComponent implements OnInit {
   @Input() siteId?: string; // present when nested under /app/sites/:siteId/equipment
 
-  readonly displayedColumns = ['name', 'assetNumber', 'qrCode', 'manufacturerModel', 'status', 'actions'];
+  readonly displayedColumns = [
+    'name',
+    'assetNumber',
+    'qrCode',
+    'manufacturerModel',
+    'status',
+    'actions',
+  ];
   readonly state = signal<UiState<Equipment[]>>({ phase: 'empty' });
   readonly clients = signal<Client[]>([]);
   readonly sites = signal<InspectionSite[]>([]);
@@ -58,10 +87,23 @@ export class EquipmentListComponent implements OnInit {
     const status = this.statusTerm();
     return data.filter(
       (e) =>
-        (!search || e.name.toLowerCase().includes(search) || (e.assetNumber || '').toLowerCase().includes(search)) &&
+        (!search ||
+          e.name.toLowerCase().includes(search) ||
+          (e.assetNumber || '').toLowerCase().includes(search)) &&
         (!status || e.status === status),
     );
   });
+  readonly displayPhase = computed(() =>
+    this.state().phase === 'success' &&
+    this.filtered().length === 0 &&
+    (this.searchTerm() || this.statusTerm())
+      ? 'no-results'
+      : this.state().phase,
+  );
+
+  clearFilters(): void {
+    this.filterForm.patchValue({ search: '', status: '', qrCode: '' });
+  }
 
   constructor(
     private readonly fb: FormBuilder,
@@ -77,7 +119,9 @@ export class EquipmentListComponent implements OnInit {
       this.selectedSiteId.set(this.siteId);
       this.load();
     } else {
-      this.clientsService.list({ size: 200, sort: 'name,asc' }).subscribe({ next: (p) => this.clients.set(p.content) });
+      this.clientsService
+        .list({ size: 200, sort: 'name,asc' })
+        .subscribe({ next: (p) => this.clients.set(p.content) });
     }
     this.filterForm.valueChanges.pipe(debounceTime(300)).subscribe(({ search, status }) => {
       this.searchTerm.set(search || '');
@@ -104,8 +148,15 @@ export class EquipmentListComponent implements OnInit {
     if (!siteId) return;
     this.state.set(loadingState());
     this.equipmentService.listBySite(siteId).subscribe({
-      next: (equipment) => this.state.set(successState(equipment, equipment.length === 0)),
-      error: (err) => this.state.set(errorState(extractErrorMessage(err))),
+      next: (equipment) =>
+        this.state.set(
+          successState(
+            equipment,
+            equipment.length === 0,
+            Object.values(this.filterForm.getRawValue()).some(Boolean),
+          ),
+        ),
+      error: (err) => this.state.set(requestErrorState(err)),
     });
   }
 
@@ -115,14 +166,17 @@ export class EquipmentListComponent implements OnInit {
     this.state.set(loadingState());
     this.equipmentService.findByQrCode(qrCode).subscribe({
       next: (equipment) => this.state.set(successState([equipment], false)),
-      error: (err) => this.state.set(errorState(extractErrorMessage(err))),
+      error: (err) => this.state.set(requestErrorState(err)),
     });
   }
 
   openCreate(): void {
     const targetSiteId = this.siteId || this.selectedSiteId();
     const site = this.sites().find((s) => s.id === targetSiteId);
-    const ref = this.dialog.open(EquipmentFormDialogComponent, { width: '640px', data: { siteId: targetSiteId, site } });
+    const ref = this.dialog.open(EquipmentFormDialogComponent, {
+      width: '640px',
+      data: { siteId: targetSiteId, site },
+    });
     ref.afterClosed().subscribe((result) => {
       if (result) {
         this.snackBar.open('Equipamento criado com sucesso.', 'Fechar', { duration: 3000 });
@@ -134,7 +188,10 @@ export class EquipmentListComponent implements OnInit {
   openEdit(equipment: Equipment): void {
     const targetSiteId = this.siteId || this.selectedSiteId();
     const site = this.sites().find((s) => s.id === targetSiteId);
-    const ref = this.dialog.open(EquipmentFormDialogComponent, { width: '640px', data: { equipment, siteId: targetSiteId, site } });
+    const ref = this.dialog.open(EquipmentFormDialogComponent, {
+      width: '640px',
+      data: { equipment, siteId: targetSiteId, site },
+    });
     ref.afterClosed().subscribe((result) => {
       if (result) {
         this.snackBar.open('Equipamento atualizado com sucesso.', 'Fechar', { duration: 3000 });
@@ -147,9 +204,16 @@ export class EquipmentListComponent implements OnInit {
     const messages = {
       activate: { title: 'Ativar equipamento', message: `Ativar ${equipment.name}?` },
       inactivate: { title: 'Inativar equipamento', message: `Inativar ${equipment.name}?` },
-      decommission: { title: 'Desativar permanentemente', message: `Marcar ${equipment.name} como desativado (fora de uso)?` },
+      decommission: {
+        title: 'Desativar permanentemente',
+        message: `Marcar ${equipment.name} como desativado (fora de uso)?`,
+      },
     }[action];
-    const targetStatus: EquipmentStatus = { activate: 'ACTIVE', inactivate: 'INACTIVE', decommission: 'DECOMMISSIONED' }[action] as EquipmentStatus;
+    const targetStatus: EquipmentStatus = {
+      activate: 'ACTIVE',
+      inactivate: 'INACTIVE',
+      decommission: 'DECOMMISSIONED',
+    }[action] as EquipmentStatus;
     const ref = this.dialog.open(ConfirmDialogComponent, {
       width: '420px',
       data: { title: messages.title, message: messages.message, danger: action !== 'activate' },

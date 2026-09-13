@@ -17,7 +17,15 @@ import { ClientsService } from '../../clients/clients.service';
 import { Client, InspectionSite } from '../../../core/models/client.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+  requestErrorState,
+} from '../../../shared/components/state-container/ui-state';
 import { SiteFormDialogComponent } from '../form-dialog/site-form-dialog.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
@@ -31,9 +39,18 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
   selector: 'app-sites-list',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatTableModule, MatFormFieldModule, MatSelectModule,
-    MatInputModule, MatButtonModule, MatIconModule, MatMenuModule,
-    StateContainerComponent, PageHeaderComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    MatTableModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    StateContainerComponent,
+    PageHeaderComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './sites-list.component.html',
 })
@@ -53,8 +70,21 @@ export class SitesListComponent implements OnInit {
     const data = this.state().data ?? [];
     const search = this.searchTerm().toLowerCase();
     const status = this.statusTerm();
-    return data.filter((s) => (!search || s.name.toLowerCase().includes(search)) && (!status || s.status === status));
+    return data.filter(
+      (s) => (!search || s.name.toLowerCase().includes(search)) && (!status || s.status === status),
+    );
   });
+  readonly displayPhase = computed(() =>
+    this.state().phase === 'success' &&
+    this.filtered().length === 0 &&
+    Object.values(this.filterForm.getRawValue()).some(Boolean)
+      ? 'no-results'
+      : this.state().phase,
+  );
+
+  clearFilters(): void {
+    this.filterForm.reset({ search: '', status: '' });
+  }
 
   constructor(
     private readonly fb: FormBuilder,
@@ -70,7 +100,9 @@ export class SitesListComponent implements OnInit {
       this.selectedClientId.set(this.clientId);
       this.load();
     } else {
-      this.clientsService.list({ size: 200, sort: 'name,asc' }).subscribe({ next: (p) => this.clients.set(p.content) });
+      this.clientsService
+        .list({ size: 200, sort: 'name,asc' })
+        .subscribe({ next: (p) => this.clients.set(p.content) });
     }
     this.filterForm.valueChanges.pipe(debounceTime(300)).subscribe(({ search, status }) => {
       this.searchTerm.set(search || '');
@@ -88,14 +120,24 @@ export class SitesListComponent implements OnInit {
     if (!clientId) return;
     this.state.set(loadingState());
     this.sitesService.listByClient(clientId).subscribe({
-      next: (sites) => this.state.set(successState(sites, sites.length === 0)),
-      error: (err) => this.state.set(errorState(extractErrorMessage(err))),
+      next: (sites) =>
+        this.state.set(
+          successState(
+            sites,
+            sites.length === 0,
+            Object.values(this.filterForm.getRawValue()).some(Boolean),
+          ),
+        ),
+      error: (err) => this.state.set(requestErrorState(err)),
     });
   }
 
   openCreate(): void {
     const targetClientId = this.clientId || this.selectedClientId();
-    const ref = this.dialog.open(SiteFormDialogComponent, { width: '640px', data: { clientId: targetClientId } });
+    const ref = this.dialog.open(SiteFormDialogComponent, {
+      width: '640px',
+      data: { clientId: targetClientId },
+    });
     ref.afterClosed().subscribe((result) => {
       if (result) {
         this.snackBar.open('Local criado com sucesso.', 'Fechar', { duration: 3000 });
@@ -105,7 +147,10 @@ export class SitesListComponent implements OnInit {
   }
 
   openEdit(site: InspectionSite): void {
-    const ref = this.dialog.open(SiteFormDialogComponent, { width: '640px', data: { site, clientId: this.clientId || this.selectedClientId() } });
+    const ref = this.dialog.open(SiteFormDialogComponent, {
+      width: '640px',
+      data: { site, clientId: this.clientId || this.selectedClientId() },
+    });
     ref.afterClosed().subscribe((result) => {
       if (result) {
         this.snackBar.open('Local atualizado com sucesso.', 'Fechar', { duration: 3000 });

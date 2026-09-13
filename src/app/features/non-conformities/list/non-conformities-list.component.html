@@ -1,32 +1,39 @@
 <div class="fo-page">
-  <app-page-header title="Não Conformidades" subtitle="Problemas e desvios identificados durante as inspeções. Informe o ID de uma inspeção para consultar."></app-page-header>
+  <app-page-header
+    title="Não Conformidades"
+    subtitle="Problemas e desvios identificados durante as inspeções. Informe o ID de uma inspeção para consultar."
+  ></app-page-header>
 
-  <form [formGroup]="filterForm" class="fo-filters" (ngSubmit)="search()">
-    <mat-form-field>
-      <mat-label>ID da inspeção</mat-label>
-      <input matInput formControlName="inspectionId" placeholder="UUID da inspeção" />
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Severidade</mat-label>
-      <mat-select formControlName="severity">
-        <mat-option value="">Todas</mat-option>
-        <mat-option value="LOW">Baixa</mat-option>
-        <mat-option value="MEDIUM">Média</mat-option>
-        <mat-option value="HIGH">Alta</mat-option>
-        <mat-option value="CRITICAL">Crítica</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <button mat-raised-button color="primary" type="submit">
-      <mat-icon>search</mat-icon> Consultar
-    </button>
-  </form>
+  <details class="fo-filter-panel" open>
+    <summary><mat-icon>filter_alt</mat-icon> Filtros</summary>
+    <form [formGroup]="filterForm" class="fo-filters" (ngSubmit)="search()">
+      <mat-form-field>
+        <mat-label>ID da inspeção</mat-label>
+        <input matInput formControlName="inspectionId" placeholder="UUID da inspeção" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Severidade</mat-label>
+        <mat-select formControlName="severity">
+          <mat-option value="">Todas</mat-option>
+          <mat-option value="LOW">Baixa</mat-option>
+          <mat-option value="MEDIUM">Média</mat-option>
+          <mat-option value="HIGH">Alta</mat-option>
+          <mat-option value="CRITICAL">Crítica</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">
+        <mat-icon>search</mat-icon> Consultar
+      </button>
+    </form>
+  </details>
 
   <app-state-container
-    [phase]="state().phase"
+    [phase]="displayPhase()"
     [errorMessage]="state().errorMessage || ''"
     emptyMessage="Informe o ID de uma inspeção acima e clique em Consultar para ver suas não conformidades."
     emptyIcon="report_problem"
     [retry]="search.bind(this)"
+    [clearFilters]="clearFilters.bind(this)"
     [content]="listTpl"
   ></app-state-container>
 
@@ -37,11 +44,13 @@
           <mat-expansion-panel-header>
             <mat-panel-title>{{ nc.title }}</mat-panel-title>
             <mat-panel-description>
-              <span [class]="'fo-severity-' + nc.severity.toLowerCase()">{{ nc.severity }}</span>
+              <app-status-badge [value]="nc.severity"></app-status-badge>
             </mat-panel-description>
           </mat-expansion-panel-header>
-          @if (nc.description) { <p>{{ nc.description }}</p> }
-          <p class="fo-muted">Status: {{ nc.status }}</p>
+          @if (nc.description) {
+            <p>{{ nc.description }}</p>
+          }
+          <p><app-status-badge [value]="nc.status"></app-status-badge></p>
           <button mat-button color="primary" (click)="viewInspection(nc)">
             <mat-icon>open_in_new</mat-icon> Ver inspeção
           </button>

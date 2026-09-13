@@ -1,9 +1,31 @@
 <div class="fo-login-page">
+  <section class="fo-login-context" aria-labelledby="login-context-title">
+    <div class="fo-context-brand">
+      <span><mat-icon>domain_verification</mat-icon></span
+      ><strong>FieldOps</strong>
+    </div>
+    <div>
+      <p class="fo-eyebrow">Controle operacional em um só lugar</p>
+      <h1 id="login-context-title">Inspeções confiáveis, do planejamento à aprovação.</h1>
+      <p class="fo-context-description">
+        Organize equipes, acompanhe o trabalho em campo e mantenha cada decisão rastreável.
+      </p>
+    </div>
+    <ul aria-label="Recursos da plataforma">
+      <li>
+        <mat-icon>check_circle</mat-icon><span>Planejamento e acompanhamento centralizados</span>
+      </li>
+      <li><mat-icon>check_circle</mat-icon><span>Revisão segura com histórico auditável</span></li>
+      <li><mat-icon>check_circle</mat-icon><span>Visão clara das pendências operacionais</span></li>
+    </ul>
+    <p class="fo-context-footer">Plataforma de gestão de inspeções</p>
+  </section>
   <mat-card class="fo-login-card">
     <div class="fo-login-brand">
-      <mat-icon>domain_verification</mat-icon>
-      <h1>FieldOps</h1>
-      <p>Interface Administrativa</p>
+      <span class="fo-login-icon"><mat-icon>lock</mat-icon></span>
+      <p class="fo-eyebrow">Acesso seguro</p>
+      <h2>Bem-vindo de volta</h2>
+      <p>Entre com sua conta para acessar o painel administrativo.</p>
     </div>
 
     <form [formGroup]="form" (ngSubmit)="submit()">
@@ -20,8 +42,19 @@
 
       <mat-form-field appearance="outline" class="fo-full">
         <mat-label>Senha</mat-label>
-        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" autocomplete="current-password" />
-        <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+        <input
+          matInput
+          [type]="hidePassword ? 'password' : 'text'"
+          formControlName="password"
+          autocomplete="current-password"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="hidePassword = !hidePassword"
+          [attr.aria-label]="hidePassword ? 'Mostrar senha' : 'Ocultar senha'"
+        >
           <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
         @if (form.controls.password.hasError('required') && form.controls.password.touched) {
@@ -33,16 +66,26 @@
       </mat-form-field>
 
       @if (errorMessage()) {
-        <p class="fo-login-error">{{ errorMessage() }}</p>
+        <p class="fo-login-error" role="alert">{{ errorMessage() }}</p>
       }
 
-      <button mat-raised-button color="primary" type="submit" class="fo-full fo-login-submit" [disabled]="loading()">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        class="fo-full fo-login-submit"
+        [disabled]="loading()"
+      >
         @if (loading()) {
           <mat-spinner diameter="20"></mat-spinner>
         } @else {
           Entrar
         }
       </button>
+      <p class="fo-login-help">
+        <mat-icon>help_outline</mat-icon
+        ><span>Problemas para acessar? Procure o administrador da sua equipe.</span>
+      </p>
     </form>
   </mat-card>
 </div>

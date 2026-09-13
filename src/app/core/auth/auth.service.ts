@@ -51,12 +51,14 @@ export class AuthService {
 
   refresh(): Observable<RefreshResponse> {
     const refreshToken = this.tokens.getRefreshToken();
-    return this.http.post<RefreshResponse>(`${environment.apiUrl}/auth/refresh`, { refreshToken }).pipe(
-      tap((res) => {
-        this.tokens.setAccessToken(res.accessToken);
-        this.tokens.setRefreshToken(res.refreshToken);
-      }),
-    );
+    return this.http
+      .post<RefreshResponse>(`${environment.apiUrl}/auth/refresh`, { refreshToken })
+      .pipe(
+        tap((res) => {
+          this.tokens.setAccessToken(res.accessToken);
+          this.tokens.setRefreshToken(res.refreshToken);
+        }),
+      );
   }
 
   logout(navigate = true): void {

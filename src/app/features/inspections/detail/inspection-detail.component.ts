@@ -9,10 +9,22 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { forkJoin } from 'rxjs';
 import { InspectionsService } from '../inspections.service';
-import { Inspection, InspectionItemSnapshot, InspectionReview } from '../../../core/models/inspection.model';
+import {
+  Inspection,
+  InspectionItemSnapshot,
+  InspectionReview,
+} from '../../../core/models/inspection.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+  requestErrorState,
+} from '../../../shared/components/state-container/ui-state';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 interface DetailData {
@@ -23,7 +35,16 @@ interface DetailData {
 @Component({
   selector: 'app-inspection-detail',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule, StateContainerComponent, PageHeaderComponent],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    StateContainerComponent,
+    PageHeaderComponent,
+    StatusBadgeComponent,
+  ],
   templateUrl: './inspection-detail.component.html',
 })
 export class InspectionDetailComponent implements OnInit {
@@ -49,10 +70,14 @@ export class InspectionDetailComponent implements OnInit {
       reviews: this.inspectionsService.getReviews(this.inspectionId),
     }).subscribe({
       next: ({ inspection, reviews }) => {
-        const sortedItems = [...(inspection.items ?? [])].sort((a, b) => a.sectionOrder - b.sectionOrder || a.itemOrder - b.itemOrder);
-        this.state.set(successState({ inspection: { ...inspection, items: sortedItems }, reviews }, false));
+        const sortedItems = [...(inspection.items ?? [])].sort(
+          (a, b) => a.sectionOrder - b.sectionOrder || a.itemOrder - b.itemOrder,
+        );
+        this.state.set(
+          successState({ inspection: { ...inspection, items: sortedItems }, reviews }, false),
+        );
       },
-      error: (err) => this.state.set(errorState(extractErrorMessage(err))),
+      error: (err) => this.state.set(requestErrorState(err)),
     });
   }
 
@@ -103,7 +128,8 @@ export class InspectionDetailComponent implements OnInit {
     if (!r) return 'Sem resposta';
     if (r.valueText) return r.valueText;
     if (r.valueNumber !== undefined && r.valueNumber !== null) return String(r.valueNumber);
-    if (r.valueBoolean !== undefined && r.valueBoolean !== null) return r.valueBoolean ? 'Sim' : 'Não';
+    if (r.valueBoolean !== undefined && r.valueBoolean !== null)
+      return r.valueBoolean ? 'Sim' : 'Não';
     if (r.valueDate) return r.valueDate;
     if (r.conformity) return r.conformity;
     return 'Sem resposta';

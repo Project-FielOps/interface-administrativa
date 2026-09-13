@@ -1,42 +1,51 @@
 <div class="fo-page">
   <app-page-header title="Locais" subtitle="Unidades e ambientes cadastrados para inspeção.">
-    <button mat-raised-button color="primary" (click)="openCreate()" [disabled]="!clientId && !selectedClientId()">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="openCreate()"
+      [disabled]="!clientId && !selectedClientId()"
+    >
       <mat-icon>add</mat-icon> Novo local
     </button>
   </app-page-header>
 
-  <form [formGroup]="filterForm" class="fo-filters">
-    @if (!clientId) {
+  <details class="fo-filter-panel" open>
+    <summary><mat-icon>filter_alt</mat-icon> Filtros</summary>
+    <form [formGroup]="filterForm" class="fo-filters">
+      @if (!clientId) {
+        <mat-form-field>
+          <mat-label>Cliente</mat-label>
+          <mat-select [value]="selectedClientId()" (selectionChange)="onClientChange($event.value)">
+            @for (c of clients(); track c.id) {
+              <mat-option [value]="c.id">{{ c.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
       <mat-form-field>
-        <mat-label>Cliente</mat-label>
-        <mat-select [value]="selectedClientId()" (selectionChange)="onClientChange($event.value)">
-          @for (c of clients(); track c.id) {
-            <mat-option [value]="c.id">{{ c.name }}</mat-option>
-          }
+        <mat-label>Buscar por nome</mat-label>
+        <input matInput formControlName="search" />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="ACTIVE">Ativo</mat-option>
+          <mat-option value="INACTIVE">Inativo</mat-option>
         </mat-select>
       </mat-form-field>
-    }
-    <mat-form-field>
-      <mat-label>Buscar por nome</mat-label>
-      <input matInput formControlName="search" />
-      <mat-icon matSuffix>search</mat-icon>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Status</mat-label>
-      <mat-select formControlName="status">
-        <mat-option value="">Todos</mat-option>
-        <mat-option value="ACTIVE">Ativo</mat-option>
-        <mat-option value="INACTIVE">Inativo</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </form>
+    </form>
+  </details>
 
   <app-state-container
-    [phase]="state().phase"
+    [phase]="displayPhase()"
     [errorMessage]="state().errorMessage || ''"
     emptyMessage="Selecione um cliente para ver seus locais."
     emptyIcon="place"
     [retry]="load.bind(this)"
+    [clearFilters]="clearFilters.bind(this)"
     [content]="tableTpl"
   ></app-state-container>
 
@@ -44,7 +53,9 @@
     <table mat-table [dataSource]="filtered()">
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>Nome</th>
-        <td mat-cell *matCellDef="let s"><a (click)="viewEquipment(s)" class="fo-link">{{ s.name }}</a></td>
+        <td mat-cell *matCellDef="let s">
+          <a (click)="viewEquipment(s)" class="fo-link">{{ s.name }}</a>
+        </td>
       </ng-container>
       <ng-container matColumnDef="city">
         <th mat-header-cell *matHeaderCellDef>Cidade/UF</th>
@@ -56,15 +67,21 @@
       </ng-container>
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef>Status</th>
-        <td mat-cell *matCellDef="let s"><span [class]="'fo-chip-' + s.status.toLowerCase()">{{ s.status }}</span></td>
+        <td mat-cell *matCellDef="let s">
+          <app-status-badge [value]="s.status"></app-status-badge>
+        </td>
       </ng-container>
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let s">
           <button mat-icon-button [matMenuTriggerFor]="menu"><mat-icon>more_vert</mat-icon></button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="viewEquipment(s)"><mat-icon>precision_manufacturing</mat-icon><span>Ver equipamentos</span></button>
-            <button mat-menu-item (click)="openEdit(s)"><mat-icon>edit</mat-icon><span>Editar</span></button>
+            <button mat-menu-item (click)="viewEquipment(s)">
+              <mat-icon>precision_manufacturing</mat-icon><span>Ver equipamentos</span>
+            </button>
+            <button mat-menu-item (click)="openEdit(s)">
+              <mat-icon>edit</mat-icon><span>Editar</span>
+            </button>
             <button mat-menu-item (click)="toggleStatus(s)">
               <mat-icon>{{ s.status === 'INACTIVE' ? 'check_circle' : 'block' }}</mat-icon>
               <span>{{ s.status === 'INACTIVE' ? 'Ativar' : 'Inativar' }}</span>

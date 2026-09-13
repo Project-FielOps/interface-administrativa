@@ -16,7 +16,8 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       {
         path: 'dashboard',
-        loadChildren: () => import('./features/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
+        loadChildren: () =>
+          import('./features/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
       },
       {
         path: 'users',
@@ -25,7 +26,8 @@ export const routes: Routes = [
       },
       {
         path: 'clients',
-        loadChildren: () => import('./features/clients/clients.routes').then((m) => m.CLIENTS_ROUTES),
+        loadChildren: () =>
+          import('./features/clients/clients.routes').then((m) => m.CLIENTS_ROUTES),
       },
       {
         path: 'sites',
@@ -33,19 +35,25 @@ export const routes: Routes = [
       },
       {
         path: 'equipment',
-        loadChildren: () => import('./features/equipment/equipment.routes').then((m) => m.EQUIPMENT_ROUTES),
+        loadChildren: () =>
+          import('./features/equipment/equipment.routes').then((m) => m.EQUIPMENT_ROUTES),
       },
       {
         path: 'inspection-templates',
-        loadChildren: () => import('./features/templates/templates.routes').then((m) => m.TEMPLATES_ROUTES),
+        loadChildren: () =>
+          import('./features/templates/templates.routes').then((m) => m.TEMPLATES_ROUTES),
       },
       {
         path: 'inspections',
-        loadChildren: () => import('./features/inspections/inspections.routes').then((m) => m.INSPECTIONS_ROUTES),
+        loadChildren: () =>
+          import('./features/inspections/inspections.routes').then((m) => m.INSPECTIONS_ROUTES),
       },
       {
         path: 'non-conformities',
-        loadChildren: () => import('./features/non-conformities/non-conformities.routes').then((m) => m.NON_CONFORMITIES_ROUTES),
+        loadChildren: () =>
+          import('./features/non-conformities/non-conformities.routes').then(
+            (m) => m.NON_CONFORMITIES_ROUTES,
+          ),
       },
       {
         path: 'audit',

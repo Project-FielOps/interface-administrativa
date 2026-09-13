@@ -8,21 +8,42 @@ import { TemplatesService } from '../templates.service';
 import { InspectionTemplateVersion } from '../../../core/models/template.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+} from '../../../shared/components/state-container/ui-state';
 
 @Component({
   selector: 'app-template-versions',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, StateContainerComponent, PageHeaderComponent],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    StateContainerComponent,
+    PageHeaderComponent,
+  ],
   templateUrl: './template-versions.component.html',
 })
 export class TemplateVersionsComponent implements OnInit {
   @Input() templateId!: string;
 
-  readonly displayedColumns = ['versionNumber', 'titleSnapshot', 'publishedAt', 'activeForNewInspections'];
+  readonly displayedColumns = [
+    'versionNumber',
+    'titleSnapshot',
+    'publishedAt',
+    'activeForNewInspections',
+  ];
   readonly state = signal<UiState<InspectionTemplateVersion[]>>(loadingState());
 
-  constructor(private readonly templatesService: TemplatesService, private readonly router: Router) {}
+  constructor(
+    private readonly templatesService: TemplatesService,
+    private readonly router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.load();

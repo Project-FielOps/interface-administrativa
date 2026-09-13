@@ -1,42 +1,198 @@
 .fo-shell {
   height: 100vh;
+  background: var(--fo-background);
 }
-
 .fo-sidenav {
-  width: 260px;
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  width: 248px;
+  background: var(--fo-navigation);
+  color: var(--fo-text-inverse);
+  border: 0;
+  border-radius: 0;
+  transition: width 160ms ease;
 }
-
+.fo-sidenav--collapsed {
+  width: 72px;
+}
 .fo-brand {
+  width: 100%;
+  height: 72px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.fo-brand__mark {
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  height: 40px;
+  color: var(--fo-navigation);
+  background: var(--fo-primary);
+  border-radius: 10px;
+}
+.fo-brand__copy,
+.fo-user-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.fo-brand__copy strong {
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 800;
+}
+.fo-brand__copy small {
+  color: #b9c8c9;
+  font-size: 11px;
+}
+.fo-nav-section {
+  margin: 20px 20px 6px;
+  color: #91a7a9;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+mat-nav-list {
+  padding: 0 8px;
+}
+a[mat-list-item] {
+  margin: 3px 0;
+  color: #dce5e5;
+  border-radius: 8px;
+  --mdc-list-list-item-label-text-color: #dce5e5;
+  --mdc-list-list-item-leading-icon-color: #9fb3b4;
+}
+a[mat-list-item]:hover {
+  background: var(--fo-navigation-hover);
+}
+a.fo-active {
+  position: relative;
+  background: var(--fo-navigation-active);
+  --mdc-list-list-item-label-text-color: white;
+  --mdc-list-list-item-leading-icon-color: #64dda5;
+  font-weight: 700;
+}
+a.fo-active::before {
+  position: absolute;
+  inset: 8px auto 8px -8px;
+  width: 3px;
+  content: '';
+  background: var(--fo-primary);
+  border-radius: 0 4px 4px 0;
+}
+.fo-sidenav--collapsed a[mat-list-item] {
+  padding: 0 8px;
+}
+.fo-sidenav__footer {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 20px 16px;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
+  padding: 10px 12px;
+  color: #b9c8c9;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  font-size: 12px;
 }
-
-.fo-active {
-  background: rgba(63, 81, 181, 0.1);
-  font-weight: 500;
+.fo-system-dot {
+  width: 8px;
+  height: 8px;
+  background: #64dda5;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(100, 221, 165, 0.14);
 }
-
-.fo-toolbar-title {
-  font-size: 16px;
+.fo-toolbar-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: 64px;
+  padding: 0 24px;
+  color: var(--fo-text-primary);
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--fo-border);
 }
-
-.fo-role-badge {
+.fo-toolbar-context {
+  display: flex;
+  flex-direction: column;
   margin-left: 8px;
-  font-size: 11px;
-  opacity: 0.85;
-  border: 1px solid currentColor;
-  border-radius: 10px;
-  padding: 1px 8px;
 }
-
+.fo-toolbar-context span {
+  font-size: 14px;
+  line-height: 19px;
+  font-weight: 700;
+}
+.fo-toolbar-context small {
+  color: var(--fo-text-secondary);
+  font-size: 11px;
+  line-height: 15px;
+}
+.fo-user-trigger {
+  height: 48px;
+  padding: 4px 8px !important;
+}
+.fo-avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-right: 9px;
+  color: var(--fo-primary-dark);
+  background: var(--fo-primary-soft);
+  border-radius: 50%;
+  font-weight: 800;
+}
+.fo-user-copy {
+  align-items: flex-start;
+  margin-right: 8px;
+}
+.fo-user-copy strong {
+  max-width: 180px;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fo-user-copy small {
+  color: var(--fo-text-secondary);
+  font-size: 11px;
+  line-height: 15px;
+}
+.fo-user-menu-heading {
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
+  padding: 14px 16px;
+}
+.fo-user-menu-heading span {
+  color: var(--fo-text-secondary);
+  font-size: 12px;
+}
 .fo-content {
-  padding: 0;
   min-height: calc(100vh - 64px);
-  background: #fafafa;
+  background: var(--fo-background);
+}
+@media (max-width: 760px) {
+  .fo-toolbar-top {
+    padding: 0 8px;
+  }
+  .fo-toolbar-context small,
+  .fo-user-copy {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fo-sidenav {
+    transition: none;
+  }
 }

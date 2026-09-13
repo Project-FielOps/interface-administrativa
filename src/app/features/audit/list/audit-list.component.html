@@ -1,24 +1,30 @@
 <div class="fo-page">
-  <app-page-header title="Auditoria" subtitle="Registro somente leitura das ações relevantes do sistema."></app-page-header>
+  <app-page-header
+    title="Auditoria"
+    subtitle="Registro somente leitura das ações relevantes do sistema."
+  ></app-page-header>
 
-  <form [formGroup]="filterForm" class="fo-filters">
-    <mat-form-field>
-      <mat-label>Tipo de entidade</mat-label>
-      <input matInput formControlName="entityType" placeholder="Ex.: INSPECTION, USER" />
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>De</mat-label>
-      <input matInput [matDatepicker]="fromPicker" formControlName="from" />
-      <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
-      <mat-datepicker #fromPicker></mat-datepicker>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Até</mat-label>
-      <input matInput [matDatepicker]="toPicker" formControlName="to" />
-      <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
-      <mat-datepicker #toPicker></mat-datepicker>
-    </mat-form-field>
-  </form>
+  <details class="fo-filter-panel" open>
+    <summary><mat-icon>filter_alt</mat-icon> Filtros</summary>
+    <form [formGroup]="filterForm" class="fo-filters">
+      <mat-form-field>
+        <mat-label>Tipo de entidade</mat-label>
+        <input matInput formControlName="entityType" placeholder="Ex.: INSPECTION, USER" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>De</mat-label>
+        <input matInput [matDatepicker]="fromPicker" formControlName="from" />
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Até</mat-label>
+        <input matInput [matDatepicker]="toPicker" formControlName="to" />
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    </form>
+  </details>
 
   <app-state-container
     [phase]="state().phase"
@@ -26,6 +32,7 @@
     emptyMessage="Nenhum evento de auditoria encontrado."
     emptyIcon="history"
     [retry]="load.bind(this)"
+    [clearFilters]="clearFilters.bind(this)"
     [content]="tableTpl"
   ></app-state-container>
 
@@ -54,6 +61,12 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-    <mat-paginator [length]="totalElements()" [pageSize]="pageSize()" [pageIndex]="pageIndex()" [pageSizeOptions]="[20,50,100]" (page)="onPage($event)"></mat-paginator>
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="[20, 50, 100]"
+      (page)="onPage($event)"
+    ></mat-paginator>
   </ng-template>
 </div>

@@ -1,31 +1,106 @@
-<mat-sidenav-container class="fo-shell">
-  <mat-sidenav mode="side" opened class="fo-sidenav">
-    <div class="fo-brand" (click)="goToDashboard()">
-      <mat-icon>domain_verification</mat-icon>
-      <span>FieldOps</span>
-    </div>
-    <mat-nav-list>
-      @for (item of visibleNavItems; track item.route) {
-        <a mat-list-item [routerLink]="item.route" routerLinkActive="fo-active" [routerLinkActiveOptions]="{ exact: false }">
-          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-          <span matListItemTitle>{{ item.label }}</span>
-        </a>
+<mat-sidenav-container class="fo-shell" [autosize]="true">
+  <mat-sidenav
+    [mode]="compactViewport() ? 'over' : 'side'"
+    [opened]="navigationOpen()"
+    (openedChange)="navigationOpen.set($event)"
+    class="fo-sidenav"
+    [class.fo-sidenav--collapsed]="navigationCollapsed()"
+    aria-label="Navegação principal"
+  >
+    <button
+      class="fo-brand"
+      type="button"
+      (click)="goToDashboard()"
+      aria-label="Ir para o dashboard"
+    >
+      <span class="fo-brand__mark"><mat-icon>domain_verification</mat-icon></span>
+      @if (!navigationCollapsed()) {
+        <span class="fo-brand__copy"
+          ><strong>FieldOps</strong><small>Gestão operacional</small></span
+        >
       }
-    </mat-nav-list>
+    </button>
+    <nav aria-label="Áreas do sistema">
+      @for (section of sections; track section) {
+        @if (itemsFor(section).length) {
+          @if (!navigationCollapsed()) {
+            <p class="fo-nav-section">{{ section }}</p>
+          }
+          <mat-nav-list>
+            @for (item of itemsFor(section); track item.route) {
+              <a
+                mat-list-item
+                [routerLink]="item.route"
+                routerLinkActive="fo-active"
+                [routerLinkActiveOptions]="{ exact: false }"
+                (click)="closeCompactNavigation()"
+                [matTooltip]="navigationCollapsed() ? item.label : ''"
+                matTooltipPosition="right"
+              >
+                <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+                @if (!navigationCollapsed()) {
+                  <span matListItemTitle>{{ item.label }}</span>
+                }
+              </a>
+            }
+          </mat-nav-list>
+        }
+      }
+    </nav>
+    @if (!navigationCollapsed()) {
+      <div class="fo-sidenav__footer">
+        <span class="fo-system-dot"></span><span>Sistema operacional</span>
+      </div>
+    }
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <mat-toolbar color="primary" class="fo-toolbar-top">
-      <span class="fo-toolbar-title">Interface Administrativa</span>
+    <mat-toolbar class="fo-toolbar-top">
+      <button
+        mat-icon-button
+        type="button"
+        (click)="toggleNavigation()"
+        [attr.aria-label]="
+          compactViewport()
+            ? navigationOpen()
+              ? 'Fechar navegação'
+              : 'Abrir navegação'
+            : navigationCollapsed()
+              ? 'Expandir navegação'
+              : 'Recolher navegação'
+        "
+      >
+        <mat-icon>{{
+          compactViewport()
+            ? 'menu'
+            : navigationCollapsed()
+              ? 'left_panel_open'
+              : 'left_panel_close'
+        }}</mat-icon>
+      </button>
+      <div class="fo-toolbar-context">
+        <span>Painel administrativo</span><small>Ambiente de desenvolvimento</small>
+      </div>
       <span class="fo-spacer"></span>
       @if (auth.currentUser(); as user) {
-        <button mat-button [matMenuTriggerFor]="userMenu">
-          <mat-icon>account_circle</mat-icon>
-          {{ user.name }}
-          <span class="fo-role-badge">{{ user.role }}</span>
+        <button
+          mat-button
+          [matMenuTriggerFor]="userMenu"
+          class="fo-user-trigger"
+          aria-label="Abrir menu do usuário"
+        >
+          <span class="fo-avatar" aria-hidden="true">{{ user.name.charAt(0) }}</span>
+          <span class="fo-user-copy"
+            ><strong>{{ user.name }}</strong
+            ><small>{{ roleLabel(user.role) }}</small></span
+          >
+          <mat-icon>expand_more</mat-icon>
         </button>
         <mat-menu #userMenu="matMenu">
-          <button mat-menu-item disabled>{{ user.email }}</button>
+          <div class="fo-user-menu-heading">
+            <strong>{{ user.name }}</strong
+            ><span>{{ user.email }}</span>
+          </div>
           <mat-divider></mat-divider>
           <button mat-menu-item (click)="logout()">
             <mat-icon>logout</mat-icon>

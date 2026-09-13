@@ -39,8 +39,15 @@ const RESPONSE_TYPES: { value: ResponseType; label: string }[] = [
   selector: 'app-item-form-dialog',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatButtonModule, MatCheckboxModule, MatIconModule,
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatIconModule,
   ],
   templateUrl: './item-form-dialog.component.html',
 })
@@ -55,7 +62,9 @@ export class ItemFormDialogComponent {
     required: [this.data.item?.required ?? true],
     observationRequiredOnFailure: [this.data.item?.observationRequiredOnFailure ?? false],
     evidenceRequiredOnFailure: [this.data.item?.evidenceRequiredOnFailure ?? false],
-    options: this.fb.array(parseOptions(this.data.item?.optionsJson).map((o) => this.fb.control(o, Validators.required))),
+    options: this.fb.array(
+      parseOptions(this.data.item?.optionsJson).map((o) => this.fb.control(o, Validators.required)),
+    ),
   });
 
   constructor(

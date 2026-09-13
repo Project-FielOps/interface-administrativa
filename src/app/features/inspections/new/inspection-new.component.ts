@@ -26,8 +26,17 @@ import { extractErrorMessage } from '../../../shared/components/state-container/
   selector: 'app-inspection-new',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatButtonModule, MatDatepickerModule, MatNativeDateModule, MatProgressSpinnerModule, PageHeaderComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatProgressSpinnerModule,
+    PageHeaderComponent,
   ],
   templateUrl: './inspection-new.component.html',
 })
@@ -69,10 +78,18 @@ export class InspectionNewComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.templatesService.list({ size: 200, status: 'ACTIVE', sort: 'title,asc' }).subscribe({ next: (p) => this.templates.set(p.content) });
-    this.clientsService.list({ size: 200, status: 'ACTIVE', sort: 'name,asc' }).subscribe({ next: (p) => this.clients.set(p.content) });
-    this.usersService.list({ size: 200, role: 'TECHNICIAN', status: 'ACTIVE' }).subscribe({ next: (p) => this.technicians.set(p.content) });
-    this.usersService.list({ size: 200, role: 'SUPERVISOR', status: 'ACTIVE' }).subscribe({ next: (p) => this.supervisors.set(p.content) });
+    this.templatesService
+      .list({ size: 200, status: 'ACTIVE', sort: 'title,asc' })
+      .subscribe({ next: (p) => this.templates.set(p.content) });
+    this.clientsService
+      .list({ size: 200, status: 'ACTIVE', sort: 'name,asc' })
+      .subscribe({ next: (p) => this.clients.set(p.content) });
+    this.usersService
+      .list({ size: 200, role: 'TECHNICIAN', status: 'ACTIVE' })
+      .subscribe({ next: (p) => this.technicians.set(p.content) });
+    this.usersService
+      .list({ size: 200, role: 'SUPERVISOR', status: 'ACTIVE' })
+      .subscribe({ next: (p) => this.supervisors.set(p.content) });
 
     this.form.controls.templateId.valueChanges.subscribe((templateId) => {
       this.form.controls.templateVersionNumber.setValue(null);
@@ -80,7 +97,9 @@ export class InspectionNewComponent implements OnInit {
       if (!templateId) return;
       this.templatesService.getVersions(templateId).subscribe({
         next: (versions) => {
-          const active = versions.filter((v) => v.activeForNewInspections).sort((a, b) => b.versionNumber - a.versionNumber);
+          const active = versions
+            .filter((v) => v.activeForNewInspections)
+            .sort((a, b) => b.versionNumber - a.versionNumber);
           this.versions.set(active);
           if (active.length === 1) {
             this.form.controls.templateVersionNumber.setValue(active[0].versionNumber);
@@ -95,7 +114,9 @@ export class InspectionNewComponent implements OnInit {
       this.sites.set([]);
       this.equipment.set([]);
       if (!clientId) return;
-      this.sitesService.listByClient(clientId).subscribe({ next: (sites) => this.sites.set(sites) });
+      this.sitesService
+        .listByClient(clientId)
+        .subscribe({ next: (sites) => this.sites.set(sites) });
     });
 
     this.form.controls.siteId.valueChanges.subscribe((siteId) => {

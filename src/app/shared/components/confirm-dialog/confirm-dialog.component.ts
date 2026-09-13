@@ -19,7 +19,14 @@ export interface ConfirmDialogData {
 @Component({
   selector: 'app-confirm-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+  ],
   template: `
     <h2 mat-dialog-title>{{ data.title }}</h2>
     <mat-dialog-content>
@@ -32,7 +39,9 @@ export interface ConfirmDialogData {
       }
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button (click)="dialogRef.close(null)">{{ data.cancelLabel || 'Cancelar' }}</button>
+      <button mat-button (click)="dialogRef.close(null)">
+        {{ data.cancelLabel || 'Cancelar' }}
+      </button>
       <button
         mat-raised-button
         [color]="data.danger ? 'warn' : 'primary'"

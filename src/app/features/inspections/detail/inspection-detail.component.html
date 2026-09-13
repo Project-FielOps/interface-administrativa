@@ -1,34 +1,76 @@
 <div class="fo-page">
-  <app-page-header title="Detalhes da Inspeção" subtitle="Acompanhamento completo da execução e revisão.">
+  <app-page-header
+    title="Detalhes da Inspeção"
+    subtitle="Acompanhamento completo da execução e revisão."
+  >
     <button mat-button (click)="back()"><mat-icon>arrow_back</mat-icon> Voltar</button>
     @if (state().data && canReview(state().data!.inspection)) {
-      <button mat-raised-button color="primary" (click)="goToReview()"><mat-icon>rate_review</mat-icon> Revisar</button>
+      <button mat-raised-button color="primary" (click)="goToReview()">
+        <mat-icon>rate_review</mat-icon> Revisar
+      </button>
     }
     @if (state().data && canCancel(state().data!.inspection)) {
-      <button mat-stroked-button color="warn" (click)="cancel()"><mat-icon>cancel</mat-icon> Cancelar</button>
+      <button mat-stroked-button color="warn" (click)="cancel()">
+        <mat-icon>cancel</mat-icon> Cancelar
+      </button>
     }
   </app-page-header>
 
-  <app-state-container [phase]="state().phase" [errorMessage]="state().errorMessage || ''" [retry]="load.bind(this)" [content]="detailTpl"></app-state-container>
+  <app-state-container
+    [phase]="state().phase"
+    [errorMessage]="state().errorMessage || ''"
+    [retry]="load.bind(this)"
+    [content]="detailTpl"
+  ></app-state-container>
 
   <ng-template #detailTpl>
     @if (state().data; as data) {
       <mat-card class="fo-meta-card">
         <h2>{{ data.inspection.title }}</h2>
         <div class="fo-detail-grid">
-          <div><span class="fo-muted">Status</span><p>{{ data.inspection.status }}</p></div>
-          <div><span class="fo-muted">Prioridade</span><p [class]="'fo-severity-' + data.inspection.priority.toLowerCase()">{{ data.inspection.priority }}</p></div>
-          <div><span class="fo-muted">Cliente</span><p>{{ data.inspection.clientName || '-' }}</p></div>
-          <div><span class="fo-muted">Local</span><p>{{ data.inspection.siteName || '-' }}</p></div>
-          <div><span class="fo-muted">Equipamento</span><p>{{ data.inspection.equipmentName || '-' }}</p></div>
-          <div><span class="fo-muted">Técnico</span><p>{{ data.inspection.technicianName || '-' }}</p></div>
-          <div><span class="fo-muted">Supervisor</span><p>{{ data.inspection.supervisorName || '-' }}</p></div>
-          <div><span class="fo-muted">Agendada para</span><p>{{ data.inspection.scheduledFor | date: 'dd/MM/yyyy HH:mm' }}</p></div>
+          <div>
+            <span class="fo-muted">Status</span>
+            <p><app-status-badge [value]="data.inspection.status"></app-status-badge></p>
+          </div>
+          <div>
+            <span class="fo-muted">Prioridade</span>
+            <p><app-status-badge [value]="data.inspection.priority"></app-status-badge></p>
+          </div>
+          <div>
+            <span class="fo-muted">Cliente</span>
+            <p>{{ data.inspection.clientName || '-' }}</p>
+          </div>
+          <div>
+            <span class="fo-muted">Local</span>
+            <p>{{ data.inspection.siteName || '-' }}</p>
+          </div>
+          <div>
+            <span class="fo-muted">Equipamento</span>
+            <p>{{ data.inspection.equipmentName || '-' }}</p>
+          </div>
+          <div>
+            <span class="fo-muted">Técnico</span>
+            <p>{{ data.inspection.technicianName || '-' }}</p>
+          </div>
+          <div>
+            <span class="fo-muted">Supervisor</span>
+            <p>{{ data.inspection.supervisorName || '-' }}</p>
+          </div>
+          <div>
+            <span class="fo-muted">Agendada para</span>
+            <p>{{ data.inspection.scheduledFor | date: 'dd/MM/yyyy HH:mm' }}</p>
+          </div>
           @if (data.inspection.submittedAtServer) {
-            <div><span class="fo-muted">Enviada em</span><p>{{ data.inspection.submittedAtServer | date: 'dd/MM/yyyy HH:mm' }}</p></div>
+            <div>
+              <span class="fo-muted">Enviada em</span>
+              <p>{{ data.inspection.submittedAtServer | date: 'dd/MM/yyyy HH:mm' }}</p>
+            </div>
           }
           @if (data.inspection.status === 'CANCELED') {
-            <div><span class="fo-muted">Motivo do cancelamento</span><p>{{ data.inspection.canceledReason }}</p></div>
+            <div>
+              <span class="fo-muted">Motivo do cancelamento</span>
+              <p>{{ data.inspection.canceledReason }}</p>
+            </div>
           }
         </div>
         @if (data.inspection.instructions) {
@@ -42,9 +84,13 @@
       }
       @for (item of data.inspection.items; track item.id) {
         <mat-card class="fo-item-card">
-          <p><strong>{{ item.sectionTitle }}</strong></p>
+          <p>
+            <strong>{{ item.sectionTitle }}</strong>
+          </p>
           <p>{{ item.itemTitle }}</p>
-          <p class="fo-response"><span class="fo-muted">Resposta:</span> {{ responseSummary(item) }}</p>
+          <p class="fo-response">
+            <span class="fo-muted">Resposta:</span> {{ responseSummary(item) }}
+          </p>
           @if (item.answer?.observation) {
             <p class="fo-muted">Observação: {{ item.answer?.observation }}</p>
           }
@@ -57,9 +103,17 @@
       }
       @for (r of data.reviews; track r.id) {
         <mat-card class="fo-item-card">
-          <p><strong>Ciclo {{ r.reviewCycle }}</strong> — {{ r.decision }} por {{ r.reviewerName || r.reviewerId }} em {{ r.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
-          @if (r.reason) { <p>Motivo: {{ r.reason }}</p> }
-          @if (r.comments) { <p>Comentários: {{ r.comments }}</p> }
+          <p>
+            <strong>Ciclo {{ r.reviewCycle }}</strong> —
+            <app-status-badge [value]="r.decision"></app-status-badge> por
+            {{ r.reviewerName || r.reviewerId }} em {{ r.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}
+          </p>
+          @if (r.reason) {
+            <p>Motivo: {{ r.reason }}</p>
+          }
+          @if (r.comments) {
+            <p>Comentários: {{ r.comments }}</p>
+          }
         </mat-card>
       }
     }

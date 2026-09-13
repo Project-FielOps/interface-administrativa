@@ -19,7 +19,9 @@ export class EquipmentService extends CrudService<Equipment, EquipmentRequest, E
 
   listBySite(siteId: string): Observable<Equipment[]> {
     return this.http
-      .get<Page<Equipment>>(`${environment.apiUrl}/sites/${siteId}/equipment`, { params: { size: 200 } })
+      .get<Page<Equipment>>(`${environment.apiUrl}/sites/${siteId}/equipment`, {
+        params: { size: 200 },
+      })
       .pipe(map((page) => page.content));
   }
 

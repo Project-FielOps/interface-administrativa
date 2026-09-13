@@ -12,9 +12,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const isAuthFree = AUTH_FREE_PATHS.some((p) => req.url.includes(p));
   const token = tokens.getAccessToken();
-  const authReq = !isAuthFree && token
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-    : req;
+  const authReq =
+    !isAuthFree && token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
 
   return next(authReq).pipe(
     catchError((err: unknown) => {

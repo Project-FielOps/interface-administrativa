@@ -1,43 +1,77 @@
 <div class="fo-page">
-  <app-page-header title="Revisão da Inspeção" subtitle="Analise as respostas do técnico (somente leitura) e registre a decisão de revisão.">
+  <app-page-header
+    title="Revisão da Inspeção"
+    subtitle="Analise as respostas do técnico (somente leitura) e registre a decisão de revisão."
+  >
     <button mat-button (click)="back()"><mat-icon>arrow_back</mat-icon> Voltar</button>
   </app-page-header>
 
-  <app-state-container [phase]="state().phase" [errorMessage]="state().errorMessage || ''" [retry]="load.bind(this)" [content]="reviewTpl"></app-state-container>
+  <app-state-container
+    [phase]="state().phase"
+    [errorMessage]="state().errorMessage || ''"
+    [retry]="load.bind(this)"
+    [content]="reviewTpl"
+  ></app-state-container>
 
   <ng-template #reviewTpl>
     @if (state().data; as data) {
       <mat-card class="fo-meta-card">
         <h2>{{ data.inspection.title }}</h2>
         <div class="fo-detail-grid">
-          <div><span class="fo-muted">Técnico</span><p>{{ data.inspection.technicianName || '-' }}</p></div>
-          <div><span class="fo-muted">Enviada em</span><p>{{ data.inspection.submittedAtServer | date: 'dd/MM/yyyy HH:mm' }}</p></div>
-          <div><span class="fo-muted">Cliente/Local</span><p>{{ data.inspection.clientName }} / {{ data.inspection.siteName }}</p></div>
-          <div><span class="fo-muted">Ciclo atual</span><p>{{ data.reviews.length + 1 }}</p></div>
-          <div><span class="fo-muted">Status</span><p>{{ data.inspection.status }}</p></div>
+          <div>
+            <span class="fo-muted">Técnico</span>
+            <p>{{ data.inspection.technicianName || '-' }}</p>
+          </div>
+          <div>
+            <span class="fo-muted">Enviada em</span>
+            <p>{{ data.inspection.submittedAtServer | date: 'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div>
+            <span class="fo-muted">Cliente/Local</span>
+            <p>{{ data.inspection.clientName }} / {{ data.inspection.siteName }}</p>
+          </div>
+          <div>
+            <span class="fo-muted">Ciclo atual</span>
+            <p>{{ data.reviews.length + 1 }}</p>
+          </div>
+          <div>
+            <span class="fo-muted">Status</span>
+            <p><app-status-badge [value]="data.inspection.status"></app-status-badge></p>
+          </div>
         </div>
       </mat-card>
 
       @if (needsBeginReview) {
         <p class="fo-readonly-note">
           <mat-icon>info</mat-icon>
-          Esta inspeção ainda está como "Enviada". Inicie a revisão para movê-la para "Em revisão" antes de aprovar ou reprovar.
+          Esta inspeção ainda está como "Enviada". Inicie a revisão para movê-la para "Em revisão"
+          antes de aprovar ou reprovar.
         </p>
-        <button mat-raised-button color="primary" (click)="beginReview()" [disabled]="startingReview()">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="beginReview()"
+          [disabled]="startingReview()"
+        >
           <mat-icon>play_arrow</mat-icon> Iniciar revisão
         </button>
       } @else {
         <p class="fo-readonly-note">
           <mat-icon>lock</mat-icon>
-          As respostas abaixo são exibidas em modo somente leitura. O supervisor não pode alterar as respostas originais do técnico — apenas aprovar ou solicitar correção.
+          As respostas abaixo são exibidas em modo somente leitura. O supervisor não pode alterar as
+          respostas originais do técnico — apenas aprovar ou solicitar correção.
         </p>
 
         <h3>Checklist respondido</h3>
         @for (item of data.items; track item.id) {
           <mat-card class="fo-item-card">
-            <p><strong>{{ item.sectionTitle }}</strong></p>
+            <p>
+              <strong>{{ item.sectionTitle }}</strong>
+            </p>
             <p>{{ item.itemTitle }}</p>
-            <p class="fo-response"><span class="fo-muted">Resposta:</span> {{ responseSummary(item) }}</p>
+            <p class="fo-response">
+              <span class="fo-muted">Resposta:</span> {{ responseSummary(item) }}
+            </p>
             @if (item.answer?.observation) {
               <p class="fo-muted">Observação: {{ item.answer?.observation }}</p>
             }
@@ -45,7 +79,8 @@
               <p class="fo-muted">
                 {{ evidenceFor(item).length }} evidência(s):
                 @for (e of evidenceFor(item); track e.id; let last = $last) {
-                  {{ e.originalFileName || e.id }}{{ e.description ? ' (' + e.description + ')' : '' }}{{ last ? '' : ', ' }}
+                  {{ e.originalFileName || e.id
+                  }}{{ e.description ? ' (' + e.description + ')' : '' }}{{ last ? '' : ', ' }}
                 }
               </p>
             }
@@ -58,8 +93,13 @@
         }
         @for (nc of data.nonConformities; track nc.id) {
           <mat-card class="fo-item-card">
-            <p><strong>{{ nc.title }}</strong> <span [class]="'fo-severity-' + nc.severity.toLowerCase()">{{ nc.severity }}</span></p>
-            @if (nc.description) { <p>{{ nc.description }}</p> }
+            <p>
+              <strong>{{ nc.title }}</strong>
+              <app-status-badge [value]="nc.severity"></app-status-badge>
+            </p>
+            @if (nc.description) {
+              <p>{{ nc.description }}</p>
+            }
           </mat-card>
         }
 
@@ -69,8 +109,14 @@
         }
         @for (r of data.reviews; track r.id) {
           <mat-card class="fo-item-card">
-            <p><strong>Ciclo {{ r.reviewCycle }}</strong> — {{ r.decision }} em {{ r.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
-            @if (r.reason) { <p>Motivo: {{ r.reason }}</p> }
+            <p>
+              <strong>Ciclo {{ r.reviewCycle }}</strong> —
+              <app-status-badge [value]="r.decision"></app-status-badge> em
+              {{ r.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}
+            </p>
+            @if (r.reason) {
+              <p>Motivo: {{ r.reason }}</p>
+            }
           </mat-card>
         }
 
@@ -81,7 +127,10 @@
                 <mat-form-field class="fo-full">
                   <mat-label>Motivo da reprovação</mat-label>
                   <textarea matInput rows="2" formControlName="reason"></textarea>
-                  @if (rejectForm.controls.reason.hasError('required') && rejectForm.controls.reason.touched) {
+                  @if (
+                    rejectForm.controls.reason.hasError('required') &&
+                    rejectForm.controls.reason.touched
+                  ) {
                     <mat-error>O motivo é obrigatório</mat-error>
                   }
                 </mat-form-field>
@@ -91,7 +140,12 @@
                 </mat-form-field>
                 <div class="fo-actions-row">
                   <button mat-button type="button" (click)="toggleRejectForm()">Cancelar</button>
-                  <button mat-raised-button color="warn" type="submit" [disabled]="submittingDecision()">
+                  <button
+                    mat-raised-button
+                    color="warn"
+                    type="submit"
+                    [disabled]="submittingDecision()"
+                  >
                     <mat-icon>thumb_down</mat-icon> Confirmar reprovação
                   </button>
                 </div>
@@ -99,10 +153,20 @@
             </mat-card>
           } @else {
             <div class="fo-actions-row">
-              <button mat-stroked-button color="warn" (click)="toggleRejectForm()" [disabled]="submittingDecision()">
+              <button
+                mat-stroked-button
+                color="warn"
+                (click)="toggleRejectForm()"
+                [disabled]="submittingDecision()"
+              >
                 <mat-icon>thumb_down</mat-icon> Reprovar / solicitar correção
               </button>
-              <button mat-raised-button color="primary" (click)="approve()" [disabled]="submittingDecision()">
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="approve()"
+                [disabled]="submittingDecision()"
+              >
                 <mat-icon>thumb_up</mat-icon> Aprovar
               </button>
             </div>

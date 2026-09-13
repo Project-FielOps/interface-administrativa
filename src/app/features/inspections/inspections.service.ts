@@ -12,7 +12,11 @@ import {
 } from '../../core/models/inspection.model';
 
 @Injectable({ providedIn: 'root' })
-export class InspectionsService extends CrudService<Inspection, InspectionCreateRequest, Partial<InspectionCreateRequest>> {
+export class InspectionsService extends CrudService<
+  Inspection,
+  InspectionCreateRequest,
+  Partial<InspectionCreateRequest>
+> {
   constructor(http: HttpClient) {
     super(http, `${environment.apiUrl}/inspections`);
   }
@@ -22,7 +26,10 @@ export class InspectionsService extends CrudService<Inspection, InspectionCreate
   }
 
   assign(inspectionId: string, technicianId: string, supervisorId: string): Observable<Inspection> {
-    return this.http.post<Inspection>(`${this.baseUrl}/${inspectionId}/assign`, { technicianId, supervisorId });
+    return this.http.post<Inspection>(`${this.baseUrl}/${inspectionId}/assign`, {
+      technicianId,
+      supervisorId,
+    });
   }
 
   start(inspectionId: string): Observable<Inspection> {

@@ -22,6 +22,8 @@ export class StateContainerComponent {
   @Input() errorMessage = '';
   @Input() emptyMessage = 'Nenhum registro encontrado.';
   @Input() emptyIcon = 'inbox';
+  @Input() noResultsMessage = 'Nenhum resultado corresponde aos filtros aplicados.';
+  @Input() clearFilters?: () => void;
   @Input() content?: TemplateRef<unknown>;
   @Input() retry?: () => void;
 }
