@@ -4,7 +4,7 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { TokenStorageService } from '../auth/token-storage.service';
 
-const AUTH_FREE_PATHS = ['/auth/login', '/auth/refresh'];
+const AUTH_FREE_PATHS = ['/auth/login', '/auth/refresh', '/auth/logout'];
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const tokens = inject(TokenStorageService);

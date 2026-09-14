@@ -17,6 +17,7 @@ export interface LoginResponse {
   refreshToken: string;
   tokenType: string;
   expiresInSeconds: number;
+  mustChangePassword: boolean;
 }
 
 export interface RefreshResponse {
@@ -24,6 +25,7 @@ export interface RefreshResponse {
   refreshToken: string;
   tokenType: string;
   expiresInSeconds: number;
+  mustChangePassword: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -33,6 +35,7 @@ export class AuthService {
   readonly currentUser = this.currentUserSignal.asReadonly();
   readonly isAuthenticated = computed(() => !!this.currentUserSignal());
   readonly isAdmin = computed(() => this.currentUserSignal()?.role === 'ADMIN');
+  readonly mustChangePassword = signal(!!this.tokens.getStoredUser<User>()?.mustChangePassword);
 
   constructor(
     private readonly http: HttpClient,
@@ -42,7 +45,10 @@ export class AuthService {
 
   login(request: LoginRequest): Observable<User> {
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, request).pipe(
-      tap((res) => this.applyTokens(res)),
+      tap((res) => {
+        this.applyTokens(res);
+        this.mustChangePassword.set(res.mustChangePassword);
+      }),
       // The backend's login response carries no user payload; fetch it separately via /auth/me.
       switchMap(() => this.http.get<User>(`${environment.apiUrl}/auth/me`)),
       tap((user) => this.applyUser(user)),
@@ -57,16 +63,30 @@ export class AuthService {
         tap((res) => {
           this.tokens.setAccessToken(res.accessToken);
           this.tokens.setRefreshToken(res.refreshToken);
+          this.mustChangePassword.set(res.mustChangePassword);
         }),
       );
   }
 
   logout(navigate = true): void {
-    this.tokens.clear();
-    this.currentUserSignal.set(null);
-    if (navigate) {
-      this.router.navigate(['/login']);
-    }
+    const refreshToken = this.tokens.getRefreshToken();
+    const finish = () => {
+      this.tokens.clear();
+      this.currentUserSignal.set(null);
+      this.mustChangePassword.set(false);
+      if (navigate) this.router.navigate(['/login']);
+    };
+    if (!refreshToken) return finish();
+    this.http.post(`${environment.apiUrl}/auth/logout`, { refreshToken }).subscribe({
+      next: finish,
+      error: finish,
+    });
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<void> {
+    return this.http
+      .post<void>(`${environment.apiUrl}/auth/change-password`, { currentPassword, newPassword })
+      .pipe(tap(() => this.mustChangePassword.set(false)));
   }
 
   hasRole(...roles: UserRole[]): boolean {
@@ -86,5 +106,6 @@ export class AuthService {
   private applyUser(user: User): void {
     this.tokens.setStoredUser(user);
     this.currentUserSignal.set(user);
+    this.mustChangePassword.set(!!user.mustChangePassword);
   }
 }

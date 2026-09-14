@@ -56,7 +56,9 @@ export class LoginComponent {
       next: () => {
         this.loading.set(false);
         const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
-        this.router.navigateByUrl(redirectTo || '/app/dashboard');
+        this.router.navigateByUrl(
+          this.auth.mustChangePassword() ? '/app/change-password' : redirectTo || '/app/dashboard',
+        );
       },
       error: (err) => {
         this.loading.set(false);

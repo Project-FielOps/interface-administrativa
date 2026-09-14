@@ -8,6 +8,7 @@ import {
   Inspection,
   InspectionCreateRequest,
   InspectionReview,
+  AuditEvent,
   RejectRequest,
 } from '../../core/models/inspection.model';
 
@@ -42,6 +43,10 @@ export class InspectionsService extends CrudService<
 
   getReviews(inspectionId: string): Observable<InspectionReview[]> {
     return this.http.get<InspectionReview[]>(`${this.baseUrl}/${inspectionId}/reviews`);
+  }
+
+  getHistory(inspectionId: string): Observable<AuditEvent[]> {
+    return this.http.get<AuditEvent[]>(`${this.baseUrl}/${inspectionId}/history`);
   }
 
   /** Moves a SUBMITTED inspection into UNDER_REVIEW. No request body. */

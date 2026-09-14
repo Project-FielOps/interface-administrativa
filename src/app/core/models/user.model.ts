@@ -11,6 +11,7 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   version: number;
+  mustChangePassword?: boolean;
 }
 
 export interface UserCreateRequest {
@@ -19,6 +20,7 @@ export interface UserCreateRequest {
   role: UserRole;
   phone?: string;
   password: string;
+  temporaryPassword?: boolean;
 }
 
 export interface UserUpdateRequest {

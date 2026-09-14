@@ -85,10 +85,10 @@ export class InspectionNewComponent implements OnInit {
       .list({ size: 200, status: 'ACTIVE', sort: 'name,asc' })
       .subscribe({ next: (p) => this.clients.set(p.content) });
     this.usersService
-      .list({ size: 200, role: 'TECHNICIAN', status: 'ACTIVE' })
+      .listAssignable('TECHNICIAN')
       .subscribe({ next: (p) => this.technicians.set(p.content) });
     this.usersService
-      .list({ size: 200, role: 'SUPERVISOR', status: 'ACTIVE' })
+      .listAssignable('SUPERVISOR')
       .subscribe({ next: (p) => this.supervisors.set(p.content) });
 
     this.form.controls.templateId.valueChanges.subscribe((templateId) => {

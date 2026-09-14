@@ -9,10 +9,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { forkJoin } from 'rxjs';
 import { InspectionsService } from '../inspections.service';
+import { EvidenceService } from '../../evidence/evidence.service';
+import { NonConformitiesService } from '../../non-conformities/non-conformities.service';
 import {
   Inspection,
   InspectionItemSnapshot,
   InspectionReview,
+  Evidence,
+  NonConformity,
+  AuditEvent,
 } from '../../../core/models/inspection.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -30,6 +35,9 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 interface DetailData {
   inspection: Inspection;
   reviews: InspectionReview[];
+  evidence: Evidence[];
+  nonConformities: NonConformity[];
+  history: AuditEvent[];
 }
 
 @Component({
@@ -54,6 +62,8 @@ export class InspectionDetailComponent implements OnInit {
 
   constructor(
     private readonly inspectionsService: InspectionsService,
+    private readonly evidenceService: EvidenceService,
+    private readonly nonConformitiesService: NonConformitiesService,
     private readonly dialog: MatDialog,
     private readonly snackBar: MatSnackBar,
     private readonly router: Router,
@@ -68,13 +78,25 @@ export class InspectionDetailComponent implements OnInit {
     forkJoin({
       inspection: this.inspectionsService.get(this.inspectionId),
       reviews: this.inspectionsService.getReviews(this.inspectionId),
+      evidence: this.evidenceService.listByInspection(this.inspectionId),
+      nonConformities: this.nonConformitiesService.listByInspection(this.inspectionId),
+      history: this.inspectionsService.getHistory(this.inspectionId),
     }).subscribe({
-      next: ({ inspection, reviews }) => {
+      next: ({ inspection, reviews, evidence, nonConformities, history }) => {
         const sortedItems = [...(inspection.items ?? [])].sort(
           (a, b) => a.sectionOrder - b.sectionOrder || a.itemOrder - b.itemOrder,
         );
         this.state.set(
-          successState({ inspection: { ...inspection, items: sortedItems }, reviews }, false),
+          successState(
+            {
+              inspection: { ...inspection, items: sortedItems },
+              reviews,
+              evidence,
+              nonConformities,
+              history,
+            },
+            false,
+          ),
         );
       },
       error: (err) => this.state.set(requestErrorState(err)),
@@ -82,7 +104,7 @@ export class InspectionDetailComponent implements OnInit {
   }
 
   canCancel(inspection: Inspection): boolean {
-    return !['APPROVED', 'REJECTED', 'CANCELED'].includes(inspection.status);
+    return ['ASSIGNED', 'IN_PROGRESS', 'REJECTED'].includes(inspection.status);
   }
 
   canReview(inspection: Inspection): boolean {
@@ -117,6 +139,21 @@ export class InspectionDetailComponent implements OnInit {
 
   goToReview(): void {
     this.router.navigate(['/app/inspections', this.inspectionId, 'review']);
+  }
+
+  openEvidence(evidenceId: string): void {
+    this.evidenceService.downloadContent(this.inspectionId, evidenceId).subscribe({
+      next: (content) => {
+        const url = URL.createObjectURL(content);
+        const link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      },
+      error: (err) => this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
+    });
   }
 
   back(): void {

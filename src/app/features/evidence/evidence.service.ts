@@ -17,4 +17,18 @@ export class EvidenceService {
   listByInspection(inspectionId: string): Observable<Evidence[]> {
     return this.http.get<Evidence[]>(`${this.baseUrl}/inspections/${inspectionId}/evidence`);
   }
+
+  getById(inspectionId: string, evidenceId: string): Observable<Evidence> {
+    return this.http.get<Evidence>(
+      `${this.baseUrl}/inspections/${inspectionId}/evidence/${evidenceId}`,
+    );
+  }
+
+  contentUrl(inspectionId: string, evidenceId: string): string {
+    return `${this.baseUrl}/inspections/${inspectionId}/evidence/${evidenceId}/content`;
+  }
+
+  downloadContent(inspectionId: string, evidenceId: string): Observable<Blob> {
+    return this.http.get(this.contentUrl(inspectionId, evidenceId), { responseType: 'blob' });
+  }
 }

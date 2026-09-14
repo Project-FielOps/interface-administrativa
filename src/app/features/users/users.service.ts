@@ -19,4 +19,10 @@ export class UsersService extends CrudService<User, UserCreateRequest, UserUpdat
   updateStatus(id: string, status: UserStatus): Observable<User> {
     return this.http.patch<User>(`${this.baseUrl}/${id}/status`, { status });
   }
+
+  listAssignable(role: 'TECHNICIAN' | 'SUPERVISOR'): Observable<{ content: User[] }> {
+    return this.http.get<{ content: User[] }>(`${environment.apiUrl}/users/assignable`, {
+      params: { role },
+    });
+  }
 }

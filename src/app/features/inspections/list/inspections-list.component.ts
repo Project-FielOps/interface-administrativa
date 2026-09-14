@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -101,6 +101,7 @@ export class InspectionsListComponent implements OnInit {
 
   constructor(
     private readonly fb: FormBuilder,
+    private readonly route: ActivatedRoute,
     private readonly inspectionsService: InspectionsService,
     private readonly clientsService: ClientsService,
     private readonly usersService: UsersService,
@@ -110,12 +111,16 @@ export class InspectionsListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const query = this.route.snapshot.queryParamMap;
+    if (query.get('awaitingReview') === 'true') {
+      this.filterForm.patchValue({ awaitingReview: true }, { emitEvent: false });
+    }
     this.load();
     this.clientsService
       .list({ size: 200, sort: 'name,asc' })
       .subscribe({ next: (p) => this.clients.set(p.content) });
     this.usersService
-      .list({ size: 200, role: 'TECHNICIAN', status: 'ACTIVE' })
+      .listAssignable('TECHNICIAN')
       .subscribe({ next: (p) => this.technicians.set(p.content) });
     this.filterForm.valueChanges.pipe(debounceTime(350)).subscribe(() => {
       this.pageIndex.set(0);
@@ -132,8 +137,8 @@ export class InspectionsListComponent implements OnInit {
         technicianId: f.technicianId || undefined,
         clientId: f.clientId || undefined,
         priority: f.priority || undefined,
-        from: f.from ? new Date(f.from).toISOString() : undefined,
-        to: f.to ? new Date(f.to).toISOString() : undefined,
+        scheduledFrom: f.from ? new Date(f.from).toISOString() : undefined,
+        scheduledTo: f.to ? new Date(f.to).toISOString() : undefined,
         overdue: f.overdue || undefined,
         awaitingReview: f.awaitingReview || undefined,
         page: this.pageIndex(),
@@ -174,7 +179,7 @@ export class InspectionsListComponent implements OnInit {
   }
 
   canCancel(inspection: Inspection): boolean {
-    return !['APPROVED', 'REJECTED', 'CANCELED'].includes(inspection.status);
+    return ['ASSIGNED', 'IN_PROGRESS', 'REJECTED'].includes(inspection.status);
   }
 
   cancel(inspection: Inspection): void {

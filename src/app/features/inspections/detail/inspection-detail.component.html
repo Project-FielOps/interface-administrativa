@@ -94,7 +94,38 @@
           @if (item.answer?.observation) {
             <p class="fo-muted">Observação: {{ item.answer?.observation }}</p>
           }
+          @for (e of data.evidence; track e.id) {
+            @if (e.responseId === item.answer?.id) {
+              <button mat-button type="button" (click)="openEvidence(e.id)">
+                {{ e.originalFileName || e.id }}
+              </button>
+            }
+          }
         </mat-card>
+      }
+
+      <h3>Evidências</h3>
+      @if (data.evidence.length === 0) {
+        <p class="fo-muted">Nenhuma evidência registrada.</p>
+      }
+      @for (e of data.evidence; track e.id) {
+        <p>
+          <button mat-button type="button" (click)="openEvidence(e.id)">
+            {{ e.originalFileName || e.id }}
+          </button>
+          — {{ e.mimeType || e.type }}
+        </p>
+      }
+
+      <h3>Não conformidades</h3>
+      @if (data.nonConformities.length === 0) {
+        <p class="fo-muted">Nenhuma não conformidade registrada.</p>
+      }
+      @for (nc of data.nonConformities; track nc.id) {
+        <p>
+          <strong>{{ nc.title }}</strong> —
+          <app-status-badge [value]="nc.severity"></app-status-badge> — {{ nc.status }}
+        </p>
       }
 
       <h3>Histórico de revisões</h3>
@@ -115,6 +146,15 @@
             <p>Comentários: {{ r.comments }}</p>
           }
         </mat-card>
+      }
+
+      <h3>Histórico</h3>
+      @for (event of data.history; track event.id) {
+        <p>
+          {{ event.occurredAt | date: 'dd/MM/yyyy HH:mm' }} — {{ event.action }} ({{
+            event.entityType
+          }})
+        </p>
       }
     }
   </ng-template>
