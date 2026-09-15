@@ -1,0 +1,176 @@
+// =============================================================================
+// FieldOps Precision System — design tokens
+// Fonte: protótipo "stitch_fieldops_mobile_app_prototype/fieldops_precision_system/DESIGN.md"
+//
+// Estética: Ultra-Modern Minimalism. Autoridade técnica + sofisticação arejada.
+// Os papéis de cor abaixo são Material 3, então sobrescrevemos diretamente as
+// variáveis `--mat-sys-*` emitidas por `mat.theme()`. Isso reveste TODO o
+// Angular Material (tabelas, campos, menus, diálogos) sem tocar em template.
+// =============================================================================
+
+:root {
+  // ---------------------------------------------------------------------------
+  // Paleta — papéis Material 3 do Precision System
+  // ---------------------------------------------------------------------------
+  --mat-sys-surface: #faf8ff;
+  --mat-sys-surface-dim: #d9d9e5;
+  --mat-sys-surface-bright: #faf8ff;
+  --mat-sys-surface-container-lowest: #ffffff;
+  --mat-sys-surface-container-low: #f3f3fe;
+  --mat-sys-surface-container: #ededf9;
+  --mat-sys-surface-container-high: #e7e7f3;
+  --mat-sys-surface-container-highest: #e1e2ed;
+  --mat-sys-surface-variant: #e1e2ed;
+  --mat-sys-on-surface: #191b23;
+  --mat-sys-on-surface-variant: #434655;
+  --mat-sys-inverse-surface: #2e3039;
+  --mat-sys-inverse-on-surface: #f0f0fb;
+  --mat-sys-outline: #737686;
+  --mat-sys-outline-variant: #c3c6d7;
+  --mat-sys-surface-tint: #0053db;
+  --mat-sys-background: #faf8ff;
+  --mat-sys-on-background: #191b23;
+
+  --mat-sys-primary: #004ac6;
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-primary-container: #2563eb;
+  --mat-sys-on-primary-container: #eeefff;
+  --mat-sys-inverse-primary: #b4c5ff;
+  --mat-sys-primary-fixed: #dbe1ff;
+  --mat-sys-primary-fixed-dim: #b4c5ff;
+  --mat-sys-on-primary-fixed: #00174b;
+  --mat-sys-on-primary-fixed-variant: #003ea8;
+
+  --mat-sys-secondary: #006398;
+  --mat-sys-on-secondary: #ffffff;
+  --mat-sys-secondary-container: #5bb8fe;
+  --mat-sys-on-secondary-container: #00476e;
+  --mat-sys-secondary-fixed: #cce5ff;
+  --mat-sys-secondary-fixed-dim: #93ccff;
+  --mat-sys-on-secondary-fixed: #001d31;
+  --mat-sys-on-secondary-fixed-variant: #004b73;
+
+  --mat-sys-tertiary: #943700;
+  --mat-sys-on-tertiary: #ffffff;
+  --mat-sys-tertiary-container: #bc4800;
+  --mat-sys-on-tertiary-container: #ffede6;
+  --mat-sys-tertiary-fixed: #ffdbcd;
+  --mat-sys-tertiary-fixed-dim: #ffb596;
+  --mat-sys-on-tertiary-fixed: #360f00;
+  --mat-sys-on-tertiary-fixed-variant: #7d2d00;
+
+  --mat-sys-error: #ba1a1a;
+  --mat-sys-on-error: #ffffff;
+  --mat-sys-error-container: #ffdad6;
+  --mat-sys-on-error-container: #93000a;
+
+  // ---------------------------------------------------------------------------
+  // Tipografia — dual-sans: "Narrativa" (Jakarta) vs "Utilidade" (Inter)
+  // ---------------------------------------------------------------------------
+  --fo-font-headline: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  --fo-font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fo-font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+
+  // Escala do Precision System
+  --fo-display-lg: 700 32px/40px var(--fo-font-headline);
+  --fo-headline-md: 600 24px/32px var(--fo-font-headline);
+  --fo-headline-sm: 600 20px/28px var(--fo-font-headline);
+  --fo-body-lg: 400 16px/24px var(--fo-font-body);
+  --fo-body-md: 400 14px/20px var(--fo-font-body);
+  --fo-label-caps: 600 12px/16px var(--fo-font-body);
+  --fo-data-mono: 500 13px/18px var(--fo-font-mono);
+  --fo-tracking-caps: 0.05em;
+
+  // Material typescale remapeado para o Precision System
+  --mat-sys-display-large-font: var(--fo-font-headline);
+  --mat-sys-display-medium-font: var(--fo-font-headline);
+  --mat-sys-display-small-font: var(--fo-font-headline);
+  --mat-sys-headline-large-font: var(--fo-font-headline);
+  --mat-sys-headline-medium-font: var(--fo-font-headline);
+  --mat-sys-headline-small-font: var(--fo-font-headline);
+  --mat-sys-title-large-font: var(--fo-font-headline);
+  --mat-sys-title-medium-font: var(--fo-font-body);
+  --mat-sys-title-small-font: var(--fo-font-body);
+  --mat-sys-body-large-font: var(--fo-font-body);
+  --mat-sys-body-medium-font: var(--fo-font-body);
+  --mat-sys-body-small-font: var(--fo-font-body);
+  --mat-sys-label-large-font: var(--fo-font-body);
+  --mat-sys-label-medium-font: var(--fo-font-body);
+  --mat-sys-label-small-font: var(--fo-font-body);
+
+  --mat-sys-headline-small: 600 20px/28px var(--fo-font-headline);
+  --mat-sys-headline-small-size: 20px;
+  --mat-sys-headline-small-weight: 600;
+  --mat-sys-headline-small-line-height: 28px;
+  --mat-sys-title-large: 600 20px/28px var(--fo-font-headline);
+  --mat-sys-title-large-weight: 600;
+  --mat-sys-body-large: 400 16px/24px var(--fo-font-body);
+  --mat-sys-body-large-size: 16px;
+  --mat-sys-body-large-line-height: 24px;
+  --mat-sys-body-medium: 400 14px/20px var(--fo-font-body);
+  --mat-sys-body-medium-size: 14px;
+  --mat-sys-body-medium-line-height: 20px;
+  --mat-sys-label-large: 600 14px/20px var(--fo-font-body);
+  --mat-sys-label-large-weight: 600;
+
+  // ---------------------------------------------------------------------------
+  // Cores semânticas — "Soft Fill": 10% de fundo, 100% de texto
+  // Usadas com parcimônia, só em status/validação/alerta crítico.
+  // ---------------------------------------------------------------------------
+  --fo-success: #047857;
+  --fo-success-soft: rgba(4, 120, 87, 0.1);
+  --fo-info: #2563eb;
+  --fo-info-soft: rgba(37, 99, 235, 0.1);
+  --fo-warning: #b45309;
+  --fo-warning-soft: rgba(180, 83, 9, 0.1);
+  --fo-high: #c2410c;
+  --fo-high-soft: rgba(194, 65, 12, 0.1);
+  --fo-danger: #ba1a1a;
+  --fo-danger-soft: rgba(186, 26, 26, 0.1);
+  --fo-neutral: #475569;
+  --fo-neutral-soft: rgba(71, 85, 105, 0.1);
+
+  // ---------------------------------------------------------------------------
+  // Elevação — Tonal Layering, não drop-shadow pesado
+  // ---------------------------------------------------------------------------
+  --fo-level-0: #faf8ff; // fundo
+  --fo-level-1: #ffffff; // cards / superfícies de conteúdo
+  --fo-hairline: #e2e8f0; // contorno de definição em ambiente de alto brilho
+  --fo-shadow-1: 0 4px 12px rgba(15, 23, 42, 0.03);
+  --fo-shadow-2: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --fo-shadow-primary: 0 4px 12px rgba(37, 99, 235, 0.2);
+  --fo-shadow-primary-hover: 0 6px 16px rgba(37, 99, 235, 0.3);
+
+  // ---------------------------------------------------------------------------
+  // Formas — aninhamento visual: card 16 > botão 12 > badge 8
+  // ---------------------------------------------------------------------------
+  --fo-radius-sm: 4px;
+  --fo-radius: 8px;
+  --fo-radius-md: 12px;
+  --fo-radius-lg: 16px;
+  --fo-radius-xl: 24px;
+  --fo-radius-full: 9999px;
+
+  --mat-sys-corner-extra-small: 4px;
+  --mat-sys-corner-small: 8px;
+  --mat-sys-corner-medium: 12px;
+  --mat-sys-corner-large: 16px;
+  --mat-sys-corner-extra-large: 24px;
+
+  // ---------------------------------------------------------------------------
+  // Espaçamento — grade base de 4px, incrementos 16/24 no layout
+  // ---------------------------------------------------------------------------
+  --fo-space-base: 4px;
+  --fo-space-xs: 8px;
+  --fo-space-sm: 12px;
+  --fo-space-md: 16px;
+  --fo-space-lg: 24px;
+  --fo-space-xl: 32px;
+  --fo-gutter: 16px;
+
+  // Alvo de toque mínimo (44x44) preservado mesmo no desktop
+  --fo-touch-target: 44px;
+
+  --fo-sidenav-width: 268px;
+  --fo-topbar-height: 68px;
+}
