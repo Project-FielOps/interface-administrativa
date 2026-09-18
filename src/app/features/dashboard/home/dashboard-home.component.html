@@ -22,26 +22,46 @@
     @if (state().data; as summary) {
       <div class="fo-cards-grid">
         @for (s of statusEntries(summary); track s.key) {
-          <mat-card class="fo-stat-card">
-            <span class="fo-stat-value">{{ s.value }}</span>
+          <mat-card class="fo-stat-card" [class]="'fo-stat-card--' + s.key.toLowerCase()">
+            <div class="fo-stat-card__topline">
+              <span class="fo-stat-icon"><mat-icon>assignment</mat-icon></span>
+              <span class="fo-stat-trend">{{ s.key }}</span>
+            </div>
+            <strong class="fo-stat-value">{{ s.value }}</strong>
             <span class="fo-stat-label">{{ s.label }}</span>
           </mat-card>
         }
       </div>
 
-      <div class="fo-cards-grid">
+      <div class="fo-dashboard-section-heading">
+        <div>
+          <p class="fo-eyebrow">Atenção operacional</p>
+          <h2>O que precisa de atenção</h2>
+        </div>
+        <span class="fo-muted">Acompanhe os próximos movimentos da equipe</span>
+      </div>
+      <div class="fo-cards-grid fo-cards-grid--highlight">
         <mat-card class="fo-stat-card fo-stat-card--warn">
+          <div class="fo-stat-card__topline"><span class="fo-stat-icon"><mat-icon>schedule</mat-icon></span></div>
           <span class="fo-stat-value">{{ summary.overdueCount }}</span>
           <span class="fo-stat-label">Inspeções atrasadas</span>
+          <span class="fo-stat-hint">Precisam de acompanhamento</span>
         </mat-card>
         <mat-card class="fo-stat-card fo-stat-card--info">
+          <div class="fo-stat-card__topline"><span class="fo-stat-icon"><mat-icon>rate_review</mat-icon></span></div>
           <span class="fo-stat-value">{{ summary.awaitingReviewCount }}</span>
           <span class="fo-stat-label">Aguardando revisão</span>
+          <span class="fo-stat-hint">Prontas para sua análise</span>
         </mat-card>
       </div>
 
-      <h2>Não conformidades por severidade</h2>
-      <div class="fo-cards-grid">
+      <div class="fo-dashboard-section-heading fo-dashboard-section-heading--severity">
+        <div>
+          <p class="fo-eyebrow">Qualidade</p>
+          <h2>Não conformidades por severidade</h2>
+        </div>
+      </div>
+      <div class="fo-cards-grid fo-cards-grid--severity">
         @for (sv of severityEntries(summary); track sv.key) {
           <mat-card class="fo-stat-card">
             <span class="fo-stat-value" [class]="'fo-severity-' + sv.key.toLowerCase()">{{

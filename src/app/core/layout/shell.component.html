@@ -30,6 +30,7 @@
             @for (item of itemsFor(section); track item.route) {
               <a
                 mat-list-item
+                class="fo-nav-item"
                 [routerLink]="item.route"
                 routerLinkActive="fo-active"
                 [routerLinkActiveOptions]="{ exact: false }"
@@ -49,7 +50,11 @@
     </nav>
     @if (!navigationCollapsed()) {
       <div class="fo-sidenav__footer">
-        <span class="fo-system-dot"></span><span>Sistema operacional</span>
+        <span class="fo-system-dot"></span>
+        <span class="fo-sidenav__footer-copy">
+          <strong>Sistema operacional</strong>
+          <small>Todos os serviços ativos</small>
+        </span>
       </div>
     }
   </mat-sidenav>

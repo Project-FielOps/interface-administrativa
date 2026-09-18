@@ -25,7 +25,7 @@ import { CommonModule } from '@angular/common';
         align-items: flex-start;
         justify-content: space-between;
         gap: 24px;
-        margin-bottom: 24px;
+        margin-bottom: 28px;
         flex-wrap: wrap;
       }
       h1 {
@@ -40,6 +40,7 @@ import { CommonModule } from '@angular/common';
         margin: 0;
         color: var(--fo-text-secondary);
         font-size: 14px;
+        line-height: 21px;
       }
       .fo-page-header__actions {
         display: flex;

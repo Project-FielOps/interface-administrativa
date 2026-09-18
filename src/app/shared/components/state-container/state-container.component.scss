@@ -15,6 +15,7 @@
   background: var(--fo-surface);
   border: 1px solid var(--fo-border);
   border-radius: 12px;
+  box-shadow: var(--fo-shadow);
 }
 
 .fo-state__error mat-icon {
