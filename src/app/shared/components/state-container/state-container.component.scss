@@ -25,10 +25,17 @@
   height: 40px;
 }
 
-.fo-state__empty mat-icon {
+.fo-state__empty > mat-icon {
   font-size: 40px;
   width: 40px;
   height: 40px;
   color: var(--fo-primary-dark);
   opacity: 0.65;
+}
+.fo-state__empty button mat-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  font-size: 20px;
+  opacity: 1;
 }

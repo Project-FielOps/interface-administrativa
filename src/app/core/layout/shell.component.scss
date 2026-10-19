@@ -55,6 +55,20 @@
     transform 160ms ease,
     box-shadow 160ms ease;
 }
+.fo-brand__mark-letter,
+.fo-brand__mark-dot {
+  grid-area: 1 / 1;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 800;
+}
+.fo-brand__mark-letter {
+  transform: translate(-4px, -2px);
+}
+.fo-brand__mark-dot {
+  color: #93ccff;
+  transform: translate(4px, 3px);
+}
 .fo-brand__copy,
 .fo-user-copy {
   display: flex;
@@ -213,15 +227,23 @@ mat-nav-list {
   line-height: 15px;
 }
 .fo-user-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   height: 48px;
   padding: 4px 8px !important;
+}
+.fo-user-trigger .mdc-button__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 .fo-avatar {
   display: grid;
   place-items: center;
   width: 34px;
   height: 34px;
-  margin-right: 9px;
+  margin-right: 0;
   color: var(--fo-text-inverse);
   background: var(--fo-secondary, #006398);
   border-radius: 50%;

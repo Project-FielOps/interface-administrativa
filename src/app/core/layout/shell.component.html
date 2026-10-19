@@ -13,7 +13,9 @@
       (click)="goToDashboard()"
       aria-label="Ir para o dashboard"
     >
-      <span class="fo-brand__mark"><mat-icon>domain_verification</mat-icon></span>
+      <span class="fo-brand__mark" aria-hidden="true">
+        <span class="fo-brand__mark-letter">F</span><span class="fo-brand__mark-dot">O</span>
+      </span>
       @if (!navigationCollapsed()) {
         <span class="fo-brand__copy"
           ><strong>FieldOps</strong><small>Gestão operacional</small></span
