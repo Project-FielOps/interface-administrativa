@@ -8,8 +8,28 @@
     <summary><mat-icon>filter_alt</mat-icon> Filtros</summary>
     <form [formGroup]="filterForm" class="fo-filters">
       <mat-form-field>
+        <mat-label>Ação</mat-label>
+        <input matInput formControlName="action" placeholder="Ex.: INSPECTION_STARTED" />
+      </mat-form-field>
+      <mat-form-field>
         <mat-label>Tipo de entidade</mat-label>
         <input matInput formControlName="entityType" placeholder="Ex.: INSPECTION, USER" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>ID da entidade</mat-label>
+        <input matInput formControlName="entityId" placeholder="UUID da entidade" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>ID do autor</mat-label>
+        <input matInput formControlName="actorId" placeholder="UUID do autor" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Data inicial</mat-label>
+        <input matInput type="date" formControlName="occurredFrom" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Data final</mat-label>
+        <input matInput type="date" formControlName="occurredTo" />
       </mat-form-field>
     </form>
   </details>

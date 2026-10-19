@@ -44,11 +44,23 @@ export class AuditListComponent implements OnInit {
   readonly pageIndex = signal(0);
 
   readonly filterForm = this.fb.group({
+    action: [''],
     entityType: [''],
+    entityId: [''],
+    actorId: [''],
+    occurredFrom: [''],
+    occurredTo: [''],
   });
 
   clearFilters(): void {
-    this.filterForm.reset({ entityType: '' });
+    this.filterForm.reset({
+      action: '',
+      entityType: '',
+      entityId: '',
+      actorId: '',
+      occurredFrom: '',
+      occurredTo: '',
+    });
   }
 
   constructor(
@@ -69,7 +81,12 @@ export class AuditListComponent implements OnInit {
     const f = this.filterForm.getRawValue();
     this.service
       .list({
+        action: f.action || undefined,
         entityType: f.entityType || undefined,
+        entityId: f.entityId || undefined,
+        actorId: f.actorId || undefined,
+        occurredFrom: f.occurredFrom || undefined,
+        occurredTo: f.occurredTo || undefined,
         page: this.pageIndex(),
         size: this.pageSize(),
         sort: 'occurredAt,desc',
