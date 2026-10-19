@@ -88,6 +88,7 @@ export class TemplatesListComponent implements OnInit {
       })
       .subscribe({
         next: (page) => {
+          this.mergeCategories(page.content.map((template) => template.category));
           this.totalElements.set(page.totalElements);
           this.state.set(
             successState(
@@ -107,8 +108,16 @@ export class TemplatesListComponent implements OnInit {
 
   private loadCategories(): void {
     this.templatesService.listCategories().subscribe({
-      next: (categories) => this.categories.set(categories),
+      next: (categories) => this.mergeCategories(categories),
     });
+  }
+
+  private mergeCategories(categories: string[]): void {
+    this.categories.update((current) =>
+      [...new Set([...current, ...categories.filter((category) => !!category?.trim())])].sort(
+        (a, b) => a.localeCompare(b),
+      ),
+    );
   }
 
   onPage(event: PageEvent): void {
