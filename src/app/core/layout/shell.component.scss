@@ -3,15 +3,13 @@
   background: var(--fo-background);
 }
 .fo-sidenav {
-  width: 248px;
-  background:
-    radial-gradient(circle at 0% 0%, rgba(22, 166, 106, 0.14), transparent 34%),
-    linear-gradient(180deg, #102a2e 0%, #0d2529 100%);
+  width: 268px;
+  background: var(--fo-navigation);
   color: var(--fo-text-inverse);
   border: 0;
   border-radius: 0;
   transition: width 160ms ease;
-  box-shadow: 8px 0 24px rgba(16, 42, 46, 0.08);
+  box-shadow: 8px 0 24px rgba(15, 23, 42, 0.08);
 }
 .fo-sidenav--collapsed {
   width: 72px;
@@ -48,12 +46,14 @@
   place-items: center;
   min-width: 42px;
   height: 42px;
-  color: var(--fo-navigation);
-  background: linear-gradient(145deg, #23bd7c, var(--fo-primary));
+  color: var(--fo-text-inverse);
+  background: var(--fo-primary-container, #2563eb);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(22, 166, 106, 0.14);
-  transition: transform 160ms ease, box-shadow 160ms ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
 }
 .fo-brand__copy,
 .fo-user-copy {
@@ -100,7 +100,10 @@ mat-nav-list {
   border-radius: 10px;
   --mdc-list-list-item-label-text-color: #dce5e5;
   --mdc-list-list-item-leading-icon-color: #9fb3b4;
-  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
 }
 .fo-nav-item[mat-list-item] [matListItemTitle],
 .fo-nav-item[mat-list-item] .mdc-list-item__primary-text {
@@ -112,10 +115,10 @@ mat-nav-list {
 }
 .fo-nav-item.fo-active {
   position: relative;
-  background: linear-gradient(90deg, rgba(35, 189, 124, 0.2), rgba(35, 189, 124, 0.08));
-  border-color: rgba(100, 221, 165, 0.12);
+  background: rgba(37, 99, 235, 0.18);
+  border-color: rgba(147, 204, 255, 0.2);
   --mdc-list-list-item-label-text-color: white;
-  --mdc-list-list-item-leading-icon-color: #64dda5;
+  --mdc-list-list-item-leading-icon-color: #93ccff;
   font-weight: 700;
 }
 .fo-nav-item.fo-active[mat-list-item] [matListItemTitle],
@@ -127,16 +130,18 @@ mat-nav-list {
   inset: 8px auto 8px -9px;
   width: 4px;
   content: '';
-  background: #64dda5;
+  background: #93ccff;
   border-radius: 0 5px 5px 0;
-  box-shadow: 0 0 10px rgba(100, 221, 165, 0.5);
+  box-shadow: 0 0 10px rgba(147, 204, 255, 0.5);
 }
 .fo-nav-item .mat-icon {
   width: 22px;
   height: 22px;
   margin-right: 4px;
   font-size: 21px;
-  transition: transform 160ms ease, color 160ms ease;
+  transition:
+    transform 160ms ease,
+    color 160ms ease;
 }
 .fo-nav-item:hover .mat-icon,
 .fo-nav-item.fo-active .mat-icon {
@@ -177,9 +182,9 @@ mat-nav-list {
 .fo-system-dot {
   width: 8px;
   height: 8px;
-  background: #64dda5;
+  background: #10b981;
   border-radius: 50%;
-  box-shadow: 0 0 0 3px rgba(100, 221, 165, 0.14);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.14);
   flex: 0 0 auto;
 }
 .fo-toolbar-top {
@@ -217,8 +222,8 @@ mat-nav-list {
   width: 34px;
   height: 34px;
   margin-right: 9px;
-  color: var(--fo-primary-dark);
-  background: var(--fo-primary-soft);
+  color: var(--fo-text-inverse);
+  background: var(--fo-secondary, #006398);
   border-radius: 50%;
   font-weight: 800;
 }

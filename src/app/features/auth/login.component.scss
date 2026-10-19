@@ -3,6 +3,7 @@
   grid-template-columns: minmax(380px, 0.9fr) minmax(480px, 1.1fr);
   min-height: 100vh;
   background: var(--fo-background);
+  font-family: 'Inter', system-ui, sans-serif;
 }
 .fo-login-context {
   display: flex;
@@ -31,7 +32,8 @@
 .fo-login-context h1 {
   max-width: 620px;
   margin: 12px 0 16px;
-  font-size: clamp(34px, 3.2vw, 52px);
+  font-family: 'Plus Jakarta Sans', Inter, sans-serif;
+  font-size: clamp(28px, 3.2vw, 40px);
   line-height: 1.12;
   letter-spacing: -0.035em;
 }
@@ -43,7 +45,7 @@
 }
 .fo-eyebrow {
   margin: 0;
-  color: #6ee0aa;
+  color: #93ccff;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -64,7 +66,7 @@
   font-weight: 600;
 }
 .fo-login-context li mat-icon {
-  color: #6ee0aa;
+  color: #93ccff;
   font-size: 20px;
   width: 20px;
   height: 20px;
@@ -78,7 +80,10 @@
   align-self: center;
   justify-self: center;
   width: min(430px, calc(100% - 48px));
-  padding: 40px;
+  padding: 32px;
+  border: 1px solid var(--fo-border);
+  border-radius: 16px;
+  box-shadow: var(--fo-shadow-overlay);
 }
 .fo-login-brand {
   margin-bottom: 28px;
@@ -98,9 +103,10 @@
 }
 .fo-login-brand h2 {
   margin: 8px 0 4px;
-  font-size: 28px;
-  line-height: 36px;
-  font-weight: 800;
+  font-family: 'Plus Jakarta Sans', Inter, sans-serif;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
 }
 .fo-login-brand > p:last-child {
   margin: 0;

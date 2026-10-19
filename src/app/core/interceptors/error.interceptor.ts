@@ -1,13 +1,11 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { ApiError } from '../models/common.model';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const snackBar = inject(MatSnackBar);
-  const router = inject(Router);
 
   return next(req).pipe(
     catchError((err: unknown) => {
@@ -20,13 +18,35 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
               duration: 6000,
             },
           );
-        } else if (err.status === 401 && !req.url.includes('/auth/')) {
-          snackBar.open('Sessão expirada. Faça login novamente.', 'Fechar', { duration: 5000 });
-          router.navigate(['/login']);
+        } else if (err.status === 401 && req.url.endsWith('/auth/login')) {
+          snackBar.open('E-mail ou senha inválidos.', 'Fechar', { duration: 5000 });
         } else if (err.status === 403) {
-          snackBar.open('Você não tem permissão para executar esta ação.', 'Fechar', {
+          const body = err.error as ApiError | undefined;
+          const message =
+            body?.code === 'PASSWORD_CHANGE_REQUIRED'
+              ? 'Altere sua senha para continuar.'
+              : 'Você não tem permissão para executar esta ação.';
+          snackBar.open(message, 'Fechar', {
             duration: 5000,
           });
+        } else if (err.status === 409) {
+          const body = err.error as ApiError | undefined;
+          snackBar.open(
+            body?.message ?? 'Conflito: os dados já foram alterados ou já existem.',
+            'Fechar',
+            {
+              duration: 5000,
+            },
+          );
+        } else if (err.status === 422) {
+          const body = err.error as ApiError | undefined;
+          snackBar.open(
+            body?.message ?? 'Não foi possível processar os dados informados.',
+            'Fechar',
+            {
+              duration: 5000,
+            },
+          );
         } else if (err.status >= 500) {
           const body = err.error as ApiError | undefined;
           snackBar.open(

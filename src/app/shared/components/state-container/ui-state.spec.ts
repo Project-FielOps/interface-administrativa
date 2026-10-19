@@ -9,6 +9,18 @@ describe('ui-state', () => {
 
   it('representa acesso proibido explicitamente', () => {
     expect(forbiddenState().phase).toBe('forbidden');
-    expect(requestErrorState({ status: 403 }).phase).toBe('forbidden');
+    expect(
+      requestErrorState({
+        status: 403,
+        error: {
+          requestId: 'req-123',
+          fieldErrors: [{ field: 'name', message: 'Nome inválido' }],
+        },
+      }),
+    ).toMatchObject({
+      phase: 'forbidden',
+      requestId: 'req-123',
+      fieldErrors: [{ field: 'name', message: 'Nome inválido' }],
+    });
   });
 });
