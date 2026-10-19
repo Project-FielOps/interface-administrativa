@@ -54,8 +54,9 @@ export class TemplatesListComponent implements OnInit {
   readonly totalElements = signal(0);
   readonly pageSize = signal(10);
   readonly pageIndex = signal(0);
+  readonly categories = signal<string[]>([]);
 
-  readonly filterForm = this.fb.group({ status: [''] });
+  readonly filterForm = this.fb.group({ status: [''], category: [''] });
 
   constructor(
     private readonly fb: FormBuilder,
@@ -66,6 +67,7 @@ export class TemplatesListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadCategories();
     this.load();
     this.filterForm.valueChanges.pipe(debounceTime(350)).subscribe(() => {
       this.pageIndex.set(0);
@@ -75,10 +77,11 @@ export class TemplatesListComponent implements OnInit {
 
   load(): void {
     this.state.set(loadingState());
-    const { status } = this.filterForm.getRawValue();
+    const { status, category } = this.filterForm.getRawValue();
     this.templatesService
       .list({
         status: status || undefined,
+        category: category || undefined,
         page: this.pageIndex(),
         size: this.pageSize(),
         sort: 'title,asc',
@@ -99,7 +102,13 @@ export class TemplatesListComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.filterForm.reset({ status: '' });
+    this.filterForm.reset({ status: '', category: '' });
+  }
+
+  private loadCategories(): void {
+    this.templatesService.listCategories().subscribe({
+      next: (categories) => this.categories.set(categories),
+    });
   }
 
   onPage(event: PageEvent): void {

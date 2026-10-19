@@ -20,6 +20,15 @@
           <mat-option value="INACTIVE">Inativo</mat-option>
         </mat-select>
       </mat-form-field>
+      <mat-form-field>
+        <mat-label>Categoria</mat-label>
+        <mat-select formControlName="category">
+          <mat-option value="">Todas</mat-option>
+          @for (category of categories(); track category) {
+            <mat-option [value]="category">{{ category }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
     </form>
   </details>
 
