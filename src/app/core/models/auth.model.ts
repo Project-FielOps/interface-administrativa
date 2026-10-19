@@ -20,3 +20,7 @@ export interface UserResponse {
   version: number;
   mustChangePassword: boolean;
 }
+
+export interface PasswordRecoveryResponse {
+  message: string;
+}

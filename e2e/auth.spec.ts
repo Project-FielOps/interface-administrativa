@@ -161,3 +161,82 @@ test('faz logout remoto e retorna ao login', async ({ page }) => {
   await expect(page).toHaveURL(/\/login$/);
   expect(logoutBody).toEqual({ refreshToken: 'refresh-token' });
 });
+
+test('solicita recuperação sem revelar se o e-mail existe', async ({ page }) => {
+  let requestBody: unknown;
+  await page.route('**/api/v1/auth/forgot-password', async (route) => {
+    requestBody = route.request().postDataJSON();
+    await route.fulfill({
+      status: 202,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        message: 'If the account exists, instructions were sent.',
+      }),
+    });
+  });
+
+  await page.goto('/forgot-password');
+  await page.getByLabel('E-mail').fill('unknown@example.com');
+  await page.getByRole('button', { name: 'Enviar instruções' }).click();
+
+  await expect(page.getByRole('status')).toContainText('Se houver uma conta ativa');
+  expect(requestBody).toEqual({ email: 'unknown@example.com' });
+  await expect(page).toHaveURL(/\/forgot-password$/);
+});
+
+test('consome token de reset da URL e redefine senha válida', async ({ page }) => {
+  let requestBody: unknown;
+  await page.route('**/api/v1/auth/reset-password', async (route) => {
+    requestBody = route.request().postDataJSON();
+    await route.fulfill({ status: 204, body: '' });
+  });
+
+  await page.goto('/reset-password?token=one-time-token');
+  await expect(page).toHaveURL(/\/reset-password$/);
+  await page.getByRole('textbox', { name: 'Nova senha', exact: true }).fill('Strong@123');
+  await page
+    .getByRole('textbox', { name: 'Confirme a nova senha', exact: true })
+    .fill('Strong@123');
+  await page.getByRole('button', { name: 'Redefinir senha' }).click();
+
+  await expect(page.getByRole('status')).toContainText('Sua senha foi redefinida');
+  expect(requestBody).toEqual({ token: 'one-time-token', newPassword: 'Strong@123' });
+});
+
+test('informa token de reset inválido sem expor o valor', async ({ page }) => {
+  await page.route('**/api/v1/auth/reset-password', (route) =>
+    route.fulfill({
+      status: 401,
+      contentType: 'application/json',
+      body: JSON.stringify({ status: 401, code: 'INVALID_CREDENTIALS' }),
+    }),
+  );
+
+  await page.goto('/reset-password?token=expired-token');
+  await page.getByRole('textbox', { name: 'Nova senha', exact: true }).fill('Strong@123');
+  await page
+    .getByRole('textbox', { name: 'Confirme a nova senha', exact: true })
+    .fill('Strong@123');
+  await page.getByRole('button', { name: 'Redefinir senha' }).click();
+
+  await expect(page.getByRole('alert')).toContainText('inválido, expirou ou já foi usado');
+  await expect(page).toHaveURL(/\/reset-password$/);
+});
+
+test('exige força e confirmação na troca obrigatória', async ({ page }) => {
+  await mockSuccessfulSession(page, true);
+  await login(page);
+
+  await page.getByLabel('Senha atual').fill('Password@123');
+  await page.getByRole('textbox', { name: 'Nova senha', exact: true }).fill('fraca');
+  await page.getByRole('textbox', { name: 'Confirme a nova senha', exact: true }).fill('diferente');
+  await page.getByRole('button', { name: 'Salvar nova senha' }).click();
+
+  await expect(
+    page.locator('mat-error').filter({ hasText: 'ao menos 8 caracteres' }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('A confirmação não coincide com a nova senha', { exact: true }),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/app\/change-password$/);
+});

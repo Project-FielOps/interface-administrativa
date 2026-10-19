@@ -3,13 +3,22 @@ import { Injectable, computed, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, defer, finalize, shareReplay, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { TokenResponse, UserResponse } from '../models/auth.model';
+import { PasswordRecoveryResponse, TokenResponse, UserResponse } from '../models/auth.model';
 import { User, UserRole } from '../models/user.model';
 import { TokenStorageService } from './token-storage.service';
 
 export interface LoginRequest {
   email: string;
   password: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
 }
 
 export type LoginResponse = TokenResponse;
@@ -86,6 +95,19 @@ export class AuthService {
     return this.http
       .post<void>(`${environment.apiUrl}/auth/change-password`, { currentPassword, newPassword })
       .pipe(tap(() => this.mustChangePassword.set(false)));
+  }
+
+  requestPasswordReset(email: string): Observable<PasswordRecoveryResponse> {
+    return this.http.post<PasswordRecoveryResponse>(`${environment.apiUrl}/auth/forgot-password`, {
+      email,
+    });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/auth/reset-password`, {
+      token,
+      newPassword,
+    });
   }
 
   hasRole(...roles: UserRole[]): boolean {

@@ -68,4 +68,28 @@ describe('AuthService', () => {
     expect(request.request.body).toEqual({ refreshToken: 'refresh' });
     request.flush({ message: 'unavailable' }, { status: 503, statusText: 'Unavailable' });
   });
+
+  it('requests recovery with the email and exposes the generic API response', async () => {
+    const result = firstValueFrom(auth.requestPasswordReset('person@example.com'));
+    const request = http.expectOne(`${environment.apiUrl}/auth/forgot-password`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ email: 'person@example.com' });
+    request.flush(
+      { message: 'If the account exists, instructions were sent.' },
+      { status: 202, statusText: 'Accepted' },
+    );
+    await expect(result).resolves.toEqual({
+      message: 'If the account exists, instructions were sent.',
+    });
+  });
+
+  it('resets the password with the token without storing it', async () => {
+    const result = firstValueFrom(auth.resetPassword('opaque-token', 'Strong@123'));
+    const request = http.expectOne(`${environment.apiUrl}/auth/reset-password`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ token: 'opaque-token', newPassword: 'Strong@123' });
+    request.flush(null);
+    await expect(result).resolves.toBeNull();
+    expect(sessionStorage.getItem('opaque-token')).toBeNull();
+  });
 });

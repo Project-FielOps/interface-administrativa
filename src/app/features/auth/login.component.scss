@@ -119,6 +119,14 @@
 .fo-login-submit mat-spinner {
   margin: auto;
 }
+.fo-login-recovery {
+  display: block;
+  margin-top: 16px;
+  color: var(--fo-primary-dark);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
 .fo-login-error {
   margin: -4px 0 12px;
 }
