@@ -100,7 +100,7 @@
   ></app-state-container>
 
   <ng-template #tableTpl>
-    <table mat-table [dataSource]="state().data || []">
+    <table mat-table [dataSource]="state().data || []" aria-label="Lista de inspeções">
       <ng-container matColumnDef="title">
         <th mat-header-cell *matHeaderCellDef>Título</th>
         <td mat-cell *matCellDef="let i">

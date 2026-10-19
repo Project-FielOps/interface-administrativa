@@ -9,7 +9,7 @@ html {
         primary: mat.$green-palette,
         tertiary: mat.$azure-palette,
       ),
-      typography: 'Inter',
+      typography: 'Nunito Sans',
       density: 0,
     )
   );
@@ -38,7 +38,7 @@ body {
   color: var(--fo-text-primary);
   background: var(--fo-background);
   font-family:
-    'Inter',
+    'Nunito Sans',
     system-ui,
     -apple-system,
     'Segoe UI',
@@ -74,13 +74,13 @@ p {
   color: inherit;
 }
 h2 {
-  font-family: 'Plus Jakarta Sans', Inter, sans-serif;
+  font-family: 'Nunito Sans', sans-serif;
   font-size: 20px;
   line-height: 28px;
   font-weight: 600;
 }
 h3 {
-  font-family: 'Plus Jakarta Sans', Inter, sans-serif;
+  font-family: 'Nunito Sans', sans-serif;
   font-size: 16px;
   line-height: 24px;
   font-weight: 600;

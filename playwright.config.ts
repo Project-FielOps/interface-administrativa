@@ -7,6 +7,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
+  timeout: 60_000,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: 'http://localhost:4200',
@@ -23,8 +24,12 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   projects: [
     {
-      name: 'chromium',
+      name: 'chromium-desktop',
       use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'chromium-mobile',
+      use: { ...devices['Pixel 5'], viewport: { width: 390, height: 844 } },
     },
   ],
 });

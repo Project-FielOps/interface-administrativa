@@ -3,7 +3,7 @@
   grid-template-columns: minmax(380px, 0.9fr) minmax(480px, 1.1fr);
   min-height: 100vh;
   background: var(--fo-background);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Nunito Sans', system-ui, sans-serif;
 }
 .fo-login-context {
   display: flex;
@@ -25,14 +25,14 @@
   place-items: center;
   width: 44px;
   height: 44px;
-  color: var(--fo-navigation);
+  color: var(--fo-text-inverse);
   background: var(--fo-primary);
   border-radius: 12px;
 }
 .fo-login-context h1 {
   max-width: 620px;
   margin: 12px 0 16px;
-  font-family: 'Plus Jakarta Sans', Inter, sans-serif;
+  font-family: 'Nunito Sans', sans-serif;
   font-size: clamp(28px, 3.2vw, 40px);
   line-height: 1.12;
   letter-spacing: -0.035em;
@@ -103,7 +103,7 @@
 }
 .fo-login-brand h2 {
   margin: 8px 0 4px;
-  font-family: 'Plus Jakarta Sans', Inter, sans-serif;
+  font-family: 'Nunito Sans', sans-serif;
   font-size: 24px;
   line-height: 32px;
   font-weight: 600;
