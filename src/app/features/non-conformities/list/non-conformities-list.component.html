@@ -38,24 +38,37 @@
   ></app-state-container>
 
   <ng-template #listTpl>
-    <mat-accordion multi>
-      @for (nc of filtered(); track nc.id) {
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>{{ nc.title }}</mat-panel-title>
-            <mat-panel-description>
-              <app-status-badge [value]="nc.severity"></app-status-badge>
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-          @if (nc.description) {
-            <p>{{ nc.description }}</p>
-          }
-          <p><app-status-badge [value]="nc.status"></app-status-badge></p>
+    <table mat-table [dataSource]="filtered()">
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Título</th>
+        <td mat-cell *matCellDef="let nc">{{ nc.title }}</td>
+      </ng-container>
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Descrição</th>
+        <td mat-cell *matCellDef="let nc">{{ nc.description || '-' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="severity">
+        <th mat-header-cell *matHeaderCellDef>Severidade</th>
+        <td mat-cell *matCellDef="let nc">
+          <app-status-badge [value]="nc.severity"></app-status-badge>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let nc">
+          <app-status-badge [value]="nc.status"></app-status-badge>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let nc">
           <button mat-button color="primary" (click)="viewInspection(nc)">
             <mat-icon>open_in_new</mat-icon> Ver inspeção
           </button>
-        </mat-expansion-panel>
-      }
-    </mat-accordion>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
   </ng-template>
 </div>

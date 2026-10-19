@@ -1,12 +1,12 @@
 import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { Router } from '@angular/router';
 import { NonConformitiesService } from '../non-conformities.service';
 import { NonConformity } from '../../../core/models/inspection.model';
@@ -34,12 +34,12 @@ import {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    MatTableModule,
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
     MatIconModule,
     MatButtonModule,
-    MatExpansionModule,
     StateContainerComponent,
     PageHeaderComponent,
     StatusBadgeComponent,
@@ -48,6 +48,7 @@ import {
 })
 export class NonConformitiesListComponent {
   readonly state = signal<UiState<NonConformity[]>>({ phase: 'empty' });
+  readonly displayedColumns = ['title', 'description', 'severity', 'status', 'actions'];
   readonly severityFilter = signal('');
 
   readonly filtered = computed(() => {
