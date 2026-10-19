@@ -15,13 +15,14 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { debounceTime, distinctUntilChanged, map } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, forkJoin, map, of } from 'rxjs';
 import { InspectionListQuery, InspectionsService } from '../inspections.service';
 import { ClientsService } from '../../clients/clients.service';
 import { UsersService } from '../../users/users.service';
 import { Inspection } from '../../../core/models/inspection.model';
-import { Client } from '../../../core/models/client.model';
+import { Client, InspectionSite } from '../../../core/models/client.model';
 import { User } from '../../../core/models/user.model';
+import { SitesService } from '../../sites/sites.service';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import {
@@ -75,6 +76,7 @@ export class InspectionsListComponent implements OnInit {
   readonly clients = signal<Client[]>([]);
   readonly technicians = signal<User[]>([]);
   readonly supervisors = signal<User[]>([]);
+  readonly sites = signal<InspectionSite[]>([]);
 
   readonly filterForm = this.fb.group({
     status: [''],
@@ -109,6 +111,7 @@ export class InspectionsListComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly inspectionsService: InspectionsService,
     private readonly clientsService: ClientsService,
+    private readonly sitesService: SitesService,
     private readonly usersService: UsersService,
     private readonly dialog: MatDialog,
     private readonly snackBar: MatSnackBar,
@@ -124,9 +127,12 @@ export class InspectionsListComponent implements OnInit {
         this.pageSize.set(this.numberParam(filters['size'], 10));
         this.load();
       });
-    this.clientsService
-      .list({ size: 200, sort: 'name,asc' })
-      .subscribe({ next: (p) => this.clients.set(p.content) });
+    this.clientsService.list({ size: 200, sort: 'name,asc' }).subscribe({
+      next: (p) => {
+        this.clients.set(p.content);
+        this.loadSites(p.content);
+      },
+    });
     this.usersService
       .listAssignable('TECHNICIAN')
       .subscribe({ next: (p) => this.technicians.set(p.content) });
@@ -136,6 +142,27 @@ export class InspectionsListComponent implements OnInit {
     this.filterForm.valueChanges.pipe(debounceTime(350), distinctUntilChanged()).subscribe(() => {
       this.pageIndex.set(0);
       this.persistUrl();
+    });
+  }
+
+  private loadSites(clients: Client[]): void {
+    if (clients.length === 0) {
+      this.sites.set([]);
+      return;
+    }
+    forkJoin(
+      clients.map((client) =>
+        this.sitesService
+          .listByClient(client.id)
+          .pipe(catchError(() => of([] as InspectionSite[]))),
+      ),
+    ).subscribe((groups) => {
+      this.sites.set(
+        groups
+          .flat()
+          .filter((site) => site.status === 'ACTIVE')
+          .sort((left, right) => left.name.localeCompare(right.name)),
+      );
     });
   }
 

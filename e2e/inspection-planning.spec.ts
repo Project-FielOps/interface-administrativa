@@ -20,8 +20,12 @@ test('lista inspeções reais com filtro e paginação base-zero', async ({ page
     await uiLogin(page, 'ADMIN');
     await page.goto('/app/inspections?status=ASSIGNED&priority=HIGH&page=0&size=10');
     await expect(page.getByRole('heading', { name: 'Inspeções' })).toBeVisible();
+    await page.getByRole('combobox', { name: 'Local' }).click();
+    await expect(page.getByRole('option', { name: scenario.site.name, exact: true })).toBeVisible();
+    await page.getByRole('option', { name: scenario.site.name, exact: true }).click();
     await expect(page.getByText(scenario.inspection.title, { exact: true })).toBeVisible();
     await expect(page).toHaveURL(/status=ASSIGNED/);
+    await expect(page).toHaveURL(/siteId=/);
   } finally {
     await cleanupScenario(request, scenario);
   }
