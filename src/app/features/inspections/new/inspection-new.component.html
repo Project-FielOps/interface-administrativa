@@ -22,6 +22,13 @@
               <mat-option [value]="t.id">{{ t.title }}</mat-option>
             }
           </mat-select>
+          @if (templatesState().phase === 'loading') {
+            <mat-hint>Carregando modelos...</mat-hint>
+          } @else if (templatesState().phase === 'empty') {
+            <mat-hint>Nenhum modelo ativo disponível.</mat-hint>
+          } @else if (templatesState().phase === 'error') {
+            <mat-error>{{ templatesState().errorMessage }}</mat-error>
+          }
           @if (form.controls.templateId.hasError('required') && form.controls.templateId.touched) {
             <mat-error>Selecione um modelo</mat-error>
           }
@@ -36,6 +43,13 @@
               >
             }
           </mat-select>
+          @if (versionsState().phase === 'loading') {
+            <mat-hint>Carregando versões...</mat-hint>
+          } @else if (versionsState().phase === 'empty') {
+            <mat-hint>Nenhuma versão ativa para novas inspeções.</mat-hint>
+          } @else if (versionsState().phase === 'error') {
+            <mat-error>{{ versionsState().errorMessage }}</mat-error>
+          }
           @if (
             form.controls.templateVersionNumber.hasError('required') &&
             form.controls.templateVersionNumber.touched
@@ -51,6 +65,13 @@
               <mat-option [value]="c.id">{{ c.name }}</mat-option>
             }
           </mat-select>
+          @if (clientsState().phase === 'loading') {
+            <mat-hint>Carregando clientes...</mat-hint>
+          } @else if (clientsState().phase === 'empty') {
+            <mat-hint>Nenhum cliente ativo disponível.</mat-hint>
+          } @else if (clientsState().phase === 'error') {
+            <mat-error>{{ clientsState().errorMessage }}</mat-error>
+          }
           @if (form.controls.clientId.hasError('required') && form.controls.clientId.touched) {
             <mat-error>Selecione um cliente</mat-error>
           }
@@ -63,6 +84,13 @@
               <mat-option [value]="s.id">{{ s.name }}</mat-option>
             }
           </mat-select>
+          @if (sitesState().phase === 'loading') {
+            <mat-hint>Carregando locais...</mat-hint>
+          } @else if (sitesState().phase === 'empty') {
+            <mat-hint>Nenhum local ativo para este cliente.</mat-hint>
+          } @else if (sitesState().phase === 'error') {
+            <mat-error>{{ sitesState().errorMessage }}</mat-error>
+          }
           @if (form.controls.siteId.hasError('required') && form.controls.siteId.touched) {
             <mat-error>Selecione um local</mat-error>
           }
@@ -76,6 +104,13 @@
               <mat-option [value]="e.id">{{ e.name }}</mat-option>
             }
           </mat-select>
+          @if (equipmentState().phase === 'loading') {
+            <mat-hint>Carregando equipamentos...</mat-hint>
+          } @else if (equipmentState().phase === 'empty') {
+            <mat-hint>Nenhum equipamento ativo; a inspeção pode ser do local.</mat-hint>
+          } @else if (equipmentState().phase === 'error') {
+            <mat-error>{{ equipmentState().errorMessage }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field>
@@ -95,6 +130,13 @@
               <mat-option [value]="t.id">{{ t.name }}</mat-option>
             }
           </mat-select>
+          @if (techniciansState().phase === 'loading') {
+            <mat-hint>Carregando técnicos atribuíveis...</mat-hint>
+          } @else if (techniciansState().phase === 'empty') {
+            <mat-hint>Nenhum técnico ativo disponível.</mat-hint>
+          } @else if (techniciansState().phase === 'error') {
+            <mat-error>{{ techniciansState().errorMessage }}</mat-error>
+          }
           @if (
             form.controls.technicianId.hasError('required') && form.controls.technicianId.touched
           ) {
@@ -109,6 +151,13 @@
               <mat-option [value]="s.id">{{ s.name }}</mat-option>
             }
           </mat-select>
+          @if (supervisorsState().phase === 'loading') {
+            <mat-hint>Carregando supervisores atribuíveis...</mat-hint>
+          } @else if (supervisorsState().phase === 'empty') {
+            <mat-hint>Nenhum supervisor ativo disponível.</mat-hint>
+          } @else if (supervisorsState().phase === 'error') {
+            <mat-error>{{ supervisorsState().errorMessage }}</mat-error>
+          }
           @if (
             form.controls.supervisorId.hasError('required') && form.controls.supervisorId.touched
           ) {

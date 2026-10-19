@@ -9,6 +9,8 @@ import {
   UserStatus,
   UserUpdateRequest,
 } from '../../core/models/user.model';
+import { Page, PageQuery } from '../../core/models/common.model';
+import { toHttpParams } from '../../core/http/crud.service';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService extends CrudService<User, UserCreateRequest, UserUpdateRequest> {
@@ -20,9 +22,9 @@ export class UsersService extends CrudService<User, UserCreateRequest, UserUpdat
     return this.http.patch<User>(`${this.baseUrl}/${id}/status`, { status });
   }
 
-  listAssignable(role: 'TECHNICIAN' | 'SUPERVISOR'): Observable<{ content: User[] }> {
-    return this.http.get<{ content: User[] }>(`${environment.apiUrl}/users/assignable`, {
-      params: { role },
+  listAssignable(role: 'TECHNICIAN' | 'SUPERVISOR', query: PageQuery = {}): Observable<Page<User>> {
+    return this.http.get<Page<User>>(`${environment.apiUrl}/users/assignable`, {
+      params: toHttpParams({ role, page: 0, size: 100, sort: 'name,asc', ...query }),
     });
   }
 }
