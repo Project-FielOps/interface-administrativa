@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { NonConformitiesService } from '../non-conformities.service';
 import { NonConformity } from '../../../core/models/inspection.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
@@ -63,7 +64,8 @@ export class NonConformitiesListComponent {
   );
 
   clearFilters(): void {
-    this.filterForm.patchValue({ severity: '' });
+    this.filterForm.reset({ inspectionId: '', severity: '' });
+    this.state.set({ phase: 'empty' });
   }
 
   readonly filterForm = this.fb.group({ inspectionId: [''], severity: [''] });
@@ -73,9 +75,19 @@ export class NonConformitiesListComponent {
     private readonly service: NonConformitiesService,
     private readonly router: Router,
   ) {
-    this.filterForm.controls.severity.valueChanges.subscribe((v) =>
-      this.severityFilter.set(v || ''),
-    );
+    this.filterForm.controls.severity.valueChanges.subscribe((v) => {
+      this.severityFilter.set(v || '');
+      if (this.hasInspectionId()) this.search();
+    });
+    this.filterForm.controls.inspectionId.valueChanges
+      .pipe(debounceTime(350), distinctUntilChanged())
+      .subscribe(() => {
+        if (this.hasInspectionId()) this.search();
+      });
+  }
+
+  private hasInspectionId(): boolean {
+    return (this.filterForm.controls.inspectionId.value || '').trim().length === 36;
   }
 
   search(): void {
