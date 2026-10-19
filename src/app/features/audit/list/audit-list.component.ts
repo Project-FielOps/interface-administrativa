@@ -4,8 +4,6 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { debounceTime } from 'rxjs';
@@ -31,8 +29,6 @@ import {
     MatTableModule,
     MatFormFieldModule,
     MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
     MatPaginatorModule,
     MatIconModule,
     StateContainerComponent,
@@ -49,12 +45,10 @@ export class AuditListComponent implements OnInit {
 
   readonly filterForm = this.fb.group({
     entityType: [''],
-    from: [null as Date | null],
-    to: [null as Date | null],
   });
 
   clearFilters(): void {
-    this.filterForm.reset({ entityType: '', from: null, to: null });
+    this.filterForm.reset({ entityType: '' });
   }
 
   constructor(
@@ -76,8 +70,6 @@ export class AuditListComponent implements OnInit {
     this.service
       .list({
         entityType: f.entityType || undefined,
-        from: f.from ? new Date(f.from).toISOString() : undefined,
-        to: f.to ? new Date(f.to).toISOString() : undefined,
         page: this.pageIndex(),
         size: this.pageSize(),
         sort: 'occurredAt,desc',

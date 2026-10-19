@@ -39,7 +39,7 @@
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>Nome</th>
         <td mat-cell *matCellDef="let c">
-          <a (click)="viewSites(c)" class="fo-link">{{ c.name }}</a>
+          <button type="button" class="fo-link" (click)="viewSites(c)">{{ c.name }}</button>
         </td>
       </ng-container>
       <ng-container matColumnDef="document">
@@ -63,7 +63,11 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let c">
-          <button mat-icon-button [matMenuTriggerFor]="menu">
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="menu"
+            [attr.aria-label]="'Abrir ações do cliente ' + c.name"
+          >
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">

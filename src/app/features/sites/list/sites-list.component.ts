@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, computed, signal } from '@angular/core';
+import { Component, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { debounceTime } from 'rxjs';
@@ -33,7 +34,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
  * The real backend has no flat GET /sites list — sites are only listable nested under a
  * client (GET /clients/{clientId}/sites). When this component isn't given a clientId via
  * route input (i.e. the top-level "Locais" screen, not /app/clients/:clientId/sites), it
- * shows a client picker first and lists that client's sites, filtering client-side.
+ * shows a client picker first and lists that client's sites through the nested endpoint.
  */
 @Component({
   selector: 'app-sites-list',
@@ -48,6 +49,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
+    MatPaginatorModule,
     StateContainerComponent,
     PageHeaderComponent,
     StatusBadgeComponent,
@@ -61,29 +63,14 @@ export class SitesListComponent implements OnInit {
   readonly state = signal<UiState<InspectionSite[]>>({ phase: 'empty' });
   readonly clients = signal<Client[]>([]);
   readonly selectedClientId = signal<string>('');
+  readonly totalElements = signal(0);
+  readonly pageSize = signal(10);
+  readonly pageIndex = signal(0);
 
-  readonly filterForm = this.fb.group({ search: [''], status: [''] });
-  private readonly searchTerm = signal('');
-  private readonly statusTerm = signal('');
-
-  readonly filtered = computed(() => {
-    const data = this.state().data ?? [];
-    const search = this.searchTerm().toLowerCase();
-    const status = this.statusTerm();
-    return data.filter(
-      (s) => (!search || s.name.toLowerCase().includes(search)) && (!status || s.status === status),
-    );
-  });
-  readonly displayPhase = computed(() =>
-    this.state().phase === 'success' &&
-    this.filtered().length === 0 &&
-    Object.values(this.filterForm.getRawValue()).some(Boolean)
-      ? 'no-results'
-      : this.state().phase,
-  );
+  readonly filterForm = this.fb.group({ status: [''] });
 
   clearFilters(): void {
-    this.filterForm.reset({ search: '', status: '' });
+    this.filterForm.reset({ status: '' });
   }
 
   constructor(
@@ -104,14 +91,14 @@ export class SitesListComponent implements OnInit {
         .list({ size: 200, sort: 'name,asc' })
         .subscribe({ next: (p) => this.clients.set(p.content) });
     }
-    this.filterForm.valueChanges.pipe(debounceTime(300)).subscribe(({ search, status }) => {
-      this.searchTerm.set(search || '');
-      this.statusTerm.set(status || '');
+    this.filterForm.valueChanges.pipe(debounceTime(300)).subscribe(() => {
+      this.load();
     });
   }
 
   onClientChange(clientId: string): void {
     this.selectedClientId.set(clientId);
+    this.pageIndex.set(0);
     if (clientId) this.load();
   }
 
@@ -119,17 +106,33 @@ export class SitesListComponent implements OnInit {
     const clientId = this.selectedClientId();
     if (!clientId) return;
     this.state.set(loadingState());
-    this.sitesService.listByClient(clientId).subscribe({
-      next: (sites) =>
-        this.state.set(
-          successState(
-            sites,
-            sites.length === 0,
-            Object.values(this.filterForm.getRawValue()).some(Boolean),
-          ),
-        ),
-      error: (err) => this.state.set(requestErrorState(err)),
-    });
+    const status = this.filterForm.controls.status.value || undefined;
+    this.sitesService
+      .listPageByClient(clientId, {
+        status: status as 'ACTIVE' | 'INACTIVE' | undefined,
+        page: this.pageIndex(),
+        size: this.pageSize(),
+        sort: 'name,asc',
+      })
+      .subscribe({
+        next: (page) => {
+          this.totalElements.set(page.totalElements);
+          this.state.set(
+            successState(
+              page.content,
+              page.content.length === 0,
+              !!this.filterForm.controls.status.value,
+            ),
+          );
+        },
+        error: (err) => this.state.set(requestErrorState(err)),
+      });
+  }
+
+  onPage(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+    this.load();
   }
 
   openCreate(): void {

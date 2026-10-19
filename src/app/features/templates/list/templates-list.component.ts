@@ -55,7 +55,7 @@ export class TemplatesListComponent implements OnInit {
   readonly pageSize = signal(10);
   readonly pageIndex = signal(0);
 
-  readonly filterForm = this.fb.group({ search: [''], status: [''] });
+  readonly filterForm = this.fb.group({ status: [''] });
 
   constructor(
     private readonly fb: FormBuilder,
@@ -75,10 +75,9 @@ export class TemplatesListComponent implements OnInit {
 
   load(): void {
     this.state.set(loadingState());
-    const { search, status } = this.filterForm.getRawValue();
+    const { status } = this.filterForm.getRawValue();
     this.templatesService
       .list({
-        search: search || undefined,
         status: status || undefined,
         page: this.pageIndex(),
         size: this.pageSize(),
@@ -100,7 +99,7 @@ export class TemplatesListComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.filterForm.reset({ search: '', status: '' });
+    this.filterForm.reset({ status: '' });
   }
 
   onPage(event: PageEvent): void {

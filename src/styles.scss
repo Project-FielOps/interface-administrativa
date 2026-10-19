@@ -251,6 +251,11 @@ app-state-container {
   background: #fff0e6;
 }
 .fo-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
   color: var(--fo-primary-dark);
   cursor: pointer;
   font-weight: 700;

@@ -22,7 +22,15 @@
     @if (state().data; as summary) {
       <div class="fo-cards-grid">
         @for (s of statusEntries(summary); track s.key) {
-          <mat-card class="fo-stat-card" [class]="'fo-stat-card--' + s.key.toLowerCase()">
+          <mat-card
+            class="fo-stat-card fo-stat-card--actionable"
+            [class]="'fo-stat-card--' + s.key.toLowerCase()"
+            role="link"
+            tabindex="0"
+            (click)="openStatus(s.key)"
+            (keydown.enter)="openStatus(s.key)"
+            (keydown.space)="$event.preventDefault(); openStatus(s.key)"
+          >
             <div class="fo-stat-card__topline">
               <span class="fo-stat-icon"><mat-icon>assignment</mat-icon></span>
               <span class="fo-stat-trend">{{ s.key }}</span>
@@ -41,7 +49,13 @@
         <span class="fo-muted">Acompanhe os próximos movimentos da equipe</span>
       </div>
       <div class="fo-cards-grid fo-cards-grid--highlight">
-        <mat-card class="fo-stat-card fo-stat-card--warn">
+        <mat-card
+          class="fo-stat-card fo-stat-card--warn fo-stat-card--actionable"
+          role="link"
+          tabindex="0"
+          (click)="openOverdue()"
+          (keydown.enter)="openOverdue()"
+        >
           <div class="fo-stat-card__topline">
             <span class="fo-stat-icon"><mat-icon>schedule</mat-icon></span>
           </div>
@@ -49,7 +63,13 @@
           <span class="fo-stat-label">Inspeções atrasadas</span>
           <span class="fo-stat-hint">Precisam de acompanhamento</span>
         </mat-card>
-        <mat-card class="fo-stat-card fo-stat-card--info">
+        <mat-card
+          class="fo-stat-card fo-stat-card--info fo-stat-card--actionable"
+          role="link"
+          tabindex="0"
+          (click)="reviewPending()"
+          (keydown.enter)="reviewPending()"
+        >
           <div class="fo-stat-card__topline">
             <span class="fo-stat-icon"><mat-icon>rate_review</mat-icon></span>
           </div>

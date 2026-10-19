@@ -15,8 +15,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { debounceTime } from 'rxjs';
-import { InspectionsService } from '../inspections.service';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs';
+import { InspectionListQuery, InspectionsService } from '../inspections.service';
 import { ClientsService } from '../../clients/clients.service';
 import { UsersService } from '../../users/users.service';
 import { Inspection } from '../../../core/models/inspection.model';
@@ -74,11 +74,14 @@ export class InspectionsListComponent implements OnInit {
   readonly pageIndex = signal(0);
   readonly clients = signal<Client[]>([]);
   readonly technicians = signal<User[]>([]);
+  readonly supervisors = signal<User[]>([]);
 
   readonly filterForm = this.fb.group({
     status: [''],
     technicianId: [''],
+    supervisorId: [''],
     clientId: [''],
+    siteId: [''],
     priority: [''],
     from: [null as Date | null],
     to: [null as Date | null],
@@ -90,7 +93,9 @@ export class InspectionsListComponent implements OnInit {
     this.filterForm.reset({
       status: '',
       technicianId: '',
+      supervisorId: '',
       clientId: '',
+      siteId: '',
       priority: '',
       from: null,
       to: null,
@@ -111,20 +116,26 @@ export class InspectionsListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const query = this.route.snapshot.queryParamMap;
-    if (query.get('awaitingReview') === 'true') {
-      this.filterForm.patchValue({ awaitingReview: true }, { emitEvent: false });
-    }
-    this.load();
+    this.route.queryParamMap
+      .pipe(map((params) => this.filtersFromUrl(params)))
+      .subscribe((filters) => {
+        this.filterForm.patchValue(filters, { emitEvent: false });
+        this.pageIndex.set(this.numberParam(filters['page'], 0));
+        this.pageSize.set(this.numberParam(filters['size'], 10));
+        this.load();
+      });
     this.clientsService
       .list({ size: 200, sort: 'name,asc' })
       .subscribe({ next: (p) => this.clients.set(p.content) });
     this.usersService
       .listAssignable('TECHNICIAN')
       .subscribe({ next: (p) => this.technicians.set(p.content) });
-    this.filterForm.valueChanges.pipe(debounceTime(350)).subscribe(() => {
+    this.usersService
+      .listAssignable('SUPERVISOR')
+      .subscribe({ next: (p) => this.supervisors.set(p.content) });
+    this.filterForm.valueChanges.pipe(debounceTime(350), distinctUntilChanged()).subscribe(() => {
       this.pageIndex.set(0);
-      this.load();
+      this.persistUrl();
     });
   }
 
@@ -132,10 +143,12 @@ export class InspectionsListComponent implements OnInit {
     this.state.set(loadingState());
     const f = this.filterForm.getRawValue();
     this.inspectionsService
-      .list({
+      .listPage({
         status: f.status || undefined,
         technicianId: f.technicianId || undefined,
+        supervisorId: f.supervisorId || undefined,
         clientId: f.clientId || undefined,
+        siteId: f.siteId || undefined,
         priority: f.priority || undefined,
         scheduledFrom: f.from ? new Date(f.from).toISOString() : undefined,
         scheduledTo: f.to ? new Date(f.to).toISOString() : undefined,
@@ -163,7 +176,56 @@ export class InspectionsListComponent implements OnInit {
   onPage(event: PageEvent): void {
     this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
-    this.load();
+    this.persistUrl();
+  }
+
+  private filtersFromUrl(params: import('@angular/router').ParamMap): Record<string, unknown> {
+    const date = (value: string | null): Date | null => {
+      if (!value) return null;
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    };
+    return {
+      status: params.get('status') || '',
+      technicianId: params.get('technicianId') || '',
+      supervisorId: params.get('supervisorId') || '',
+      clientId: params.get('clientId') || '',
+      siteId: params.get('siteId') || '',
+      priority: params.get('priority') || '',
+      from: date(params.get('scheduledFrom')),
+      to: date(params.get('scheduledTo')),
+      overdue: params.get('overdue') === 'true',
+      awaitingReview: params.get('awaitingReview') === 'true',
+      page: params.get('page'),
+      size: params.get('size'),
+    };
+  }
+
+  private persistUrl(): void {
+    const f = this.filterForm.getRawValue();
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      replaceUrl: true,
+      queryParams: {
+        status: f.status || null,
+        technicianId: f.technicianId || null,
+        supervisorId: f.supervisorId || null,
+        clientId: f.clientId || null,
+        siteId: f.siteId || null,
+        priority: f.priority || null,
+        scheduledFrom: f.from ? f.from.toISOString() : null,
+        scheduledTo: f.to ? f.to.toISOString() : null,
+        overdue: f.overdue ? true : null,
+        awaitingReview: f.awaitingReview ? true : null,
+        page: this.pageIndex() || null,
+        size: this.pageSize() === 10 ? null : this.pageSize(),
+      },
+    });
+  }
+
+  private numberParam(value: unknown, fallback: number): number {
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed >= 0 ? parsed : fallback;
   }
 
   create(): void {

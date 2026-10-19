@@ -33,4 +33,14 @@ describe('UsersService', () => {
 
     await expect(response).resolves.toMatchObject({ content: [] });
   });
+
+  it('does not add an unsupported textual search parameter to the user list', () => {
+    service.list({ role: 'TECHNICIAN', status: 'ACTIVE', page: 0, size: 10 }).subscribe();
+    const request = http.expectOne((req) => req.url === `${environment.apiUrl}/users`);
+
+    expect(request.request.params.get('role')).toBe('TECHNICIAN');
+    expect(request.request.params.get('status')).toBe('ACTIVE');
+    expect(request.request.params.get('search')).toBeNull();
+    request.flush({ content: [], page: 0, size: 10, totalElements: 0, totalPages: 0 });
+  });
 });

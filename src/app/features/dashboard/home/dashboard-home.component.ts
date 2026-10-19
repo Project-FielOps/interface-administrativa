@@ -85,4 +85,12 @@ export class DashboardHomeComponent implements OnInit {
   reviewPending(): void {
     this.router.navigate(['/app/inspections'], { queryParams: { awaitingReview: true } });
   }
+
+  openStatus(status: string): void {
+    this.router.navigate(['/app/inspections'], { queryParams: { status } });
+  }
+
+  openOverdue(): void {
+    this.router.navigate(['/app/inspections'], { queryParams: { overdue: true } });
+  }
 }

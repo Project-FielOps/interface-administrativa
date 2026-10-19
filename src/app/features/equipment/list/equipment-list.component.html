@@ -39,11 +39,6 @@
         </mat-form-field>
       }
       <mat-form-field>
-        <mat-label>Buscar por nome/patrimônio</mat-label>
-        <input matInput formControlName="search" />
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-      <mat-form-field>
         <mat-label>Status</mat-label>
         <mat-select formControlName="status">
           <mat-option value="">Todos</mat-option>
@@ -55,7 +50,7 @@
       <mat-form-field>
         <mat-label>Buscar por código QR</mat-label>
         <input matInput formControlName="qrCode" (keyup.enter)="searchByQr()" />
-        <button mat-icon-button matSuffix (click)="searchByQr()">
+        <button mat-icon-button matSuffix (click)="searchByQr()" aria-label="Buscar por código QR">
           <mat-icon>qr_code_scanner</mat-icon>
         </button>
       </mat-form-field>
@@ -63,7 +58,7 @@
   </details>
 
   <app-state-container
-    [phase]="displayPhase()"
+    [phase]="state().phase"
     [errorMessage]="state().errorMessage || ''"
     [emptyMessage]="
       siteId || selectedSiteId()
@@ -77,7 +72,7 @@
   ></app-state-container>
 
   <ng-template #tableTpl>
-    <table mat-table [dataSource]="filtered()">
+    <table mat-table [dataSource]="state().data || []">
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>Nome</th>
         <td mat-cell *matCellDef="let e">{{ e.name }}</td>
@@ -105,7 +100,13 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let e">
-          <button mat-icon-button [matMenuTriggerFor]="menu"><mat-icon>more_vert</mat-icon></button>
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="menu"
+            [attr.aria-label]="'Abrir ações do equipamento ' + e.name"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
           <mat-menu #menu="matMenu">
             <button mat-menu-item (click)="openEdit(e)">
               <mat-icon>edit</mat-icon><span>Editar</span>
@@ -131,5 +132,12 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="[10, 25, 50]"
+      (page)="onPage($event)"
+    ></mat-paginator>
   </ng-template>
 </div>
