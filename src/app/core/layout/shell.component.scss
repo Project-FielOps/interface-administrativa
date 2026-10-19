@@ -227,16 +227,32 @@ mat-nav-list {
   line-height: 15px;
 }
 .fo-user-trigger {
-  display: inline-flex;
-  align-items: center;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center;
   gap: 8px;
   height: 48px;
   padding: 4px 8px !important;
 }
 .fo-user-trigger .mdc-button__label {
-  display: inline-flex;
+  display: inline-flex !important;
+  flex-direction: row !important;
   align-items: center;
   gap: 8px;
+}
+.fo-user-trigger__content {
+  display: inline-flex;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.fo-user-trigger__content .fo-user-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-right: 0;
 }
 .fo-avatar {
   display: grid;

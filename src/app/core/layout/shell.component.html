@@ -96,11 +96,13 @@
           class="fo-user-trigger"
           aria-label="Abrir menu do usuário"
         >
-          <span class="fo-avatar" aria-hidden="true">{{ user.name.charAt(0) }}</span>
-          <span class="fo-user-copy"
-            ><strong>{{ user.name }}</strong
-            ><small>{{ roleLabel(user.role) }}</small></span
-          >
+          <span class="fo-user-trigger__content">
+            <span class="fo-avatar" aria-hidden="true">{{ user.name.charAt(0) }}</span>
+            <span class="fo-user-copy"
+              ><strong>{{ user.name }}</strong
+              ><small>{{ roleLabel(user.role) }}</small></span
+            >
+          </span>
           <mat-icon>expand_more</mat-icon>
         </button>
         <mat-menu #userMenu="matMenu">
