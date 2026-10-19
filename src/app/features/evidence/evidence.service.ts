@@ -5,8 +5,7 @@ import { environment } from '../../../environments/environment';
 import { Evidence } from '../../core/models/inspection.model';
 
 /**
- * Evidence metadata only (spec MVP: no image byte-serving endpoint), nested under an
- * inspection: GET /inspections/{inspectionId}/evidence.
+ * Evidence metadata and authorized content access, nested under an inspection.
  */
 @Injectable({ providedIn: 'root' })
 export class EvidenceService {
@@ -29,6 +28,8 @@ export class EvidenceService {
   }
 
   downloadContent(inspectionId: string, evidenceId: string): Observable<Blob> {
-    return this.http.get(this.contentUrl(inspectionId, evidenceId), { responseType: 'blob' });
+    return this.http.get(this.contentUrl(inspectionId, evidenceId), {
+      responseType: 'blob',
+    });
   }
 }

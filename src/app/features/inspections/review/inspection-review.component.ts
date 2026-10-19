@@ -9,36 +9,29 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { forkJoin } from 'rxjs';
 import { InspectionsService } from '../inspections.service';
+import { EvidenceService } from '../../evidence/evidence.service';
+import { NonConformitiesService } from '../../non-conformities/non-conformities.service';
 import {
-  Evidence,
   Inspection,
+  InspectionAnswer,
   InspectionItemSnapshot,
   InspectionReview,
   NonConformity,
+  Evidence,
+  AuditEvent,
 } from '../../../core/models/inspection.model';
-import { NonConformitiesService } from '../../non-conformities/non-conformities.service';
-import { EvidenceService } from '../../evidence/evidence.service';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import {
   UiState,
-  errorState,
-  extractErrorMessage,
   loadingState,
   successState,
+  requestErrorState,
+  extractErrorMessage,
 } from '../../../shared/components/state-container/ui-state';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
-import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
-
-interface ReviewData {
-  inspection: Inspection;
-  items: InspectionItemSnapshot[];
-  reviews: InspectionReview[];
-  nonConformities: NonConformity[];
-  evidence: Evidence[];
-}
 
 @Component({
   selector: 'app-inspection-review',
@@ -59,16 +52,16 @@ interface ReviewData {
 })
 export class InspectionReviewComponent implements OnInit {
   @Input() inspectionId!: string;
-
-  readonly state = signal<UiState<ReviewData>>(loadingState());
+  readonly inspectionState = signal<UiState<Inspection>>(loadingState());
+  readonly responsesState = signal<UiState<InspectionAnswer[]>>(loadingState());
+  readonly reviewsState = signal<UiState<InspectionReview[]>>(loadingState());
+  readonly nonConformitiesState = signal<UiState<NonConformity[]>>(loadingState());
+  readonly evidenceState = signal<UiState<Evidence[]>>(loadingState());
+  readonly historyState = signal<UiState<AuditEvent[]>>(loadingState());
   readonly submittingDecision = signal(false);
   readonly startingReview = signal(false);
-
-  readonly rejectForm = this.fb.group({
-    reason: ['', [Validators.required]],
-    comments: [''],
-  });
   readonly showRejectForm = signal(false);
+  readonly rejectForm = this.fb.group({ reason: ['', [Validators.required]], comments: [''] });
 
   constructor(
     private readonly fb: FormBuilder,
@@ -85,33 +78,78 @@ export class InspectionReviewComponent implements OnInit {
   }
 
   load(): void {
-    this.state.set(loadingState());
-    forkJoin({
-      inspection: this.inspectionsService.get(this.inspectionId),
-      reviews: this.inspectionsService.getReviews(this.inspectionId),
-      nonConformities: this.nonConformitiesService.listByInspection(this.inspectionId),
-      evidence: this.evidenceService.listByInspection(this.inspectionId),
-    }).subscribe({
-      next: ({ inspection, reviews, nonConformities, evidence }) => {
-        const sortedItems = [...(inspection.items ?? [])].sort(
-          (a, b) => a.sectionOrder - b.sectionOrder || a.itemOrder - b.itemOrder,
-        );
-        this.state.set(
-          successState(
-            { inspection, items: sortedItems, reviews, nonConformities, evidence },
-            false,
-          ),
-        );
+    this.inspectionState.set(loadingState());
+    this.responsesState.set(loadingState());
+    this.reviewsState.set(loadingState());
+    this.nonConformitiesState.set(loadingState());
+    this.evidenceState.set(loadingState());
+    this.historyState.set(loadingState());
+    this.inspectionsService.get(this.inspectionId).subscribe({
+      next: (inspection) => {
+        this.inspectionState.set(successState(this.sortedInspection(inspection), false));
       },
-      error: (err) => this.state.set(errorState(extractErrorMessage(err))),
+      error: (err) => this.inspectionState.set(requestErrorState(err)),
+    });
+    this.inspectionsService.getResponses(this.inspectionId).subscribe({
+      next: (responses) => {
+        this.responsesState.set(successState(responses, responses.length === 0));
+        this.mergeResponses(responses);
+      },
+      error: (err) => this.responsesState.set(requestErrorState(err)),
+    });
+    this.inspectionsService.getReviews(this.inspectionId).subscribe({
+      next: (reviews) => this.reviewsState.set(successState(reviews, reviews.length === 0)),
+      error: (err) => this.reviewsState.set(requestErrorState(err)),
+    });
+    this.nonConformitiesService.listByInspection(this.inspectionId).subscribe({
+      next: (items) => this.nonConformitiesState.set(successState(items, items.length === 0)),
+      error: (err) => this.nonConformitiesState.set(requestErrorState(err)),
+    });
+    this.evidenceService.listByInspection(this.inspectionId).subscribe({
+      next: (items) => this.evidenceState.set(successState(items, items.length === 0)),
+      error: (err) => this.evidenceState.set(requestErrorState(err)),
+    });
+    this.inspectionsService.getHistory(this.inspectionId).subscribe({
+      next: (items) => this.historyState.set(successState(items, items.length === 0)),
+      error: (err) => this.historyState.set(requestErrorState(err)),
     });
   }
 
-  /** Only SUBMITTED inspections need an explicit begin-review call before a decision can be made. */
-  get needsBeginReview(): boolean {
-    return this.state().data?.inspection.status === 'SUBMITTED';
+  private sortedInspection(inspection: Inspection): Inspection {
+    return {
+      ...inspection,
+      items: [...(inspection.items ?? [])].sort(
+        (a, b) => a.sectionOrder - b.sectionOrder || a.itemOrder - b.itemOrder,
+      ),
+    };
   }
-
+  private mergeResponses(responses: InspectionAnswer[]): void {
+    const inspection = this.inspectionState().data;
+    if (!inspection?.items) return;
+    const byItem = new Map(responses.map((response) => [response.inspectionItemId, response]));
+    this.inspectionState.set(
+      successState(
+        {
+          ...inspection,
+          items: inspection.items.map((item) => ({
+            ...item,
+            answer: byItem.get(item.id) ?? item.answer ?? null,
+          })),
+        },
+        false,
+      ),
+    );
+  }
+  get needsBeginReview(): boolean {
+    return this.inspectionState().data?.status === 'SUBMITTED';
+  }
+  get canDecide(): boolean {
+    return this.inspectionState().data?.status === 'UNDER_REVIEW' && !this.submittingDecision();
+  }
+  get isReadOnly(): boolean {
+    const status = this.inspectionState().data?.status;
+    return status === 'APPROVED' || status === 'CANCELED';
+  }
   responseSummary(item: InspectionItemSnapshot): string {
     const r = item.answer;
     if (!r) return 'Sem resposta';
@@ -123,14 +161,12 @@ export class InspectionReviewComponent implements OnInit {
     if (r.conformity) return r.conformity;
     return 'Sem resposta';
   }
-
   evidenceFor(item: InspectionItemSnapshot): Evidence[] {
-    const answerId = item.answer?.id;
-    if (!answerId) return [];
-    return (this.state().data?.evidence ?? []).filter((e) => e.responseId === answerId);
+    const id = item.answer?.id;
+    return id ? (this.evidenceState().data ?? []).filter((e) => e.responseId === id) : [];
   }
-
   beginReview(): void {
+    if (!this.needsBeginReview || this.startingReview()) return;
     this.startingReview.set(true);
     this.inspectionsService.beginReview(this.inspectionId).subscribe({
       next: () => {
@@ -139,12 +175,12 @@ export class InspectionReviewComponent implements OnInit {
       },
       error: (err) => {
         this.startingReview.set(false);
-        this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 6000 });
+        this.showError(err);
       },
     });
   }
-
   approve(): void {
+    if (!this.canDecide) return;
     const ref = this.dialog.open(ConfirmDialogComponent, {
       width: '460px',
       data: {
@@ -154,46 +190,49 @@ export class InspectionReviewComponent implements OnInit {
       },
     });
     ref.afterClosed().subscribe((confirmed) => {
-      if (!confirmed) return;
+      if (!confirmed || !this.canDecide) return;
       this.submittingDecision.set(true);
       this.inspectionsService.approve(this.inspectionId).subscribe({
         next: () => {
           this.submittingDecision.set(false);
           this.snackBar.open('Inspeção aprovada.', 'Fechar', { duration: 4000 });
-          this.router.navigate(['/app/inspections', this.inspectionId]);
+          this.load();
         },
         error: (err) => {
           this.submittingDecision.set(false);
-          this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 6000 });
+          this.showError(err);
         },
       });
     });
   }
-
   toggleRejectForm(): void {
-    this.showRejectForm.set(!this.showRejectForm());
+    if (this.canDecide) this.showRejectForm.set(!this.showRejectForm());
   }
-
   submitReject(): void {
+    if (!this.canDecide) return;
     if (this.rejectForm.invalid) {
       this.rejectForm.markAllAsTouched();
       return;
     }
     const { reason, comments } = this.rejectForm.getRawValue();
     this.submittingDecision.set(true);
-    this.inspectionsService.reject(this.inspectionId, reason!, comments || undefined).subscribe({
-      next: () => {
-        this.submittingDecision.set(false);
-        this.snackBar.open('Inspeção reprovada.', 'Fechar', { duration: 4000 });
-        this.router.navigate(['/app/inspections', this.inspectionId]);
-      },
-      error: (err) => {
-        this.submittingDecision.set(false);
-        this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 6000 });
-      },
-    });
+    this.inspectionsService
+      .reject(this.inspectionId, reason!.trim(), comments || undefined)
+      .subscribe({
+        next: () => {
+          this.submittingDecision.set(false);
+          this.snackBar.open('Inspeção reprovada.', 'Fechar', { duration: 4000 });
+          this.load();
+        },
+        error: (err) => {
+          this.submittingDecision.set(false);
+          this.showError(err);
+        },
+      });
   }
-
+  showError(err: unknown): void {
+    this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 6000 });
+  }
   back(): void {
     this.router.navigate(['/app/inspections', this.inspectionId]);
   }

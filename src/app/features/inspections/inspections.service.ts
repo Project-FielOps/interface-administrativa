@@ -10,6 +10,7 @@ import {
   InspectionReview,
   AuditEvent,
   RejectRequest,
+  InspectionAnswer,
 } from '../../core/models/inspection.model';
 
 @Injectable({ providedIn: 'root' })
@@ -43,6 +44,10 @@ export class InspectionsService extends CrudService<
 
   getReviews(inspectionId: string): Observable<InspectionReview[]> {
     return this.http.get<InspectionReview[]>(`${this.baseUrl}/${inspectionId}/reviews`);
+  }
+
+  getResponses(inspectionId: string): Observable<InspectionAnswer[]> {
+    return this.http.get<InspectionAnswer[]>(`${this.baseUrl}/${inspectionId}/responses`);
   }
 
   getHistory(inspectionId: string): Observable<AuditEvent[]> {
