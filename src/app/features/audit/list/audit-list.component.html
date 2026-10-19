@@ -9,11 +9,21 @@
     <form [formGroup]="filterForm" class="fo-filters">
       <mat-form-field>
         <mat-label>Ação</mat-label>
-        <input matInput formControlName="action" placeholder="Ex.: INSPECTION_STARTED" />
+        <mat-select formControlName="action">
+          <mat-option value="">Todas</mat-option>
+          @for (action of actionOptions; track action) {
+            <mat-option [value]="action">{{ action }}</mat-option>
+          }
+        </mat-select>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Tipo de entidade</mat-label>
-        <input matInput formControlName="entityType" placeholder="Ex.: INSPECTION, USER" />
+        <mat-select formControlName="entityType">
+          <mat-option value="">Todos</mat-option>
+          @for (entityType of entityTypeOptions; track entityType) {
+            <mat-option [value]="entityType">{{ entityType }}</mat-option>
+          }
+        </mat-select>
       </mat-form-field>
       <mat-form-field>
         <mat-label>ID da entidade</mat-label>

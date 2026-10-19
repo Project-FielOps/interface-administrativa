@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { debounceTime } from 'rxjs';
@@ -29,6 +30,7 @@ import {
     MatTableModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatPaginatorModule,
     MatIconModule,
     StateContainerComponent,
@@ -42,6 +44,33 @@ export class AuditListComponent implements OnInit {
   readonly totalElements = signal(0);
   readonly pageSize = signal(20);
   readonly pageIndex = signal(0);
+  readonly actionOptions = [
+    'EVIDENCE_ADDED',
+    'EVIDENCE_REMOVED',
+    'INSPECTION_APPROVED',
+    'INSPECTION_ASSIGNED',
+    'INSPECTION_CANCELED',
+    'INSPECTION_CREATED',
+    'INSPECTION_REJECTED',
+    'INSPECTION_REOPENED_FOR_CORRECTION',
+    'INSPECTION_STARTED',
+    'INSPECTION_SUBMITTED',
+    'NON_CONFORMITY_CREATED',
+    'NON_CONFORMITY_STATUS_CHANGED',
+    'RESPONSE_CREATED',
+    'RESPONSE_UPDATED',
+    'REVIEW_STARTED',
+    'TEMPLATE_CREATED',
+    'TEMPLATE_VERSION_PUBLISHED',
+  ];
+  readonly entityTypeOptions = [
+    'Evidence',
+    'Inspection',
+    'InspectionResponse',
+    'InspectionTemplate',
+    'InspectionTemplateVersion',
+    'NonConformity',
+  ];
 
   readonly filterForm = this.fb.group({
     action: [''],
