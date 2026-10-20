@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { extractErrorMessage } from '../../shared/components/state-container/ui-state';
 
@@ -23,6 +24,7 @@ import { extractErrorMessage } from '../../shared/components/state-container/ui-
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    RouterLink,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
@@ -56,7 +58,9 @@ export class LoginComponent {
       next: () => {
         this.loading.set(false);
         const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
-        this.router.navigateByUrl(redirectTo || '/app/dashboard');
+        this.router.navigateByUrl(
+          this.auth.mustChangePassword() ? '/app/change-password' : redirectTo || '/app/dashboard',
+        );
       },
       error: (err) => {
         this.loading.set(false);

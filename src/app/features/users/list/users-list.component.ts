@@ -1,6 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FoLabelPipe } from '../../../shared/pipes/fo-label.pipe';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,15 +17,22 @@ import { UsersService } from '../users.service';
 import { User, UserStatus } from '../../../core/models/user.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+  requestErrorState,
+} from '../../../shared/components/state-container/ui-state';
 import { UserFormDialogComponent } from '../form-dialog/user-form-dialog.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-users-list',
   standalone: true,
   imports: [
-    FoLabelPipe,
     CommonModule,
     ReactiveFormsModule,
     MatTableModule,
@@ -40,6 +46,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
     MatPaginatorModule,
     StateContainerComponent,
     PageHeaderComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './users-list.component.html',
 })
@@ -51,7 +58,6 @@ export class UsersListComponent implements OnInit {
   readonly pageIndex = signal(0);
 
   readonly filterForm = this.fb.group({
-    search: [''],
     role: [''],
     status: [''],
   });
@@ -73,16 +79,32 @@ export class UsersListComponent implements OnInit {
 
   load(): void {
     this.state.set(loadingState());
-    const { search, role, status } = this.filterForm.getRawValue();
+    const { role, status } = this.filterForm.getRawValue();
     this.usersService
-      .list({ search: search || undefined, role: role || undefined, status: status || undefined, page: this.pageIndex(), size: this.pageSize(), sort: 'name,asc' })
+      .list({
+        role: role || undefined,
+        status: status || undefined,
+        page: this.pageIndex(),
+        size: this.pageSize(),
+        sort: 'name,asc',
+      })
       .subscribe({
         next: (page) => {
           this.totalElements.set(page.totalElements);
-          this.state.set(successState(page.content, page.content.length === 0));
+          this.state.set(
+            successState(
+              page.content,
+              page.content.length === 0,
+              Object.values(this.filterForm.getRawValue()).some(Boolean),
+            ),
+          );
         },
-        error: (err) => this.state.set(errorState(extractErrorMessage(err))),
+        error: (err) => this.state.set(requestErrorState(err)),
       });
+  }
+
+  clearFilters(): void {
+    this.filterForm.reset({ role: '', status: '' });
   }
 
   onPage(event: PageEvent): void {
@@ -115,9 +137,16 @@ export class UsersListComponent implements OnInit {
     const messages = {
       activate: { title: 'Ativar usuário', message: `Ativar o acesso de ${user.name}?` },
       inactivate: { title: 'Inativar usuário', message: `Inativar o acesso de ${user.name}?` },
-      block: { title: 'Bloquear usuário', message: `Bloquear o acesso de ${user.name}? Ele não poderá mais fazer login.` },
+      block: {
+        title: 'Bloquear usuário',
+        message: `Bloquear o acesso de ${user.name}? Ele não poderá mais fazer login.`,
+      },
     }[action];
-    const targetStatus: UserStatus = { activate: 'ACTIVE', inactivate: 'INACTIVE', block: 'BLOCKED' }[action] as UserStatus;
+    const targetStatus: UserStatus = {
+      activate: 'ACTIVE',
+      inactivate: 'INACTIVE',
+      block: 'BLOCKED',
+    }[action] as UserStatus;
 
     const ref = this.dialog.open(ConfirmDialogComponent, {
       width: '420px',

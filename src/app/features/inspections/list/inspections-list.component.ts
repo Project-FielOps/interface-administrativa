@@ -1,8 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FoLabelPipe } from '../../../shared/pipes/fo-label.pipe';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -16,42 +15,75 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { debounceTime } from 'rxjs';
-import { InspectionsService } from '../inspections.service';
+import { catchError, debounceTime, distinctUntilChanged, forkJoin, map, of } from 'rxjs';
+import { InspectionListQuery, InspectionsService } from '../inspections.service';
 import { ClientsService } from '../../clients/clients.service';
 import { UsersService } from '../../users/users.service';
 import { Inspection } from '../../../core/models/inspection.model';
-import { Client } from '../../../core/models/client.model';
+import { Client, InspectionSite } from '../../../core/models/client.model';
 import { User } from '../../../core/models/user.model';
+import { SitesService } from '../../sites/sites.service';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+  requestErrorState,
+} from '../../../shared/components/state-container/ui-state';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-inspections-list',
   standalone: true,
   imports: [
-    FoLabelPipe,
-    CommonModule, ReactiveFormsModule, MatTableModule, MatFormFieldModule, MatSelectModule,
-    MatInputModule, MatButtonModule, MatIconModule, MatMenuModule, MatCheckboxModule,
-    MatDatepickerModule, MatNativeDateModule, MatPaginatorModule, StateContainerComponent, PageHeaderComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    MatTableModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatPaginatorModule,
+    StateContainerComponent,
+    PageHeaderComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './inspections-list.component.html',
 })
 export class InspectionsListComponent implements OnInit {
-  readonly displayedColumns = ['title', 'client', 'technician', 'priority', 'status', 'scheduledFor', 'actions'];
+  readonly displayedColumns = [
+    'title',
+    'client',
+    'technician',
+    'priority',
+    'status',
+    'scheduledFor',
+    'actions',
+  ];
   readonly state = signal<UiState<Inspection[]>>(loadingState());
   readonly totalElements = signal(0);
   readonly pageSize = signal(10);
   readonly pageIndex = signal(0);
   readonly clients = signal<Client[]>([]);
   readonly technicians = signal<User[]>([]);
+  readonly supervisors = signal<User[]>([]);
+  readonly sites = signal<InspectionSite[]>([]);
 
   readonly filterForm = this.fb.group({
     status: [''],
     technicianId: [''],
+    supervisorId: [''],
     clientId: [''],
+    siteId: [''],
     priority: [''],
     from: [null as Date | null],
     to: [null as Date | null],
@@ -59,10 +91,27 @@ export class InspectionsListComponent implements OnInit {
     awaitingReview: [false],
   });
 
+  clearFilters(): void {
+    this.filterForm.reset({
+      status: '',
+      technicianId: '',
+      supervisorId: '',
+      clientId: '',
+      siteId: '',
+      priority: '',
+      from: null,
+      to: null,
+      overdue: false,
+      awaitingReview: false,
+    });
+  }
+
   constructor(
     private readonly fb: FormBuilder,
+    private readonly route: ActivatedRoute,
     private readonly inspectionsService: InspectionsService,
     private readonly clientsService: ClientsService,
+    private readonly sitesService: SitesService,
     private readonly usersService: UsersService,
     private readonly dialog: MatDialog,
     private readonly snackBar: MatSnackBar,
@@ -70,12 +119,50 @@ export class InspectionsListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.load();
-    this.clientsService.list({ size: 200, sort: 'name,asc' }).subscribe({ next: (p) => this.clients.set(p.content) });
-    this.usersService.list({ size: 200, role: 'TECHNICIAN', status: 'ACTIVE' }).subscribe({ next: (p) => this.technicians.set(p.content) });
-    this.filterForm.valueChanges.pipe(debounceTime(350)).subscribe(() => {
+    this.route.queryParamMap
+      .pipe(map((params) => this.filtersFromUrl(params)))
+      .subscribe((filters) => {
+        this.filterForm.patchValue(filters, { emitEvent: false });
+        this.pageIndex.set(this.numberParam(filters['page'], 0));
+        this.pageSize.set(this.numberParam(filters['size'], 10));
+        this.load();
+      });
+    this.clientsService.list({ size: 200, sort: 'name,asc' }).subscribe({
+      next: (p) => {
+        this.clients.set(p.content);
+        this.loadSites(p.content);
+      },
+    });
+    this.usersService
+      .listAssignable('TECHNICIAN')
+      .subscribe({ next: (p) => this.technicians.set(p.content) });
+    this.usersService
+      .listAssignable('SUPERVISOR')
+      .subscribe({ next: (p) => this.supervisors.set(p.content) });
+    this.filterForm.valueChanges.pipe(debounceTime(350), distinctUntilChanged()).subscribe(() => {
       this.pageIndex.set(0);
-      this.load();
+      this.persistUrl();
+    });
+  }
+
+  private loadSites(clients: Client[]): void {
+    if (clients.length === 0) {
+      this.sites.set([]);
+      return;
+    }
+    forkJoin(
+      clients.map((client) =>
+        this.sitesService
+          .listByClient(client.id)
+          .pipe(catchError(() => of([] as InspectionSite[]))),
+      ),
+    ).subscribe((groups) => {
+      this.sites.set(
+        groups
+          .flat()
+          .filter((site) => site.status === 'ACTIVE')
+          .sort((left, right) => left.name.localeCompare(right.name)),
+      );
     });
   }
 
@@ -83,13 +170,15 @@ export class InspectionsListComponent implements OnInit {
     this.state.set(loadingState());
     const f = this.filterForm.getRawValue();
     this.inspectionsService
-      .list({
+      .listPage({
         status: f.status || undefined,
         technicianId: f.technicianId || undefined,
+        supervisorId: f.supervisorId || undefined,
         clientId: f.clientId || undefined,
+        siteId: f.siteId || undefined,
         priority: f.priority || undefined,
-        from: f.from ? new Date(f.from).toISOString() : undefined,
-        to: f.to ? new Date(f.to).toISOString() : undefined,
+        scheduledFrom: f.from ? new Date(f.from).toISOString() : undefined,
+        scheduledTo: f.to ? new Date(f.to).toISOString() : undefined,
         overdue: f.overdue || undefined,
         awaitingReview: f.awaitingReview || undefined,
         page: this.pageIndex(),
@@ -99,16 +188,71 @@ export class InspectionsListComponent implements OnInit {
       .subscribe({
         next: (page) => {
           this.totalElements.set(page.totalElements);
-          this.state.set(successState(page.content, page.content.length === 0));
+          this.state.set(
+            successState(
+              page.content,
+              page.content.length === 0,
+              Object.values(this.filterForm.getRawValue()).some(Boolean),
+            ),
+          );
         },
-        error: (err) => this.state.set(errorState(extractErrorMessage(err))),
+        error: (err) => this.state.set(requestErrorState(err)),
       });
   }
 
   onPage(event: PageEvent): void {
     this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
-    this.load();
+    this.persistUrl();
+  }
+
+  private filtersFromUrl(params: import('@angular/router').ParamMap): Record<string, unknown> {
+    const date = (value: string | null): Date | null => {
+      if (!value) return null;
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    };
+    return {
+      status: params.get('status') || '',
+      technicianId: params.get('technicianId') || '',
+      supervisorId: params.get('supervisorId') || '',
+      clientId: params.get('clientId') || '',
+      siteId: params.get('siteId') || '',
+      priority: params.get('priority') || '',
+      from: date(params.get('scheduledFrom')),
+      to: date(params.get('scheduledTo')),
+      overdue: params.get('overdue') === 'true',
+      awaitingReview: params.get('awaitingReview') === 'true',
+      page: params.get('page'),
+      size: params.get('size'),
+    };
+  }
+
+  private persistUrl(): void {
+    const f = this.filterForm.getRawValue();
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      replaceUrl: true,
+      queryParams: {
+        status: f.status || null,
+        technicianId: f.technicianId || null,
+        supervisorId: f.supervisorId || null,
+        clientId: f.clientId || null,
+        siteId: f.siteId || null,
+        priority: f.priority || null,
+        scheduledFrom: f.from ? f.from.toISOString() : null,
+        scheduledTo: f.to ? f.to.toISOString() : null,
+        overdue: f.overdue ? true : null,
+        awaitingReview: f.awaitingReview ? true : null,
+        page: this.pageIndex() || null,
+        size: this.pageSize() === 10 ? null : this.pageSize(),
+      },
+    });
+  }
+
+  private numberParam(value: unknown, fallback: number): number {
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed >= 0 ? parsed : fallback;
   }
 
   create(): void {
@@ -124,7 +268,7 @@ export class InspectionsListComponent implements OnInit {
   }
 
   canCancel(inspection: Inspection): boolean {
-    return !['APPROVED', 'REJECTED', 'CANCELED'].includes(inspection.status);
+    return ['ASSIGNED', 'IN_PROGRESS', 'REJECTED'].includes(inspection.status);
   }
 
   cancel(inspection: Inspection): void {

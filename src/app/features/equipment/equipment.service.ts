@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CrudService } from '../../core/http/crud.service';
+import { CrudService, toHttpParams } from '../../core/http/crud.service';
 import { Equipment, EquipmentRequest, EquipmentStatus } from '../../core/models/client.model';
-import { Page } from '../../core/models/common.model';
+import { Page, PageQuery } from '../../core/models/common.model';
 
 @Injectable({ providedIn: 'root' })
 export class EquipmentService extends CrudService<Equipment, EquipmentRequest, EquipmentRequest> {
@@ -17,10 +17,21 @@ export class EquipmentService extends CrudService<Equipment, EquipmentRequest, E
     return this.http.post<Equipment>(`${environment.apiUrl}/sites/${siteId}/equipment`, payload);
   }
 
-  listBySite(siteId: string): Observable<Equipment[]> {
+  listBySite(siteId: string, status?: EquipmentStatus): Observable<Equipment[]> {
     return this.http
-      .get<Page<Equipment>>(`${environment.apiUrl}/sites/${siteId}/equipment`, { params: { size: 200 } })
+      .get<Page<Equipment>>(`${environment.apiUrl}/sites/${siteId}/equipment`, {
+        params: status ? { size: 200, status } : { size: 200 },
+      })
       .pipe(map((page) => page.content));
+  }
+
+  listPageBySite(
+    siteId: string,
+    query: PageQuery & { status?: EquipmentStatus } = {},
+  ): Observable<Page<Equipment>> {
+    return this.http.get<Page<Equipment>>(`${environment.apiUrl}/sites/${siteId}/equipment`, {
+      params: toHttpParams({ page: 0, size: 10, sort: 'name,asc', ...query }),
+    });
   }
 
   findByQrCode(qrCode: string): Observable<Equipment> {

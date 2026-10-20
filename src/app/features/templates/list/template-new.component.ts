@@ -14,10 +14,22 @@ import { extractErrorMessage } from '../../../shared/components/state-container/
 @Component({
   selector: 'app-template-new',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatProgressSpinnerModule, PageHeaderComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    PageHeaderComponent,
+  ],
   template: `
     <div class="fo-page">
-      <app-page-header title="Novo Modelo de Inspeção" subtitle="Informe os dados básicos. As seções e itens são configurados na próxima etapa."></app-page-header>
+      <app-page-header
+        title="Novo Modelo de Inspeção"
+        subtitle="Informe os dados básicos. As seções e itens são configurados na próxima etapa."
+      ></app-page-header>
       <mat-card style="padding:24px; max-width:640px">
         <form [formGroup]="form" (ngSubmit)="submit()">
           <div class="fo-form-grid">
@@ -34,7 +46,11 @@ import { extractErrorMessage } from '../../../shared/components/state-container/
             </mat-form-field>
             <mat-form-field class="fo-full">
               <mat-label>Categoria</mat-label>
-              <input matInput formControlName="category" placeholder="Ex.: Elétrica, Segurança, Estrutural" />
+              <input
+                matInput
+                formControlName="category"
+                placeholder="Ex.: Elétrica, Segurança, Estrutural"
+              />
               @if (form.controls.category.hasError('required') && form.controls.category.touched) {
                 <mat-error>Categoria é obrigatória</mat-error>
               }
@@ -46,7 +62,11 @@ import { extractErrorMessage } from '../../../shared/components/state-container/
           <div class="fo-actions-row">
             <button mat-button type="button" (click)="cancel()">Cancelar</button>
             <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
-              @if (saving()) { <mat-spinner diameter="18"></mat-spinner> } @else { Criar e continuar }
+              @if (saving()) {
+                <mat-spinner diameter="18"></mat-spinner>
+              } @else {
+                Criar e continuar
+              }
             </button>
           </div>
         </form>
@@ -78,16 +98,22 @@ export class TemplateNewComponent {
     this.saving.set(true);
     this.errorMessage.set('');
     const raw = this.form.getRawValue();
-    this.templatesService.create({ title: raw.title!, description: raw.description || undefined, category: raw.category! }).subscribe({
-      next: (template) => {
-        this.saving.set(false);
-        this.router.navigate(['/app/inspection-templates', template.id, 'edit']);
-      },
-      error: (err) => {
-        this.saving.set(false);
-        this.errorMessage.set(extractErrorMessage(err));
-      },
-    });
+    this.templatesService
+      .create({
+        title: raw.title!,
+        description: raw.description || undefined,
+        category: raw.category!,
+      })
+      .subscribe({
+        next: (template) => {
+          this.saving.set(false);
+          this.router.navigate(['/app/inspection-templates', template.id, 'edit']);
+        },
+        error: (err) => {
+          this.saving.set(false);
+          this.errorMessage.set(extractErrorMessage(err));
+        },
+      });
   }
 
   cancel(): void {

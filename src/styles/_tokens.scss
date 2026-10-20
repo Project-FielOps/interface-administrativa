@@ -65,10 +65,10 @@
   --mat-sys-on-error-container: #93000a;
 
   // ---------------------------------------------------------------------------
-  // Tipografia — dual-sans: "Narrativa" (Jakarta) vs "Utilidade" (Inter)
+  // Tipografia — Nunito Sans em toda a plataforma
   // ---------------------------------------------------------------------------
-  --fo-font-headline: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
-  --fo-font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fo-font-headline: 'Nunito Sans', system-ui, sans-serif;
+  --fo-font-body: 'Nunito Sans', system-ui, sans-serif;
   --fo-font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
 
   // Escala do Precision System

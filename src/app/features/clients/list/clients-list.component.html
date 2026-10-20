@@ -5,21 +5,24 @@
     </button>
   </app-page-header>
 
-  <form [formGroup]="filterForm" class="fo-filters">
-    <mat-form-field>
-      <mat-label>Buscar por nome ou documento</mat-label>
-      <input matInput formControlName="search" />
-      <mat-icon matIconSuffix>search</mat-icon>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Status</mat-label>
-      <mat-select formControlName="status">
-        <mat-option value="">Todos</mat-option>
-        <mat-option value="ACTIVE">Ativo</mat-option>
-        <mat-option value="INACTIVE">Inativo</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </form>
+  <details class="fo-filter-panel" open>
+    <summary><mat-icon>filter_alt</mat-icon> Filtros</summary>
+    <form [formGroup]="filterForm" class="fo-filters">
+      <mat-form-field>
+        <mat-label>Buscar por nome ou documento</mat-label>
+        <input matInput formControlName="search" />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="ACTIVE">Ativo</mat-option>
+          <mat-option value="INACTIVE">Inativo</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </details>
 
   <app-state-container
     [phase]="state().phase"
@@ -27,6 +30,7 @@
     emptyMessage="Nenhum cliente cadastrado ainda."
     emptyIcon="business"
     [retry]="load.bind(this)"
+    [clearFilters]="clearFilters.bind(this)"
     [content]="tableTpl"
   ></app-state-container>
 
@@ -35,7 +39,7 @@
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>Nome</th>
         <td mat-cell *matCellDef="let c">
-          <a (click)="viewSites(c)" class="fo-link">{{ c.name }}</a>
+          <button type="button" class="fo-link" (click)="viewSites(c)">{{ c.name }}</button>
         </td>
       </ng-container>
       <ng-container matColumnDef="document">
@@ -52,17 +56,27 @@
       </ng-container>
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef>Status</th>
-        <td mat-cell *matCellDef="let c"><span [class]="'fo-chip-' + c.status.toLowerCase()">{{ c.status | foLabel }}</span></td>
+        <td mat-cell *matCellDef="let c">
+          <app-status-badge [value]="c.status"></app-status-badge>
+        </td>
       </ng-container>
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let c">
-          <button mat-icon-button [matMenuTriggerFor]="menu">
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="menu"
+            [attr.aria-label]="'Abrir ações do cliente ' + c.name"
+          >
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="viewSites(c)"><mat-icon>place</mat-icon><span>Ver locais</span></button>
-            <button mat-menu-item (click)="openEdit(c)"><mat-icon>edit</mat-icon><span>Editar</span></button>
+            <button mat-menu-item (click)="viewSites(c)">
+              <mat-icon>place</mat-icon><span>Ver locais</span>
+            </button>
+            <button mat-menu-item (click)="openEdit(c)">
+              <mat-icon>edit</mat-icon><span>Editar</span>
+            </button>
             <button mat-menu-item (click)="toggleStatus(c)">
               <mat-icon>{{ c.status === 'INACTIVE' ? 'check_circle' : 'block' }}</mat-icon>
               <span>{{ c.status === 'INACTIVE' ? 'Ativar' : 'Inativar' }}</span>
@@ -73,6 +87,12 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-    <mat-paginator [length]="totalElements()" [pageSize]="pageSize()" [pageIndex]="pageIndex()" [pageSizeOptions]="[10,25,50]" (page)="onPage($event)"></mat-paginator>
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="[10, 25, 50]"
+      (page)="onPage($event)"
+    ></mat-paginator>
   </ng-template>
 </div>

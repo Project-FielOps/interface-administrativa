@@ -1,182 +1,179 @@
-// Login no FieldOps Precision System: fundo tonal arejado, cartão elevado,
-// aresta de marca no topo. Sem gradiente pesado — "less but better".
-
 .fo-login-page {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: minmax(380px, 0.9fr) minmax(480px, 1.1fr);
   min-height: 100vh;
-  padding: var(--fo-space-lg) var(--fo-gutter);
-  background:
-    radial-gradient(1000px 520px at 50% -10%, rgba(37, 99, 235, 0.08), transparent 70%),
-    radial-gradient(720px 420px at 100% 100%, rgba(91, 184, 254, 0.1), transparent 65%),
-    var(--fo-level-0);
+  background: var(--fo-background);
+  font-family: 'Nunito Sans', system-ui, sans-serif;
 }
-
-.fo-login-shell {
-  width: 100%;
-  max-width: 420px;
+.fo-login-context {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--fo-space-lg);
+  justify-content: space-between;
+  padding: clamp(40px, 6vw, 88px);
+  color: white;
+  background: var(--fo-navigation);
 }
-
-// ---------------------------------------------------------------------------
-// Marca
-// ---------------------------------------------------------------------------
-
-.fo-login-brand {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--fo-space-sm);
-  text-align: center;
-
-  h1 {
-    font: var(--fo-headline-md);
-    letter-spacing: -0.02em;
-    margin: var(--fo-space-base) 0 0;
-    color: var(--mat-sys-on-surface);
-  }
-}
-
-.fo-login-mark {
-  width: 64px;
-  height: 64px;
-  border-radius: var(--fo-radius-lg);
-  background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-primary-container));
-  color: #ffffff;
+.fo-context-brand {
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: var(--fo-shadow-primary);
-
-  mat-icon {
-    font-size: 32px;
-    width: 32px;
-    height: 32px;
-  }
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 800;
 }
-
-// Linha de estado com ponto pulsante, espelhando o "Offline Ready" do protótipo.
-.fo-login-status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--fo-space-xs);
+.fo-context-brand > span {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--fo-text-inverse);
+  background: var(--fo-primary);
+  border-radius: 12px;
+}
+.fo-login-context h1 {
+  max-width: 620px;
+  margin: 12px 0 16px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: clamp(28px, 3.2vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+.fo-context-description {
+  max-width: 540px;
+  color: #c6d3d4;
+  font-size: 17px;
+  line-height: 26px;
+}
+.fo-eyebrow {
   margin: 0;
-  font: var(--fo-label-caps);
-  letter-spacing: var(--fo-tracking-caps);
-  text-transform: uppercase;
-  color: var(--mat-sys-on-surface-variant);
-}
-
-.fo-login-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--fo-radius-full);
-  background: #10b981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-}
-
-// ---------------------------------------------------------------------------
-// Cartão
-// ---------------------------------------------------------------------------
-
-.fo-login-card {
-  width: 100%;
-  padding: var(--fo-space-xl) var(--fo-space-lg) var(--fo-space-lg);
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--fo-shadow-2) !important;
-}
-
-.fo-login-edge {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--mat-sys-primary), var(--mat-sys-secondary-container));
-}
-
-.fo-full {
-  width: 100%;
-}
-
-.fo-login-card .mat-mdc-form-field {
-  margin-bottom: var(--fo-space-base);
-
-  // Ícone-guia à esquerda, que acende no foco.
-  [matIconPrefix] {
-    margin: 0 var(--fo-space-sm) 0 var(--fo-space-base);
-    color: var(--mat-sys-outline-variant);
-    transition: color 0.2s ease;
-  }
-
-  &.mat-focused [matIconPrefix] {
-    color: var(--mat-sys-primary-container);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Ações
-// ---------------------------------------------------------------------------
-
-.fo-login-submit {
-  margin-top: var(--fo-space-xs);
-  height: 52px;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-
-  .fo-login-submit__inner {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--fo-space-xs);
-  }
-
-  .fo-login-submit__arrow {
-    margin: 0;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    transition: transform 0.3s ease;
-  }
-
-  &:hover:not([disabled]) .fo-login-submit__arrow {
-    transform: translateX(4px);
-  }
-}
-
-// Erro: soft fill, contido, sem gritar.
-.fo-login-error {
-  display: flex;
-  align-items: center;
-  gap: var(--fo-space-xs);
-  margin: 0 0 var(--fo-space-sm);
-  padding: var(--fo-space-sm) var(--fo-space-sm);
-  border-radius: var(--fo-radius-md);
-  background: var(--fo-danger-soft);
-  border: 1px solid rgba(186, 26, 26, 0.2);
-  color: var(--fo-danger);
-  font-size: 13px;
-  font-weight: 500;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-  }
-}
-
-.fo-login-footnote {
-  margin: 0;
-  text-align: center;
+  color: #93ccff;
   font-size: 12px;
-  color: var(--mat-sys-on-surface-variant);
-  opacity: 0.75;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.fo-login-context ul {
+  display: grid;
+  gap: 14px;
+  margin: 40px 0;
+  padding: 0;
+  list-style: none;
+}
+.fo-login-context li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #dce5e5;
+  font-weight: 600;
+}
+.fo-login-context li mat-icon {
+  color: #93ccff;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+.fo-context-footer {
+  margin: 0;
+  color: #91a7a9;
+  font-size: 12px;
+}
+.fo-login-card {
+  align-self: center;
+  justify-self: center;
+  width: min(430px, calc(100% - 48px));
+  padding: 32px;
+  border: 1px solid var(--fo-border);
+  border-radius: 16px;
+  box-shadow: var(--fo-shadow-overlay);
+}
+.fo-login-brand {
+  margin-bottom: 28px;
+}
+.fo-login-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 20px;
+  color: var(--fo-primary-dark);
+  background: var(--fo-primary-soft);
+  border-radius: 12px;
+}
+.fo-login-brand .fo-eyebrow {
+  color: var(--fo-primary-dark);
+}
+.fo-login-brand h2 {
+  margin: 8px 0 4px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+}
+.fo-login-brand > p:last-child {
+  margin: 0;
+  color: var(--fo-text-secondary);
+}
+.fo-login-submit {
+  height: 44px;
+  margin-top: 8px;
+}
+.fo-login-submit mat-spinner {
+  margin: auto;
+}
+.fo-login-recovery {
+  display: block;
+  margin-top: 16px;
+  color: var(--fo-primary-dark);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+.fo-login-error {
+  margin: -4px 0 12px;
+}
+.fo-login-help {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 22px 0 0;
+  color: var(--fo-text-secondary);
+  font-size: 12px;
+}
+.fo-login-help mat-icon {
+  flex: 0 0 auto;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+@media (max-width: 900px) {
+  .fo-login-page {
+    grid-template-columns: 1fr;
+  }
+  .fo-login-context {
+    min-height: 260px;
+    padding: 32px;
+  }
+  .fo-login-context h1 {
+    max-width: 700px;
+    font-size: 32px;
+  }
+  .fo-login-context ul,
+  .fo-context-footer {
+    display: none;
+  }
+  .fo-login-card {
+    margin: 32px auto;
+  }
+}
+@media (max-width: 520px) {
+  .fo-login-context {
+    min-height: 220px;
+    padding: 24px;
+  }
+  .fo-login-context h1 {
+    font-size: 28px;
+  }
+  .fo-login-card {
+    width: calc(100% - 32px);
+    padding: 28px 24px;
+  }
 }

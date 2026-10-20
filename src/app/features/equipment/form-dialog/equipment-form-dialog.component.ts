@@ -25,8 +25,16 @@ export interface EquipmentFormDialogData {
   selector: 'app-equipment-form-dialog',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatButtonModule, MatDatepickerModule, MatNativeDateModule, MatProgressSpinnerModule,
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './equipment-form-dialog.component.html',
 })
@@ -45,7 +53,9 @@ export class EquipmentFormDialogComponent implements OnInit {
     model: [this.data.equipment?.model ?? ''],
     description: [this.data.equipment?.description ?? ''],
     qrCode: [this.data.equipment?.qrCode ?? '', [Validators.required]],
-    installedAt: [this.data.equipment?.installedAt ? new Date(this.data.equipment.installedAt) : null],
+    installedAt: [
+      this.data.equipment?.installedAt ? new Date(this.data.equipment.installedAt) : null,
+    ],
   });
 
   constructor(
@@ -84,7 +94,9 @@ export class EquipmentFormDialogComponent implements OnInit {
       model: raw.model || undefined,
       description: raw.description || undefined,
       qrCode: raw.qrCode!,
-      installedAt: raw.installedAt ? new Date(raw.installedAt).toISOString().substring(0, 10) : undefined,
+      installedAt: raw.installedAt
+        ? new Date(raw.installedAt).toISOString().substring(0, 10)
+        : undefined,
       version: this.data.equipment?.version,
     };
 

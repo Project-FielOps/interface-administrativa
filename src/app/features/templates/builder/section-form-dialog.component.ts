@@ -14,7 +14,14 @@ export interface SectionFormDialogData {
 @Component({
   selector: 'app-section-form-dialog',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+  ],
   template: `
     <h2 mat-dialog-title>{{ data.section ? 'Editar Seção' : 'Nova Seção' }}</h2>
     <form [formGroup]="form" (ngSubmit)="submit()">

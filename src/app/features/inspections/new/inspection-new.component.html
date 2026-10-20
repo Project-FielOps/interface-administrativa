@@ -1,7 +1,10 @@
 <div class="fo-page">
-  <app-page-header title="Nova Inspeção" subtitle="Agendamento de uma nova inspeção em campo."></app-page-header>
+  <app-page-header
+    title="Nova Inspeção"
+    subtitle="Agendamento de uma nova inspeção em campo."
+  ></app-page-header>
 
-  <mat-card style="padding:24px; max-width:820px">
+  <mat-card style="padding: 24px; max-width: 820px">
     <form [formGroup]="form" (ngSubmit)="submit()">
       <div class="fo-form-grid">
         <mat-form-field class="fo-full">
@@ -19,6 +22,13 @@
               <mat-option [value]="t.id">{{ t.title }}</mat-option>
             }
           </mat-select>
+          @if (templatesState().phase === 'loading') {
+            <mat-hint>Carregando modelos...</mat-hint>
+          } @else if (templatesState().phase === 'empty') {
+            <mat-hint>Nenhum modelo ativo disponível.</mat-hint>
+          } @else if (templatesState().phase === 'error') {
+            <mat-error>{{ templatesState().errorMessage }}</mat-error>
+          }
           @if (form.controls.templateId.hasError('required') && form.controls.templateId.touched) {
             <mat-error>Selecione um modelo</mat-error>
           }
@@ -28,10 +38,22 @@
           <mat-label>Versão publicada</mat-label>
           <mat-select formControlName="templateVersionNumber" [disabled]="versions().length === 0">
             @for (v of versions(); track v.versionNumber) {
-              <mat-option [value]="v.versionNumber">v{{ v.versionNumber }} — {{ v.titleSnapshot }}</mat-option>
+              <mat-option [value]="v.versionNumber"
+                >v{{ v.versionNumber }} — {{ v.titleSnapshot }}</mat-option
+              >
             }
           </mat-select>
-          @if (form.controls.templateVersionNumber.hasError('required') && form.controls.templateVersionNumber.touched) {
+          @if (versionsState().phase === 'loading') {
+            <mat-hint>Carregando versões...</mat-hint>
+          } @else if (versionsState().phase === 'empty') {
+            <mat-hint>Nenhuma versão ativa para novas inspeções.</mat-hint>
+          } @else if (versionsState().phase === 'error') {
+            <mat-error>{{ versionsState().errorMessage }}</mat-error>
+          }
+          @if (
+            form.controls.templateVersionNumber.hasError('required') &&
+            form.controls.templateVersionNumber.touched
+          ) {
             <mat-error>Selecione uma versão</mat-error>
           }
         </mat-form-field>
@@ -43,6 +65,13 @@
               <mat-option [value]="c.id">{{ c.name }}</mat-option>
             }
           </mat-select>
+          @if (clientsState().phase === 'loading') {
+            <mat-hint>Carregando clientes...</mat-hint>
+          } @else if (clientsState().phase === 'empty') {
+            <mat-hint>Nenhum cliente ativo disponível.</mat-hint>
+          } @else if (clientsState().phase === 'error') {
+            <mat-error>{{ clientsState().errorMessage }}</mat-error>
+          }
           @if (form.controls.clientId.hasError('required') && form.controls.clientId.touched) {
             <mat-error>Selecione um cliente</mat-error>
           }
@@ -55,6 +84,13 @@
               <mat-option [value]="s.id">{{ s.name }}</mat-option>
             }
           </mat-select>
+          @if (sitesState().phase === 'loading') {
+            <mat-hint>Carregando locais...</mat-hint>
+          } @else if (sitesState().phase === 'empty') {
+            <mat-hint>Nenhum local ativo para este cliente.</mat-hint>
+          } @else if (sitesState().phase === 'error') {
+            <mat-error>{{ sitesState().errorMessage }}</mat-error>
+          }
           @if (form.controls.siteId.hasError('required') && form.controls.siteId.touched) {
             <mat-error>Selecione um local</mat-error>
           }
@@ -68,6 +104,13 @@
               <mat-option [value]="e.id">{{ e.name }}</mat-option>
             }
           </mat-select>
+          @if (equipmentState().phase === 'loading') {
+            <mat-hint>Carregando equipamentos...</mat-hint>
+          } @else if (equipmentState().phase === 'empty') {
+            <mat-hint>Nenhum equipamento ativo; a inspeção pode ser do local.</mat-hint>
+          } @else if (equipmentState().phase === 'error') {
+            <mat-error>{{ equipmentState().errorMessage }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field>
@@ -87,7 +130,16 @@
               <mat-option [value]="t.id">{{ t.name }}</mat-option>
             }
           </mat-select>
-          @if (form.controls.technicianId.hasError('required') && form.controls.technicianId.touched) {
+          @if (techniciansState().phase === 'loading') {
+            <mat-hint>Carregando técnicos atribuíveis...</mat-hint>
+          } @else if (techniciansState().phase === 'empty') {
+            <mat-hint>Nenhum técnico ativo disponível.</mat-hint>
+          } @else if (techniciansState().phase === 'error') {
+            <mat-error>{{ techniciansState().errorMessage }}</mat-error>
+          }
+          @if (
+            form.controls.technicianId.hasError('required') && form.controls.technicianId.touched
+          ) {
             <mat-error>Selecione um técnico</mat-error>
           }
         </mat-form-field>
@@ -99,7 +151,16 @@
               <mat-option [value]="s.id">{{ s.name }}</mat-option>
             }
           </mat-select>
-          @if (form.controls.supervisorId.hasError('required') && form.controls.supervisorId.touched) {
+          @if (supervisorsState().phase === 'loading') {
+            <mat-hint>Carregando supervisores atribuíveis...</mat-hint>
+          } @else if (supervisorsState().phase === 'empty') {
+            <mat-hint>Nenhum supervisor ativo disponível.</mat-hint>
+          } @else if (supervisorsState().phase === 'error') {
+            <mat-error>{{ supervisorsState().errorMessage }}</mat-error>
+          }
+          @if (
+            form.controls.supervisorId.hasError('required') && form.controls.supervisorId.touched
+          ) {
             <mat-error>Selecione um supervisor</mat-error>
           }
         </mat-form-field>
@@ -109,7 +170,9 @@
           <input matInput [matDatepicker]="picker" formControlName="scheduledFor" />
           <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
-          @if (form.controls.scheduledFor.hasError('required') && form.controls.scheduledFor.touched) {
+          @if (
+            form.controls.scheduledFor.hasError('required') && form.controls.scheduledFor.touched
+          ) {
             <mat-error>Informe a data agendada</mat-error>
           }
         </mat-form-field>
@@ -127,7 +190,11 @@
       <div class="fo-actions-row">
         <button mat-button type="button" (click)="cancel()">Cancelar</button>
         <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
-          @if (saving()) { <mat-spinner diameter="18"></mat-spinner> } @else { Agendar inspeção }
+          @if (saving()) {
+            <mat-spinner diameter="18"></mat-spinner>
+          } @else {
+            Agendar inspeção
+          }
         </button>
       </div>
     </form>

@@ -12,13 +12,26 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { forkJoin } from 'rxjs';
 import { TemplatesService } from '../templates.service';
-import { InspectionTemplate, TemplateItem, TemplateItemRequest, TemplateSection, TemplateSectionRequest } from '../../../core/models/template.model';
+import {
+  InspectionTemplate,
+  TemplateItem,
+  TemplateItemRequest,
+  TemplateSection,
+  TemplateSectionRequest,
+} from '../../../core/models/template.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+} from '../../../shared/components/state-container/ui-state';
 import { SectionFormDialogComponent } from './section-form-dialog.component';
 import { ItemFormDialogComponent } from './item-form-dialog.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 interface BuilderData {
   template: InspectionTemplate;
@@ -29,8 +42,17 @@ interface BuilderData {
   selector: 'app-template-builder',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule,
-    MatButtonModule, MatIconModule, MatChipsModule, StateContainerComponent, PageHeaderComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    StateContainerComponent,
+    PageHeaderComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './template-builder.component.html',
 })
@@ -69,7 +91,11 @@ export class TemplateBuilderComponent implements OnInit {
         const sections = draft.sections;
         const sorted = [...sections].sort((a, b) => a.displayOrder - b.displayOrder);
         sorted.forEach((s) => s.items.sort((a, b) => a.displayOrder - b.displayOrder));
-        this.metaForm.patchValue({ title: template.title, description: template.description, category: template.category });
+        this.metaForm.patchValue({
+          title: template.title,
+          description: template.description,
+          category: template.category,
+        });
         this.state.set(successState({ template, sections: sorted }, false));
       },
       error: (err) => this.state.set(errorState(extractErrorMessage(err))),
@@ -89,17 +115,24 @@ export class TemplateBuilderComponent implements OnInit {
     if (!template) return;
     this.savingMeta.set(true);
     const raw = this.metaForm.getRawValue();
-    this.templatesService.update(template.id, { title: raw.title!, description: raw.description || undefined, category: raw.category!, version: template.version }).subscribe({
-      next: () => {
-        this.savingMeta.set(false);
-        this.snackBar.open('Dados do modelo atualizados.', 'Fechar', { duration: 3000 });
-        this.load();
-      },
-      error: (err) => {
-        this.savingMeta.set(false);
-        this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 });
-      },
-    });
+    this.templatesService
+      .update(template.id, {
+        title: raw.title!,
+        description: raw.description || undefined,
+        category: raw.category!,
+        version: template.version,
+      })
+      .subscribe({
+        next: () => {
+          this.savingMeta.set(false);
+          this.snackBar.open('Dados do modelo atualizados.', 'Fechar', { duration: 3000 });
+          this.load();
+        },
+        error: (err) => {
+          this.savingMeta.set(false);
+          this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 });
+        },
+      });
   }
 
   addSection(): void {
@@ -107,10 +140,17 @@ export class TemplateBuilderComponent implements OnInit {
     ref.afterClosed().subscribe((result) => {
       if (!result) return;
       const nextOrder = (this.state().data?.sections.length ?? 0) + 1;
-      this.templatesService.createSection(this.templateId, { title: result.title, description: result.description, displayOrder: nextOrder }).subscribe({
-        next: () => this.load(),
-        error: (err) => this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
-      });
+      this.templatesService
+        .createSection(this.templateId, {
+          title: result.title,
+          description: result.description,
+          displayOrder: nextOrder,
+        })
+        .subscribe({
+          next: () => this.load(),
+          error: (err) =>
+            this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
+        });
     });
   }
 
@@ -118,17 +158,28 @@ export class TemplateBuilderComponent implements OnInit {
     const ref = this.dialog.open(SectionFormDialogComponent, { width: '480px', data: { section } });
     ref.afterClosed().subscribe((result) => {
       if (!result) return;
-      this.templatesService.updateSection(this.templateId, section.id, { title: result.title, description: result.description, displayOrder: section.displayOrder }).subscribe({
-        next: () => this.load(),
-        error: (err) => this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
-      });
+      this.templatesService
+        .updateSection(this.templateId, section.id, {
+          title: result.title,
+          description: result.description,
+          displayOrder: section.displayOrder,
+        })
+        .subscribe({
+          next: () => this.load(),
+          error: (err) =>
+            this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
+        });
     });
   }
 
   deleteSection(section: TemplateSection): void {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       width: '420px',
-      data: { title: 'Remover seção', message: `Remover a seção "${section.title}" e todos os seus itens?`, danger: true },
+      data: {
+        title: 'Remover seção',
+        message: `Remover a seção "${section.title}" e todos os seus itens?`,
+        danger: true,
+      },
     });
     ref.afterClosed().subscribe((confirmed) => {
       if (!confirmed) return;
@@ -146,8 +197,16 @@ export class TemplateBuilderComponent implements OnInit {
     const b = sections[target];
     // Swap displayOrder between the two sections via individual PUTs (no bulk reorder endpoint exists).
     forkJoin([
-      this.templatesService.updateSection(this.templateId, a.id, this.toSectionRequest(a, b.displayOrder)),
-      this.templatesService.updateSection(this.templateId, b.id, this.toSectionRequest(b, a.displayOrder)),
+      this.templatesService.updateSection(
+        this.templateId,
+        a.id,
+        this.toSectionRequest(a, b.displayOrder),
+      ),
+      this.templatesService.updateSection(
+        this.templateId,
+        b.id,
+        this.toSectionRequest(b, a.displayOrder),
+      ),
     ]).subscribe({
       next: () => this.load(),
       error: (err) => this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
@@ -163,10 +222,13 @@ export class TemplateBuilderComponent implements OnInit {
     ref.afterClosed().subscribe((result) => {
       if (!result) return;
       const nextOrder = section.items.length + 1;
-      this.templatesService.createItem(this.templateId, section.id, { ...result, displayOrder: nextOrder }).subscribe({
-        next: () => this.load(),
-        error: (err) => this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
-      });
+      this.templatesService
+        .createItem(this.templateId, section.id, { ...result, displayOrder: nextOrder })
+        .subscribe({
+          next: () => this.load(),
+          error: (err) =>
+            this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
+        });
     });
   }
 
@@ -174,10 +236,16 @@ export class TemplateBuilderComponent implements OnInit {
     const ref = this.dialog.open(ItemFormDialogComponent, { width: '600px', data: { item } });
     ref.afterClosed().subscribe((result) => {
       if (!result) return;
-      this.templatesService.updateItem(this.templateId, section.id, item.id, { ...result, displayOrder: item.displayOrder }).subscribe({
-        next: () => this.load(),
-        error: (err) => this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
-      });
+      this.templatesService
+        .updateItem(this.templateId, section.id, item.id, {
+          ...result,
+          displayOrder: item.displayOrder,
+        })
+        .subscribe({
+          next: () => this.load(),
+          error: (err) =>
+            this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
+        });
     });
   }
 
@@ -202,8 +270,18 @@ export class TemplateBuilderComponent implements OnInit {
     const b = section.items[target];
     // Swap displayOrder between the two items via individual PUTs (no bulk reorder endpoint exists).
     forkJoin([
-      this.templatesService.updateItem(this.templateId, section.id, a.id, this.toItemRequest(a, b.displayOrder)),
-      this.templatesService.updateItem(this.templateId, section.id, b.id, this.toItemRequest(b, a.displayOrder)),
+      this.templatesService.updateItem(
+        this.templateId,
+        section.id,
+        a.id,
+        this.toItemRequest(a, b.displayOrder),
+      ),
+      this.templatesService.updateItem(
+        this.templateId,
+        section.id,
+        b.id,
+        this.toItemRequest(b, a.displayOrder),
+      ),
     ]).subscribe({
       next: () => this.load(),
       error: (err) => this.snackBar.open(extractErrorMessage(err), 'Fechar', { duration: 5000 }),
@@ -228,14 +306,17 @@ export class TemplateBuilderComponent implements OnInit {
     const data = this.state().data;
     if (!data) return;
     if (data.sections.length === 0) {
-      this.snackBar.open('Adicione ao menos uma seção com itens antes de publicar.', 'Fechar', { duration: 5000 });
+      this.snackBar.open('Adicione ao menos uma seção com itens antes de publicar.', 'Fechar', {
+        duration: 5000,
+      });
       return;
     }
     const ref = this.dialog.open(ConfirmDialogComponent, {
       width: '480px',
       data: {
         title: 'Publicar modelo',
-        message: 'Publicar cria uma nova versão imutável do modelo, disponível para novos agendamentos. Deseja continuar?',
+        message:
+          'Publicar cria uma nova versão imutável do modelo, disponível para novos agendamentos. Deseja continuar?',
         confirmLabel: 'Publicar',
       },
     });

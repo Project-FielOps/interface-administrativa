@@ -7,6 +7,7 @@ export const SITES_ROUTES: Routes = [
   },
   {
     path: ':siteId/equipment',
-    loadComponent: () => import('../equipment/list/equipment-list.component').then((m) => m.EquipmentListComponent),
+    loadComponent: () =>
+      import('../equipment/list/equipment-list.component').then((m) => m.EquipmentListComponent),
   },
 ];

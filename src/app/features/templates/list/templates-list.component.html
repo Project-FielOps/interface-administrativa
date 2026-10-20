@@ -1,26 +1,36 @@
 <div class="fo-page">
-  <app-page-header title="Modelos de Inspeção" subtitle="Checklists reutilizáveis, versionados de forma imutável ao serem publicados.">
+  <app-page-header
+    title="Modelos de Inspeção"
+    subtitle="Checklists reutilizáveis, versionados de forma imutável ao serem publicados."
+  >
     <button mat-raised-button color="primary" (click)="create()">
       <mat-icon>add</mat-icon> Novo modelo
     </button>
   </app-page-header>
 
-  <form [formGroup]="filterForm" class="fo-filters">
-    <mat-form-field>
-      <mat-label>Buscar por título/categoria</mat-label>
-      <input matInput formControlName="search" />
-      <mat-icon matIconSuffix>search</mat-icon>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Status</mat-label>
-      <mat-select formControlName="status">
-        <mat-option value="">Todos</mat-option>
-        <mat-option value="DRAFT">Rascunho</mat-option>
-        <mat-option value="ACTIVE">Ativo</mat-option>
-        <mat-option value="INACTIVE">Inativo</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </form>
+  <details class="fo-filter-panel" open>
+    <summary><mat-icon>filter_alt</mat-icon> Filtros</summary>
+    <form [formGroup]="filterForm" class="fo-filters">
+      <mat-form-field>
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="DRAFT">Rascunho</mat-option>
+          <mat-option value="ACTIVE">Ativo</mat-option>
+          <mat-option value="INACTIVE">Inativo</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Categoria</mat-label>
+        <mat-select formControlName="category">
+          <mat-option value="">Todas</mat-option>
+          @for (category of categories(); track category) {
+            <mat-option [value]="category">{{ category }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </details>
 
   <app-state-container
     [phase]="state().phase"
@@ -28,6 +38,7 @@
     emptyMessage="Nenhum modelo de inspeção cadastrado ainda."
     emptyIcon="fact_check"
     [retry]="load.bind(this)"
+    [clearFilters]="clearFilters.bind(this)"
     [content]="tableTpl"
   ></app-state-container>
 
@@ -35,7 +46,9 @@
     <table mat-table [dataSource]="state().data || []">
       <ng-container matColumnDef="title">
         <th mat-header-cell *matHeaderCellDef>Título</th>
-        <td mat-cell *matCellDef="let t"><a class="fo-link" (click)="edit(t)">{{ t.title }}</a></td>
+        <td mat-cell *matCellDef="let t">
+          <button type="button" class="fo-link" (click)="edit(t)">{{ t.title }}</button>
+        </td>
       </ng-container>
       <ng-container matColumnDef="category">
         <th mat-header-cell *matHeaderCellDef>Categoria</th>
@@ -43,7 +56,9 @@
       </ng-container>
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef>Status</th>
-        <td mat-cell *matCellDef="let t"><span [class]="'fo-chip-' + t.status.toLowerCase()">{{ t.status | foLabel }}</span></td>
+        <td mat-cell *matCellDef="let t">
+          <app-status-badge [value]="t.status"></app-status-badge>
+        </td>
       </ng-container>
       <ng-container matColumnDef="currentVersion">
         <th mat-header-cell *matHeaderCellDef>Versão atual</th>
@@ -52,13 +67,27 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let t">
-          <button mat-icon-button [matMenuTriggerFor]="menu"><mat-icon>more_vert</mat-icon></button>
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="menu"
+            [attr.aria-label]="'Abrir ações do modelo ' + t.title"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="edit(t)"><mat-icon>edit</mat-icon><span>Editar</span></button>
-            <button mat-menu-item (click)="preview(t)"><mat-icon>visibility</mat-icon><span>Pré-visualizar</span></button>
-            <button mat-menu-item (click)="versions(t)"><mat-icon>history</mat-icon><span>Histórico de versões</span></button>
+            <button mat-menu-item (click)="edit(t)">
+              <mat-icon>edit</mat-icon><span>Editar</span>
+            </button>
+            <button mat-menu-item (click)="preview(t)">
+              <mat-icon>visibility</mat-icon><span>Pré-visualizar</span>
+            </button>
+            <button mat-menu-item (click)="versions(t)">
+              <mat-icon>history</mat-icon><span>Histórico de versões</span>
+            </button>
             @if (t.status !== 'INACTIVE') {
-              <button mat-menu-item (click)="inactivate(t)"><mat-icon>block</mat-icon><span>Inativar</span></button>
+              <button mat-menu-item (click)="inactivate(t)">
+                <mat-icon>block</mat-icon><span>Inativar</span>
+              </button>
             }
           </mat-menu>
         </td>
@@ -66,6 +95,12 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-    <mat-paginator [length]="totalElements()" [pageSize]="pageSize()" [pageIndex]="pageIndex()" [pageSizeOptions]="[10,25,50]" (page)="onPage($event)"></mat-paginator>
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="[10, 25, 50]"
+      (page)="onPage($event)"
+    ></mat-paginator>
   </ng-template>
 </div>

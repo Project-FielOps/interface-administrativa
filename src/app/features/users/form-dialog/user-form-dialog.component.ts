@@ -48,7 +48,7 @@ export class UserFormDialogComponent {
     email: [this.data.user?.email ?? '', [Validators.required, Validators.email]],
     phone: [this.data.user?.phone ?? ''],
     role: [this.data.user?.role ?? 'TECHNICIAN', [Validators.required]],
-    password: ['', this.isEdit ? [] : [Validators.required, Validators.minLength(6)]],
+    password: ['', this.isEdit ? [] : [Validators.required, Validators.minLength(8)]],
   });
 
   constructor(
@@ -80,6 +80,7 @@ export class UserFormDialogComponent {
           role: raw.role as UserRole,
           phone: raw.phone || undefined,
           password: raw.password!,
+          temporaryPassword: false,
         });
 
     request$.subscribe({
@@ -96,7 +97,8 @@ export class UserFormDialogComponent {
   }
 
   private applyFieldErrors(err: unknown): void {
-    const fieldErrors = (err as { error?: { fieldErrors?: { field: string; message: string }[] } })?.error?.fieldErrors;
+    const fieldErrors = (err as { error?: { fieldErrors?: { field: string; message: string }[] } })
+      ?.error?.fieldErrors;
     fieldErrors?.forEach((fe) => {
       const control = this.form.get(fe.field);
       if (control) {

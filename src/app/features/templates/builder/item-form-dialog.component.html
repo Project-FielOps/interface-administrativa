@@ -35,7 +35,7 @@
         <div formArrayName="options">
           @for (opt of options.controls; track $index) {
             <div class="fo-option-row">
-              <mat-form-field style="flex:1">
+              <mat-form-field style="flex: 1">
                 <mat-label>Opção {{ $index + 1 }}</mat-label>
                 <input matInput [formControlName]="$index" />
               </mat-form-field>
@@ -56,8 +56,12 @@
 
     <div class="fo-toggles">
       <mat-checkbox formControlName="required">Resposta obrigatória</mat-checkbox>
-      <mat-checkbox formControlName="observationRequiredOnFailure">Exigir observação quando não conforme</mat-checkbox>
-      <mat-checkbox formControlName="evidenceRequiredOnFailure">Exigir evidência (foto) quando não conforme</mat-checkbox>
+      <mat-checkbox formControlName="observationRequiredOnFailure"
+        >Exigir observação quando não conforme</mat-checkbox
+      >
+      <mat-checkbox formControlName="evidenceRequiredOnFailure"
+        >Exigir evidência (foto) quando não conforme</mat-checkbox
+      >
     </div>
   </mat-dialog-content>
 

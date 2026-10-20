@@ -1,4 +1,12 @@
-export type InspectionStatus = 'DRAFT' | 'ASSIGNED' | 'IN_PROGRESS' | 'SUBMITTED' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED' | 'CANCELED';
+export type InspectionStatus =
+  | 'DRAFT'
+  | 'ASSIGNED'
+  | 'IN_PROGRESS'
+  | 'SUBMITTED'
+  | 'UNDER_REVIEW'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'CANCELED';
 export type InspectionPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 export type Conformity = 'NOT_APPLICABLE' | 'CONFORMING' | 'NON_CONFORMING';
 export type Severity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
@@ -91,6 +99,8 @@ export interface InspectionAnswer {
   serverReceivedAt?: string;
   version: number;
 }
+
+export type InspectionResponse = InspectionAnswer;
 
 export interface Evidence {
   id: string;

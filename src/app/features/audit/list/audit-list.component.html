@@ -1,24 +1,48 @@
 <div class="fo-page">
-  <app-page-header title="Auditoria" subtitle="Registro somente leitura das ações relevantes do sistema."></app-page-header>
+  <app-page-header
+    title="Auditoria"
+    subtitle="Registro somente leitura das ações relevantes do sistema."
+  ></app-page-header>
 
-  <form [formGroup]="filterForm" class="fo-filters">
-    <mat-form-field>
-      <mat-label>Tipo de entidade</mat-label>
-      <input matInput formControlName="entityType" placeholder="Ex.: INSPECTION, USER" />
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>De</mat-label>
-      <input matInput [matDatepicker]="fromPicker" formControlName="from" />
-      <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
-      <mat-datepicker #fromPicker></mat-datepicker>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Até</mat-label>
-      <input matInput [matDatepicker]="toPicker" formControlName="to" />
-      <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
-      <mat-datepicker #toPicker></mat-datepicker>
-    </mat-form-field>
-  </form>
+  <details class="fo-filter-panel" open>
+    <summary><mat-icon>filter_alt</mat-icon> Filtros</summary>
+    <form [formGroup]="filterForm" class="fo-filters">
+      <mat-form-field>
+        <mat-label>Ação</mat-label>
+        <mat-select formControlName="action">
+          <mat-option value="">Todas</mat-option>
+          @for (action of actionOptions; track action) {
+            <mat-option [value]="action">{{ action }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Tipo de entidade</mat-label>
+        <mat-select formControlName="entityType">
+          <mat-option value="">Todos</mat-option>
+          @for (entityType of entityTypeOptions; track entityType) {
+            <mat-option [value]="entityType">{{ entityType }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>ID da entidade</mat-label>
+        <input matInput formControlName="entityId" placeholder="UUID da entidade" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>ID do autor</mat-label>
+        <input matInput formControlName="actorId" placeholder="UUID do autor" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Data inicial</mat-label>
+        <input matInput type="date" formControlName="occurredFrom" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Data final</mat-label>
+        <input matInput type="date" formControlName="occurredTo" />
+      </mat-form-field>
+    </form>
+  </details>
 
   <app-state-container
     [phase]="state().phase"
@@ -26,6 +50,7 @@
     emptyMessage="Nenhum evento de auditoria encontrado."
     emptyIcon="history"
     [retry]="load.bind(this)"
+    [clearFilters]="clearFilters.bind(this)"
     [content]="tableTpl"
   ></app-state-container>
 
@@ -54,6 +79,12 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-    <mat-paginator [length]="totalElements()" [pageSize]="pageSize()" [pageIndex]="pageIndex()" [pageSizeOptions]="[20,50,100]" (page)="onPage($event)"></mat-paginator>
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="[20, 50, 100]"
+      (page)="onPage($event)"
+    ></mat-paginator>
   </ng-template>
 </div>

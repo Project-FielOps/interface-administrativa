@@ -1,8 +1,15 @@
 <div class="fo-page">
-  <app-page-header [title]="state().data?.template?.title || 'Modelo de Inspeção'" subtitle="Editor de seções e itens do checklist.">
+  <app-page-header
+    [title]="state().data?.template?.title || 'Modelo de Inspeção'"
+    subtitle="Editor de seções e itens do checklist."
+  >
     <button mat-button (click)="back()"><mat-icon>arrow_back</mat-icon> Voltar</button>
-    <button mat-stroked-button (click)="goToPreview()"><mat-icon>visibility</mat-icon> Pré-visualizar</button>
-    <button mat-stroked-button (click)="goToVersions()"><mat-icon>history</mat-icon> Versões</button>
+    <button mat-stroked-button (click)="goToPreview()">
+      <mat-icon>visibility</mat-icon> Pré-visualizar
+    </button>
+    <button mat-stroked-button (click)="goToVersions()">
+      <mat-icon>history</mat-icon> Versões
+    </button>
     @if (isDraft) {
       <button mat-raised-button color="primary" (click)="publish()" [disabled]="publishing()">
         <mat-icon>publish</mat-icon> Publicar
@@ -20,12 +27,15 @@
   <ng-template #builderTpl>
     @if (state().data; as data) {
       <div class="fo-status-row">
-        <span [class]="'fo-chip-' + data.template.status.toLowerCase()">{{ data.template.status }}</span>
+        <app-status-badge [value]="data.template.status"></app-status-badge>
         @if (data.template.currentVersion) {
           <span class="fo-muted">Versão publicada atual: {{ data.template.currentVersion }}</span>
         }
         @if (!isDraft) {
-          <span class="fo-muted">Este modelo já foi publicado. Alterações de seções/itens gerarão uma nova versão ao publicar novamente.</span>
+          <span class="fo-muted"
+            >Este modelo já foi publicado. Alterações de seções/itens gerarão uma nova versão ao
+            publicar novamente.</span
+          >
         }
       </div>
 
@@ -46,18 +56,24 @@
             </mat-form-field>
           </div>
           <div class="fo-actions-row">
-            <button mat-stroked-button type="submit" [disabled]="savingMeta()">Salvar dados básicos</button>
+            <button mat-stroked-button type="submit" [disabled]="savingMeta()">
+              Salvar dados básicos
+            </button>
           </div>
         </form>
       </mat-card>
 
       <div class="fo-sections-header">
         <h2>Seções</h2>
-        <button mat-stroked-button color="primary" (click)="addSection()"><mat-icon>add</mat-icon> Adicionar seção</button>
+        <button mat-stroked-button color="primary" (click)="addSection()">
+          <mat-icon>add</mat-icon> Adicionar seção
+        </button>
       </div>
 
       @if (data.sections.length === 0) {
-        <p class="fo-muted">Nenhuma seção criada ainda. Adicione uma seção para começar a montar o checklist.</p>
+        <p class="fo-muted">
+          Nenhuma seção criada ainda. Adicione uma seção para começar a montar o checklist.
+        </p>
       }
 
       @for (section of data.sections; track section.id; let sIndex = $index) {
@@ -70,14 +86,28 @@
               }
             </div>
             <div class="fo-section-actions">
-              <button mat-icon-button (click)="moveSection(data.sections, sIndex, -1)" [disabled]="sIndex === 0" title="Mover para cima">
+              <button
+                mat-icon-button
+                (click)="moveSection(data.sections, sIndex, -1)"
+                [disabled]="sIndex === 0"
+                title="Mover para cima"
+              >
                 <mat-icon>arrow_upward</mat-icon>
               </button>
-              <button mat-icon-button (click)="moveSection(data.sections, sIndex, 1)" [disabled]="sIndex === data.sections.length - 1" title="Mover para baixo">
+              <button
+                mat-icon-button
+                (click)="moveSection(data.sections, sIndex, 1)"
+                [disabled]="sIndex === data.sections.length - 1"
+                title="Mover para baixo"
+              >
                 <mat-icon>arrow_downward</mat-icon>
               </button>
-              <button mat-icon-button (click)="editSection(section)"><mat-icon>edit</mat-icon></button>
-              <button mat-icon-button (click)="deleteSection(section)"><mat-icon>delete</mat-icon></button>
+              <button mat-icon-button (click)="editSection(section)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button (click)="deleteSection(section)">
+                <mat-icon>delete</mat-icon>
+              </button>
             </div>
           </div>
 
@@ -91,25 +121,47 @@
                 <strong>{{ iIndex + 1 }}. {{ item.title }}</strong>
                 <span class="fo-item-meta">
                   {{ item.responseType }}
-                  @if (item.required) { · obrigatório }
-                  @if (item.observationRequiredOnFailure) { · observação na falha }
-                  @if (item.evidenceRequiredOnFailure) { · evidência na falha }
+                  @if (item.required) {
+                    · obrigatório
+                  }
+                  @if (item.observationRequiredOnFailure) {
+                    · observação na falha
+                  }
+                  @if (item.evidenceRequiredOnFailure) {
+                    · evidência na falha
+                  }
                 </span>
               </div>
               <div class="fo-section-actions">
-                <button mat-icon-button (click)="moveItem(section, iIndex, -1)" [disabled]="iIndex === 0" title="Mover para cima">
+                <button
+                  mat-icon-button
+                  (click)="moveItem(section, iIndex, -1)"
+                  [disabled]="iIndex === 0"
+                  title="Mover para cima"
+                >
                   <mat-icon>arrow_upward</mat-icon>
                 </button>
-                <button mat-icon-button (click)="moveItem(section, iIndex, 1)" [disabled]="iIndex === section.items.length - 1" title="Mover para baixo">
+                <button
+                  mat-icon-button
+                  (click)="moveItem(section, iIndex, 1)"
+                  [disabled]="iIndex === section.items.length - 1"
+                  title="Mover para baixo"
+                >
                   <mat-icon>arrow_downward</mat-icon>
                 </button>
-                <button mat-icon-button (click)="editItem(section, item)"><mat-icon>edit</mat-icon></button>
-                <button mat-icon-button (click)="deleteItem(section, item)"><mat-icon>delete</mat-icon></button>
+                <button mat-icon-button (click)="editItem(section, item)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteItem(section, item)">
+                  <mat-icon>delete</mat-icon>
+                </button>
               </div>
             </div>
           }
 
-          <button mat-button color="primary" (click)="addItem(section)"><mat-icon>add</mat-icon> Adicionar item</button>
+          <button mat-button color="primary" (click)="addItem(section)">
+            <mat-icon>add</mat-icon> Adicionar item
+          </button>
         </mat-card>
       }
     }

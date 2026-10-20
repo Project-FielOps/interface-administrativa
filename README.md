@@ -163,6 +163,20 @@ npm run build     # ng build --configuration production
 
 Gera os artefatos em `dist/fieldops-admin/`. O build de produção foi validado sem erros.
 
+## Testes E2E com Playwright
+
+Instale o navegador uma vez e execute a suíte web:
+
+```bash
+npx playwright install chromium
+npm run e2e
+```
+
+Use `npm run e2e:headed` para acompanhar o navegador. A configuração inicia o Angular em
+`http://127.0.0.1:4200` e cobre login, credencial inválida, troca obrigatória, refresh/retry e logout.
+Os cenários isolam a UI com respostas HTTP controladas; a validação contra API real continua sendo uma
+etapa de integração separada.
+
 ## Autenticação e armazenamento de tokens
 
 - **Access token**: mantido apenas em memória (`TokenStorageService`), nunca em `localStorage`/

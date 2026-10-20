@@ -11,7 +11,13 @@ import { TemplatesService } from '../templates.service';
 import { InspectionTemplate, TemplateSection } from '../../../core/models/template.model';
 import { StateContainerComponent } from '../../../shared/components/state-container/state-container.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { UiState, errorState, extractErrorMessage, loadingState, successState } from '../../../shared/components/state-container/ui-state';
+import {
+  UiState,
+  errorState,
+  extractErrorMessage,
+  loadingState,
+  successState,
+} from '../../../shared/components/state-container/ui-state';
 
 interface PreviewData {
   template: InspectionTemplate;
@@ -21,7 +27,16 @@ interface PreviewData {
 @Component({
   selector: 'app-template-preview',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule, MatRadioModule, StateContainerComponent, PageHeaderComponent],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    MatRadioModule,
+    StateContainerComponent,
+    PageHeaderComponent,
+  ],
   templateUrl: './template-preview.component.html',
 })
 export class TemplatePreviewComponent implements OnInit {
@@ -29,7 +44,10 @@ export class TemplatePreviewComponent implements OnInit {
 
   readonly state = signal<UiState<PreviewData>>(loadingState());
 
-  constructor(private readonly templatesService: TemplatesService, private readonly router: Router) {}
+  constructor(
+    private readonly templatesService: TemplatesService,
+    private readonly router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.load();

@@ -1,5 +1,6 @@
 export type TemplateStatus = 'DRAFT' | 'ACTIVE' | 'INACTIVE';
-export type ResponseType = 'TEXT_SHORT' | 'TEXT_LONG' | 'NUMBER' | 'BOOLEAN' | 'CONFORMITY' | 'SINGLE_CHOICE' | 'DATE';
+export type ResponseType =
+  'TEXT_SHORT' | 'TEXT_LONG' | 'NUMBER' | 'BOOLEAN' | 'CONFORMITY' | 'SINGLE_CHOICE' | 'DATE';
 
 export interface InspectionTemplate {
   id: string;

@@ -1,0 +1,38 @@
+:root {
+  // Canonical palette shared with mobile/src/theme/tokens.ts.
+  --fo-primary: #004ac6;
+  --fo-primary-hover: #003ea8;
+  --fo-primary-pressed: #00174b;
+  --fo-primary-dark: #003ea8;
+  --fo-primary-container: #2563eb;
+  --fo-primary-soft: #dbe1ff;
+  --fo-primary-subtle: #f3f3fe;
+  --fo-navigation: #2e3039;
+  --fo-navigation-hover: #434655;
+  --fo-navigation-active: #2563eb;
+  --fo-background: #faf8ff;
+  --fo-surface: #ffffff;
+  --fo-surface-secondary: #f3f3fe;
+  --fo-surface-selected: rgba(37, 99, 235, 0.1);
+  --fo-text-primary: #191b23;
+  --fo-text-secondary: #434655;
+  --fo-text-tertiary: #737686;
+  --fo-text-inverse: #ffffff;
+  --fo-border: #e2e8f0;
+  --fo-border-strong: #c3c6d7;
+  --fo-disabled: #9da0ad;
+  --fo-focus: #2563eb;
+  --fo-success: #047857;
+  --fo-success-soft: rgba(4, 120, 87, 0.1);
+  --fo-warning: #b45309;
+  --fo-warning-soft: rgba(180, 83, 9, 0.1);
+  --fo-error: #ba1a1a;
+  --fo-error-soft: rgba(186, 26, 26, 0.1);
+  --fo-info: #1f4fa3;
+  --fo-secondary: #006398;
+  --fo-info-soft: rgba(37, 99, 235, 0.1);
+  --fo-conflict: #7d4bb3;
+  --fo-conflict-soft: rgba(125, 75, 179, 0.1);
+  --fo-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+  --fo-shadow-overlay: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
