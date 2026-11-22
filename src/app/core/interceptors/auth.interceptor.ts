@@ -1,10 +1,18 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { HttpContextToken } from '@angular/common/http';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { TokenStorageService } from '../auth/token-storage.service';
 
-const AUTH_FREE_PATHS = ['/auth/login', '/auth/refresh', '/auth/logout'];
+const AUTH_FREE_PATHS = [
+  '/auth/login',
+  '/auth/refresh',
+  '/auth/logout',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+];
+const RETRIED_AFTER_REFRESH = new HttpContextToken<boolean>(() => false);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const tokens = inject(TokenStorageService);
@@ -17,11 +25,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((err: unknown) => {
-      if (err instanceof HttpErrorResponse && err.status === 401 && !isAuthFree) {
+      if (
+        err instanceof HttpErrorResponse &&
+        err.status === 401 &&
+        !isAuthFree &&
+        !req.context.get(RETRIED_AFTER_REFRESH)
+      ) {
         return auth.refresh().pipe(
           switchMap(() => {
             const retried = req.clone({
               setHeaders: { Authorization: `Bearer ${tokens.getAccessToken()}` },
+              context: req.context.set(RETRIED_AFTER_REFRESH, true),
             });
             return next(retried);
           }),

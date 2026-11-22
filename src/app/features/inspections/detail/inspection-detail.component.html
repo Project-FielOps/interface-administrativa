@@ -1,15 +1,12 @@
 <div class="fo-page">
-  <app-page-header
-    title="Detalhes da Inspeção"
-    subtitle="Acompanhamento completo da execução e revisão."
-  >
+  <app-page-header title="Detalhes da Inspeção" subtitle="Acompanhamento da execução e revisão.">
     <button mat-button (click)="back()"><mat-icon>arrow_back</mat-icon> Voltar</button>
-    @if (state().data && canReview(state().data!.inspection)) {
+    @if (inspectionState().data && canReview(inspectionState().data!)) {
       <button mat-raised-button color="primary" (click)="goToReview()">
         <mat-icon>rate_review</mat-icon> Revisar
       </button>
     }
-    @if (state().data && canCancel(state().data!.inspection)) {
+    @if (inspectionState().data && canCancel(inspectionState().data!)) {
       <button mat-stroked-button color="warn" (click)="cancel()">
         <mat-icon>cancel</mat-icon> Cancelar
       </button>
@@ -17,145 +14,210 @@
   </app-page-header>
 
   <app-state-container
-    [phase]="state().phase"
-    [errorMessage]="state().errorMessage || ''"
+    [phase]="inspectionState().phase"
+    [errorMessage]="inspectionState().errorMessage || ''"
     [retry]="load.bind(this)"
     [content]="detailTpl"
   ></app-state-container>
 
   <ng-template #detailTpl>
-    @if (state().data; as data) {
+    @if (inspectionState().data; as inspection) {
       <mat-card class="fo-meta-card">
-        <h2>{{ data.inspection.title }}</h2>
+        <h2>{{ inspection.title }}</h2>
         <div class="fo-detail-grid">
           <div>
             <span class="fo-muted">Status</span>
-            <p><app-status-badge [value]="data.inspection.status"></app-status-badge></p>
+            <p><app-status-badge [value]="inspection.status"></app-status-badge></p>
           </div>
           <div>
             <span class="fo-muted">Prioridade</span>
-            <p><app-status-badge [value]="data.inspection.priority"></app-status-badge></p>
+            <p><app-status-badge [value]="inspection.priority"></app-status-badge></p>
           </div>
           <div>
             <span class="fo-muted">Cliente</span>
-            <p>{{ data.inspection.clientName || '-' }}</p>
+            <p>{{ inspection.clientName || '-' }}</p>
           </div>
           <div>
             <span class="fo-muted">Local</span>
-            <p>{{ data.inspection.siteName || '-' }}</p>
+            <p>{{ inspection.siteName || '-' }}</p>
           </div>
           <div>
             <span class="fo-muted">Equipamento</span>
-            <p>{{ data.inspection.equipmentName || '-' }}</p>
+            <p>{{ inspection.equipmentName || '-' }}</p>
           </div>
           <div>
             <span class="fo-muted">Técnico</span>
-            <p>{{ data.inspection.technicianName || '-' }}</p>
+            <p>{{ inspection.technicianName || '-' }}</p>
           </div>
           <div>
             <span class="fo-muted">Supervisor</span>
-            <p>{{ data.inspection.supervisorName || '-' }}</p>
+            <p>{{ inspection.supervisorName || '-' }}</p>
           </div>
           <div>
             <span class="fo-muted">Agendada para</span>
-            <p>{{ data.inspection.scheduledFor | date: 'dd/MM/yyyy HH:mm' }}</p>
+            <p>{{ inspection.scheduledFor | date: 'dd/MM/yyyy HH:mm' }}</p>
           </div>
-          @if (data.inspection.submittedAtServer) {
-            <div>
-              <span class="fo-muted">Enviada em</span>
-              <p>{{ data.inspection.submittedAtServer | date: 'dd/MM/yyyy HH:mm' }}</p>
-            </div>
-          }
-          @if (data.inspection.status === 'CANCELED') {
+          @if (inspection.status === 'CANCELED') {
             <div>
               <span class="fo-muted">Motivo do cancelamento</span>
-              <p>{{ data.inspection.canceledReason }}</p>
+              <p>{{ inspection.canceledReason || '-' }}</p>
             </div>
           }
         </div>
-        @if (data.inspection.instructions) {
-          <p><strong>Instruções:</strong> {{ data.inspection.instructions }}</p>
+        @if (inspection.instructions) {
+          <p><strong>Instruções:</strong> {{ inspection.instructions }}</p>
+        }
+        @if (isReadOnly(inspection)) {
+          <p class="fo-readonly-note">
+            <mat-icon>lock</mat-icon> Esta inspeção está somente leitura.
+          </p>
         }
       </mat-card>
 
-      <h3>Checklist</h3>
-      @if (!data.inspection.items || data.inspection.items.length === 0) {
-        <p class="fo-muted">O snapshot do checklist ainda não está disponível.</p>
-      }
-      @for (item of data.inspection.items; track item.id) {
-        <mat-card class="fo-item-card">
-          <p>
-            <strong>{{ item.sectionTitle }}</strong>
-          </p>
-          <p>{{ item.itemTitle }}</p>
-          <p class="fo-response">
-            <span class="fo-muted">Resposta:</span> {{ responseSummary(item) }}
-          </p>
-          @if (item.answer?.observation) {
-            <p class="fo-muted">Observação: {{ item.answer?.observation }}</p>
-          }
-          @for (e of data.evidence; track e.id) {
-            @if (e.responseId === item.answer?.id) {
-              <button mat-button type="button" (click)="openEvidence(e.id)">
-                {{ e.originalFileName || e.id }}
-              </button>
+      <h3>Checklist e respostas</h3>
+      <app-state-container
+        [phase]="responsesState().phase"
+        [errorMessage]="responsesState().errorMessage || ''"
+        [retry]="retryResponses.bind(this)"
+        [content]="responsesTpl"
+      ></app-state-container>
+      <ng-template #responsesTpl>
+        @if (!inspection.items?.length) {
+          <p class="fo-muted">O snapshot do checklist está vazio.</p>
+        }
+        @for (item of inspection.items; track item.id) {
+          <mat-card class="fo-item-card">
+            <p>
+              <strong>{{ item.sectionTitle }}</strong>
+            </p>
+            <p>{{ item.itemTitle }}</p>
+            <p class="fo-response">
+              <span class="fo-muted">Resposta:</span> {{ responseSummary(item) }}
+            </p>
+            @if (item.answer?.observation) {
+              <p class="fo-muted">Observação: {{ item.answer?.observation }}</p>
             }
-          }
-        </mat-card>
-      }
+            @for (e of evidenceState().data || []; track e.id) {
+              @if (e.responseId === item.answer?.id) {
+                <div class="fo-actions-row">
+                  <span>{{ e.originalFileName || e.id }}</span
+                  ><button
+                    mat-button
+                    type="button"
+                    (click)="previewEvidence(e)"
+                    [disabled]="contentLoading() === e.id"
+                  >
+                    {{ evidenceLabel(e) }}</button
+                  ><button
+                    mat-button
+                    type="button"
+                    (click)="downloadEvidence(e)"
+                    [disabled]="contentLoading() === e.id"
+                  >
+                    Baixar
+                  </button>
+                </div>
+              }
+            }
+          </mat-card>
+        }
+      </ng-template>
 
       <h3>Evidências</h3>
-      @if (data.evidence.length === 0) {
-        <p class="fo-muted">Nenhuma evidência registrada.</p>
-      }
-      @for (e of data.evidence; track e.id) {
-        <p>
-          <button mat-button type="button" (click)="openEvidence(e.id)">
-            {{ e.originalFileName || e.id }}
-          </button>
-          — {{ e.mimeType || e.type }}
-        </p>
-      }
+      <app-state-container
+        [phase]="evidenceState().phase"
+        [errorMessage]="evidenceState().errorMessage || ''"
+        [retry]="load.bind(this)"
+        [content]="evidenceTpl"
+      ></app-state-container>
+      <ng-template #evidenceTpl>
+        @for (e of evidenceState().data || []; track e.id) {
+          <mat-card class="fo-item-card"
+            ><div class="fo-actions-row">
+              <span
+                ><strong>{{ e.originalFileName || e.id }}</strong> —
+                {{ e.mimeType || e.type }}</span
+              ><button
+                mat-stroked-button
+                type="button"
+                (click)="previewEvidence(e)"
+                [disabled]="contentLoading() === e.id"
+              >
+                <mat-icon>open_in_new</mat-icon> {{ evidenceLabel(e) }}</button
+              ><button
+                mat-button
+                type="button"
+                (click)="downloadEvidence(e)"
+                [disabled]="contentLoading() === e.id"
+              >
+                <mat-icon>download</mat-icon> Baixar
+              </button>
+            </div></mat-card
+          >
+        }
+      </ng-template>
 
       <h3>Não conformidades</h3>
-      @if (data.nonConformities.length === 0) {
-        <p class="fo-muted">Nenhuma não conformidade registrada.</p>
-      }
-      @for (nc of data.nonConformities; track nc.id) {
-        <p>
-          <strong>{{ nc.title }}</strong> —
-          <app-status-badge [value]="nc.severity"></app-status-badge> — {{ nc.status }}
-        </p>
-      }
+      <app-state-container
+        [phase]="nonConformitiesState().phase"
+        [errorMessage]="nonConformitiesState().errorMessage || ''"
+        [retry]="load.bind(this)"
+        [content]="ncTpl"
+      ></app-state-container>
+      <ng-template #ncTpl>
+        @for (nc of nonConformitiesState().data || []; track nc.id) {
+          <mat-card class="fo-item-card"
+            ><strong>{{ nc.title }}</strong> —
+            <app-status-badge [value]="nc.severity"></app-status-badge> — {{ nc.status }}
+            @if (nc.description) {
+              <p>{{ nc.description }}</p>
+            }
+          </mat-card>
+        }
+      </ng-template>
 
-      <h3>Histórico de revisões</h3>
-      @if (data.reviews.length === 0) {
-        <p class="fo-muted">Nenhum ciclo de revisão registrado ainda.</p>
-      }
-      @for (r of data.reviews; track r.id) {
-        <mat-card class="fo-item-card">
-          <p>
-            <strong>Ciclo {{ r.reviewCycle }}</strong> —
-            <app-status-badge [value]="r.decision"></app-status-badge> por
-            {{ r.reviewerName || r.reviewerId }} em {{ r.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}
-          </p>
-          @if (r.reason) {
-            <p>Motivo: {{ r.reason }}</p>
-          }
-          @if (r.comments) {
-            <p>Comentários: {{ r.comments }}</p>
-          }
-        </mat-card>
-      }
+      <h3>Histórico de revisão</h3>
+      <app-state-container
+        [phase]="reviewsState().phase"
+        [errorMessage]="reviewsState().errorMessage || ''"
+        [retry]="load.bind(this)"
+        [content]="reviewsTpl"
+      ></app-state-container>
+      <ng-template #reviewsTpl>
+        @for (review of reviewsState().data || []; track review.id) {
+          <mat-card class="fo-item-card"
+            ><strong>Ciclo {{ review.reviewCycle }}</strong> —
+            <app-status-badge [value]="review.decision"></app-status-badge> por
+            {{ review.reviewerName || review.reviewerId }} em
+            {{ review.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}
+            @if (review.reason) {
+              <p>Motivo: {{ review.reason }}</p>
+            }
+            @if (review.comments) {
+              <p>Comentários: {{ review.comments }}</p>
+            }
+          </mat-card>
+        }
+      </ng-template>
 
-      <h3>Histórico</h3>
-      @for (event of data.history; track event.id) {
-        <p>
-          {{ event.occurredAt | date: 'dd/MM/yyyy HH:mm' }} — {{ event.action }} ({{
-            event.entityType
-          }})
-        </p>
-      }
+      <h3>Linha do tempo</h3>
+      <app-state-container
+        [phase]="historyState().phase"
+        [errorMessage]="historyState().errorMessage || ''"
+        [retry]="load.bind(this)"
+        [content]="historyTpl"
+      ></app-state-container>
+      <ng-template #historyTpl
+        ><ol aria-label="Histórico da inspeção">
+          @for (event of historyState().data || []; track event.id) {
+            <li>
+              {{ event.occurredAt | date: 'dd/MM/yyyy HH:mm' }} — {{ event.action }} ({{
+                event.entityType
+              }})
+            </li>
+          }
+        </ol></ng-template
+      >
     }
   </ng-template>
 </div>

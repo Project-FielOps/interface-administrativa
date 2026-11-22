@@ -100,6 +100,8 @@ export interface InspectionAnswer {
   version: number;
 }
 
+export type InspectionResponse = InspectionAnswer;
+
 export interface Evidence {
   id: string;
   inspectionId: string;

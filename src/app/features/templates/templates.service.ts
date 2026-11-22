@@ -95,4 +95,8 @@ export class TemplatesService extends CrudService<
   updateStatus(id: string, status: TemplateStatus): Observable<InspectionTemplate> {
     return this.http.patch<InspectionTemplate>(`${this.baseUrl}/${id}/status`, { status });
   }
+
+  listCategories(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/categories`);
+  }
 }

@@ -2,7 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CrudService } from '../../core/http/crud.service';
+import { CrudService, toHttpParams } from '../../core/http/crud.service';
+import { Page } from '../../core/models/common.model';
 import {
   ApproveRequest,
   Inspection,
@@ -10,7 +11,24 @@ import {
   InspectionReview,
   AuditEvent,
   RejectRequest,
+  InspectionAnswer,
 } from '../../core/models/inspection.model';
+
+export interface InspectionListQuery {
+  technicianId?: string;
+  supervisorId?: string;
+  clientId?: string;
+  siteId?: string;
+  status?: string;
+  priority?: string;
+  scheduledFrom?: string;
+  scheduledTo?: string;
+  overdue?: boolean;
+  awaitingReview?: boolean;
+  page?: number;
+  size?: number;
+  sort?: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class InspectionsService extends CrudService<
@@ -20,6 +38,10 @@ export class InspectionsService extends CrudService<
 > {
   constructor(http: HttpClient) {
     super(http, `${environment.apiUrl}/inspections`);
+  }
+
+  listPage(query: InspectionListQuery = {}): Observable<Page<Inspection>> {
+    return this.http.get<Page<Inspection>>(this.baseUrl, { params: toHttpParams(query) });
   }
 
   cancel(inspectionId: string, reason: string): Observable<Inspection> {
@@ -43,6 +65,10 @@ export class InspectionsService extends CrudService<
 
   getReviews(inspectionId: string): Observable<InspectionReview[]> {
     return this.http.get<InspectionReview[]>(`${this.baseUrl}/${inspectionId}/reviews`);
+  }
+
+  getResponses(inspectionId: string): Observable<InspectionAnswer[]> {
+    return this.http.get<InspectionAnswer[]>(`${this.baseUrl}/${inspectionId}/responses`);
   }
 
   getHistory(inspectionId: string): Observable<AuditEvent[]> {

@@ -13,7 +13,9 @@
       (click)="goToDashboard()"
       aria-label="Ir para o dashboard"
     >
-      <span class="fo-brand__mark"><mat-icon>domain_verification</mat-icon></span>
+      <span class="fo-brand__mark" aria-hidden="true">
+        <span class="fo-brand__mark-letter">F</span><span class="fo-brand__mark-dot">O</span>
+      </span>
       @if (!navigationCollapsed()) {
         <span class="fo-brand__copy"
           ><strong>FieldOps</strong><small>Gestão operacional</small></span
@@ -94,11 +96,13 @@
           class="fo-user-trigger"
           aria-label="Abrir menu do usuário"
         >
-          <span class="fo-avatar" aria-hidden="true">{{ user.name.charAt(0) }}</span>
-          <span class="fo-user-copy"
-            ><strong>{{ user.name }}</strong
-            ><small>{{ roleLabel(user.role) }}</small></span
-          >
+          <span class="fo-user-trigger__content">
+            <span class="fo-avatar" aria-hidden="true">{{ user.name.charAt(0) }}</span>
+            <span class="fo-user-copy"
+              ><strong>{{ user.name }}</strong
+              ><small>{{ roleLabel(user.role) }}</small></span
+            >
+          </span>
           <mat-icon>expand_more</mat-icon>
         </button>
         <mat-menu #userMenu="matMenu">

@@ -4,8 +4,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { debounceTime } from 'rxjs';
@@ -31,8 +30,7 @@ import {
     MatTableModule,
     MatFormFieldModule,
     MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
+    MatSelectModule,
     MatPaginatorModule,
     MatIconModule,
     StateContainerComponent,
@@ -46,15 +44,52 @@ export class AuditListComponent implements OnInit {
   readonly totalElements = signal(0);
   readonly pageSize = signal(20);
   readonly pageIndex = signal(0);
+  readonly actionOptions = [
+    'EVIDENCE_ADDED',
+    'EVIDENCE_REMOVED',
+    'INSPECTION_APPROVED',
+    'INSPECTION_ASSIGNED',
+    'INSPECTION_CANCELED',
+    'INSPECTION_CREATED',
+    'INSPECTION_REJECTED',
+    'INSPECTION_REOPENED_FOR_CORRECTION',
+    'INSPECTION_STARTED',
+    'INSPECTION_SUBMITTED',
+    'NON_CONFORMITY_CREATED',
+    'NON_CONFORMITY_STATUS_CHANGED',
+    'RESPONSE_CREATED',
+    'RESPONSE_UPDATED',
+    'REVIEW_STARTED',
+    'TEMPLATE_CREATED',
+    'TEMPLATE_VERSION_PUBLISHED',
+  ];
+  readonly entityTypeOptions = [
+    'Evidence',
+    'Inspection',
+    'InspectionResponse',
+    'InspectionTemplate',
+    'InspectionTemplateVersion',
+    'NonConformity',
+  ];
 
   readonly filterForm = this.fb.group({
+    action: [''],
     entityType: [''],
-    from: [null as Date | null],
-    to: [null as Date | null],
+    entityId: [''],
+    actorId: [''],
+    occurredFrom: [''],
+    occurredTo: [''],
   });
 
   clearFilters(): void {
-    this.filterForm.reset({ entityType: '', from: null, to: null });
+    this.filterForm.reset({
+      action: '',
+      entityType: '',
+      entityId: '',
+      actorId: '',
+      occurredFrom: '',
+      occurredTo: '',
+    });
   }
 
   constructor(
@@ -75,9 +110,12 @@ export class AuditListComponent implements OnInit {
     const f = this.filterForm.getRawValue();
     this.service
       .list({
+        action: f.action || undefined,
         entityType: f.entityType || undefined,
-        from: f.from ? new Date(f.from).toISOString() : undefined,
-        to: f.to ? new Date(f.to).toISOString() : undefined,
+        entityId: f.entityId || undefined,
+        actorId: f.actorId || undefined,
+        occurredFrom: f.occurredFrom || undefined,
+        occurredTo: f.occurredTo || undefined,
         page: this.pageIndex(),
         size: this.pageSize(),
         sort: 'occurredAt,desc',

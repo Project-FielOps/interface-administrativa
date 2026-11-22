@@ -24,11 +24,6 @@
         </mat-form-field>
       }
       <mat-form-field>
-        <mat-label>Buscar por nome</mat-label>
-        <input matInput formControlName="search" />
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-      <mat-form-field>
         <mat-label>Status</mat-label>
         <mat-select formControlName="status">
           <mat-option value="">Todos</mat-option>
@@ -40,7 +35,7 @@
   </details>
 
   <app-state-container
-    [phase]="displayPhase()"
+    [phase]="state().phase"
     [errorMessage]="state().errorMessage || ''"
     emptyMessage="Selecione um cliente para ver seus locais."
     emptyIcon="place"
@@ -50,11 +45,11 @@
   ></app-state-container>
 
   <ng-template #tableTpl>
-    <table mat-table [dataSource]="filtered()">
+    <table mat-table [dataSource]="state().data || []">
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>Nome</th>
         <td mat-cell *matCellDef="let s">
-          <a (click)="viewEquipment(s)" class="fo-link">{{ s.name }}</a>
+          <button type="button" class="fo-link" (click)="viewEquipment(s)">{{ s.name }}</button>
         </td>
       </ng-container>
       <ng-container matColumnDef="city">
@@ -74,7 +69,13 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let s">
-          <button mat-icon-button [matMenuTriggerFor]="menu"><mat-icon>more_vert</mat-icon></button>
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="menu"
+            [attr.aria-label]="'Abrir ações do local ' + s.name"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
           <mat-menu #menu="matMenu">
             <button mat-menu-item (click)="viewEquipment(s)">
               <mat-icon>precision_manufacturing</mat-icon><span>Ver equipamentos</span>
@@ -92,5 +93,12 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="[10, 25, 50]"
+      (page)="onPage($event)"
+    ></mat-paginator>
   </ng-template>
 </div>
